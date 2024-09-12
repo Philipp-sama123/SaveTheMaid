@@ -8,8 +8,8 @@ import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 public class SaveTheMaidGame extends Game {
     public SpriteBatch batch;
 
-    public static final int GAME_WIDTH = 640;
-    public static final int GAME_HEIGHT = 320;
+    public static final int GAME_WIDTH =  384;
+    public static final int GAME_HEIGHT = 192;
 
     @Override
     public void create() {

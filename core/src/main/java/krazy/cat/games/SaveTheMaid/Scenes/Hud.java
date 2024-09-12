@@ -51,16 +51,18 @@ public class Hud implements Disposable {
         Table table = new Table();
         table.top();
         table.setFillParent(true);
-        countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        scoreLabel = new Label(String.format("%06d", score), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        levelLabel = new Label("1/1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        worldLabel = new Label("WORLD", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        playerLabel = new Label("PLAYER", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(0.5f);  // Scale down the font size to 50%
+        countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
+        scoreLabel = new Label(String.format("%06d", score), new Label.LabelStyle(font, Color.WHITE));
+        timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
+        levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
+        worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
+        playerLabel = new Label("PLAYER", new Label.LabelStyle(font, Color.WHITE));
 
-        table.add(playerLabel).expandX().padTop(10);
-        table.add(worldLabel).expandX().padTop(10);
-        table.add(timeLabel).expandX().padTop(10);
+        table.add(playerLabel).expandX();
+        table.add(worldLabel).expandX();
+        table.add(timeLabel).expandX();
         table.row();
         table.add(scoreLabel).expandX();
         table.add(levelLabel).expandX();
@@ -105,7 +107,7 @@ public class Hud implements Disposable {
         Table table = new Table();
         table.setFillParent(true);
         table.center().right();
-        table.add(jumpButton).size(50, 50).pad(10);
+        table.add(jumpButton).size(25, 25).pad(10);
 
         stage.addActor(table);
     }
@@ -132,15 +134,15 @@ public class Hud implements Disposable {
 
         // Adjust knob size relative to background
         TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
-        float knobWidth = joystickKnob.getWidth() * 0.25f;  // Scale down the knob width
-        float knobHeight = joystickKnob.getHeight() * 0.25f; // Scale down the knob height
+        float knobWidth = joystickKnob.getWidth() * 0.125f;  // Scale down the knob width
+        float knobHeight = joystickKnob.getHeight() * 0.125f; // Scale down the knob height
 
         knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
         knobDrawable.setMinHeight(knobHeight);
 
         // Create the Touchpad with a smaller size
-        float joystickWidth = joystickBackground.getWidth() * 0.25f; // Scale down the joystick background width
-        float joystickHeight = joystickBackground.getHeight() * 0.25f; // Scale down the joystick background height
+        float joystickWidth = joystickBackground.getWidth() * 0.125f; // Scale down the joystick background width
+        float joystickHeight = joystickBackground.getHeight() * 0.125f; // Scale down the joystick background height
 
         movementJoystick = new Touchpad(10, movementJoystickStyle);
 
@@ -177,15 +179,15 @@ public class Hud implements Disposable {
 
         // Adjust knob size relative to background
         TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
-        float knobWidth = joystickKnob.getWidth() * 0.25f;  // Scale down the knob width
-        float knobHeight = joystickKnob.getHeight() * 0.25f; // Scale down the knob height
+        float knobWidth = joystickKnob.getWidth() * 0.125f;  // Scale down the knob width
+        float knobHeight = joystickKnob.getHeight() * 0.125f; // Scale down the knob height
 
         knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
         knobDrawable.setMinHeight(knobHeight);
 
         // Create the Touchpad with a smaller size
-        float joystickWidth = joystickBackground.getWidth() * 0.25f; // Scale down the joystick background width
-        float joystickHeight = joystickBackground.getHeight() * 0.25f; // Scale down the joystick background height
+        float joystickWidth = joystickBackground.getWidth() * 0.125f; // Scale down the joystick background width
+        float joystickHeight = joystickBackground.getHeight() * 0.125f; // Scale down the joystick background height
 
         shootingJoystick = new Touchpad(10, movementJoystickStyle);
 

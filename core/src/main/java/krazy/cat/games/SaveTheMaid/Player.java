@@ -148,7 +148,7 @@ public class Player {
                 batch.draw(getCurrentLowerBodyFrame(), body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, 64, 64);
             }*/
     public void jump() {
-        body.applyLinearImpulse(new Vector2(body.getLinearVelocity().x, 250f), body.getWorldCenter(), true);
+        body.applyLinearImpulse(new Vector2(body.getLinearVelocity().x, 750), body.getWorldCenter(), true);
     }
 
     public void move(float moveInput) {

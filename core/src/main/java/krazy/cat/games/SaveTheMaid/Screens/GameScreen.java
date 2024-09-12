@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
-        this.world = new World(new Vector2(0, -100), false);
+        this.world = new World(new Vector2(0, -250), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
         new Box2dWorldCreator(world, map);
@@ -71,7 +71,7 @@ public class GameScreen implements Screen {
         world.step(1 / 60f, 6, 2);
 
         gameCamera.position.x = player.body.getPosition().x;
-        gameCamera.position.y = player.body.getPosition().y;
+        gameCamera.position.y = player.body.getPosition().y + 32;
 
         gameCamera.update();
         // just render what the camera can see
