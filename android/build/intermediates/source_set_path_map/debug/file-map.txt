@@ -1,7 +1,0 @@
-krazy.cat.games.android-pngs-0 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/build/generated/res/pngs/debug
-krazy.cat.games.android-resValues-1 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/build/generated/res/resValues/debug
-krazy.cat.games.android-packageDebugResources-2 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-krazy.cat.games.android-packageDebugResources-3 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-krazy.cat.games.android-merged_res-4 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/build/intermediates/merged_res/debug
-krazy.cat.games.android-android-5 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/res
-krazy.cat.games.android-debug-6 /Users/philippstampfer/Documents/LibGdx/SaveTheMaid/android/src/debug/res

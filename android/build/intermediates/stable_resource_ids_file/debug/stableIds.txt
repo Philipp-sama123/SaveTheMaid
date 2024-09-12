@@ -1,4 +1,0 @@
-krazy.cat.games:style/GdxTheme = 0x7f040000
-krazy.cat.games:string/app_name = 0x7f030000
-krazy.cat.games:drawable/ic_launcher = 0x7f020000
-krazy.cat.games:color/ic_background_color = 0x7f010000
