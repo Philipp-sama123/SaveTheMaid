@@ -7,25 +7,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
-import krazy.cat.games.SaveTheMaid.Sprites.Player;
+import krazy.cat.games.SaveTheMaid.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 
 public class GameScreen implements Screen {
@@ -59,7 +52,7 @@ public class GameScreen implements Screen {
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
-        this.world = new World(new Vector2(0, -100), true);
+        this.world = new World(new Vector2(0, -100), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
         new Box2dWorldCreator(world, map);
@@ -140,14 +133,19 @@ public class GameScreen implements Screen {
     @Override
     public void render(float dt) {
         update(dt);
-
+        player.update(dt);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // render game map
         renderer.render();
         // render Box2D Debug
         box2DDebugRenderer.render(world, gameCamera.combined);
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        game.batch.setProjectionMatrix(gameCamera.combined);
+        game.batch.begin();
+        player.draw(game.batch);
+        //  player.updateAnimationState(game.batch);
+        game.batch.end();
+
         hud.stage.draw();
     }
 
