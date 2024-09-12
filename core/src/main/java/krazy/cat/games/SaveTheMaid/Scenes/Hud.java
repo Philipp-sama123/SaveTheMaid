@@ -3,18 +3,26 @@ package krazy.cat.games.SaveTheMaid.Scenes;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Hud implements Disposable {
+    private final InputMultiplexer inputMultiplexer;
     public Stage stage;
     public Viewport viewport;
 
@@ -28,6 +36,10 @@ public class Hud implements Disposable {
     Label levelLabel;
     Label worldLabel;
     Label playerLabel;
+    private ImageButton jumpButton;
+    private ImageButton shootButton;
+    private Touchpad movementJoystick;
+    private Touchpad shootingJoystick;
 
     public Hud(SpriteBatch spriteBatch) {
         worldTimer = 300;
@@ -53,6 +65,137 @@ public class Hud implements Disposable {
         table.add(scoreLabel).expandX();
         table.add(levelLabel).expandX();
         table.add(countdownLabel).expandX();
+
+        stage.addActor(table);
+
+        createMovementJoystick();
+        createShootingJoystick();
+        createJumpButton();
+
+        // Initialize InputMultiplexer
+        inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(inputMultiplexer);
+    }
+
+    public Touchpad getMovementJoystick() {
+        return movementJoystick;
+    }
+
+    public Touchpad getShootingJoystick() {
+        return shootingJoystick;
+    }
+
+    public ImageButton getJumpButton() {
+        return jumpButton;
+    }
+
+    private void createJumpButton() {
+        // Load texture for pause button
+        Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
+        Texture jumpTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/JumpPressed.png"));
+        ImageButton.ImageButtonStyle buttonStylePause = new ImageButton.ImageButtonStyle();
+
+        buttonStylePause.up = new TextureRegionDrawable(jumpTextureUp);
+        buttonStylePause.down = new TextureRegionDrawable(jumpTextureDown);
+
+        jumpButton = new ImageButton(buttonStylePause);
+
+        // Arrange button in a table
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center().right();
+        table.add(jumpButton).size(50, 50).pad(10);
+
+        stage.addActor(table);
+    }
+
+    private void createMovementJoystick() {
+        // Load textures for the joystick background and knob
+        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/2dStick.png"));
+        Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/MoveStick.png"));
+
+        // Check if textures are loaded
+        if (!joystickBackground.getTextureData().isPrepared()) {
+            joystickBackground.getTextureData().prepare();
+        }
+        if (!joystickKnob.getTextureData().isPrepared()) {
+            joystickKnob.getTextureData().prepare();
+        }
+
+        // Create joystick style
+        Touchpad.TouchpadStyle movementJoystickStyle = new Touchpad.TouchpadStyle();
+
+        // Set background and knob using TextureRegionDrawable
+        movementJoystickStyle.background = new TextureRegionDrawable(new TextureRegion(joystickBackground));
+        movementJoystickStyle.knob = new TextureRegionDrawable(new TextureRegion(joystickKnob));
+
+        // Adjust knob size relative to background
+        TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
+        float knobWidth = joystickKnob.getWidth() * 0.25f;  // Scale down the knob width
+        float knobHeight = joystickKnob.getHeight() * 0.25f; // Scale down the knob height
+
+        knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
+        knobDrawable.setMinHeight(knobHeight);
+
+        // Create the Touchpad with a smaller size
+        float joystickWidth = joystickBackground.getWidth() * 0.25f; // Scale down the joystick background width
+        float joystickHeight = joystickBackground.getHeight() * 0.25f; // Scale down the joystick background height
+
+        movementJoystick = new Touchpad(10, movementJoystickStyle);
+
+        // Place the joystick in the bottom left corner
+        Table table = new Table();
+        table.setFillParent(true);
+        table.bottom().left();
+
+        // Use the scaled size for the joystick
+        table.add(movementJoystick).size(joystickWidth, joystickHeight).pad(25);
+
+        stage.addActor(table);
+    }
+
+    private void createShootingJoystick() {
+        // Load textures for the joystick background and knob
+        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootPad.png"));
+        Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootStick.png"));
+
+        // Check if textures are loaded
+        if (!joystickBackground.getTextureData().isPrepared()) {
+            joystickBackground.getTextureData().prepare();
+        }
+        if (!joystickKnob.getTextureData().isPrepared()) {
+            joystickKnob.getTextureData().prepare();
+        }
+
+        // Create joystick style
+        Touchpad.TouchpadStyle movementJoystickStyle = new Touchpad.TouchpadStyle();
+
+        // Set background and knob using TextureRegionDrawable
+        movementJoystickStyle.background = new TextureRegionDrawable(new TextureRegion(joystickBackground));
+        movementJoystickStyle.knob = new TextureRegionDrawable(new TextureRegion(joystickKnob));
+
+        // Adjust knob size relative to background
+        TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
+        float knobWidth = joystickKnob.getWidth() * 0.25f;  // Scale down the knob width
+        float knobHeight = joystickKnob.getHeight() * 0.25f; // Scale down the knob height
+
+        knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
+        knobDrawable.setMinHeight(knobHeight);
+
+        // Create the Touchpad with a smaller size
+        float joystickWidth = joystickBackground.getWidth() * 0.25f; // Scale down the joystick background width
+        float joystickHeight = joystickBackground.getHeight() * 0.25f; // Scale down the joystick background height
+
+        shootingJoystick = new Touchpad(10, movementJoystickStyle);
+
+        // Place the joystick in the bottom left corner
+        Table table = new Table();
+        table.setFillParent(true);
+        table.bottom().right();
+
+        // Use the scaled size for the joystick
+        table.add(shootingJoystick).size(joystickWidth, joystickHeight);
 
         stage.addActor(table);
     }

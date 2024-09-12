@@ -1,6 +1,7 @@
 package krazy.cat.games.SaveTheMaid;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -91,9 +92,11 @@ public class Player {
         if (body.getLinearVelocity().x > 0) {
             isFacingRightLowerBody = true;
             isFacingRightUpperBody = true;
-        } else {
+        } else if (body.getLinearVelocity().x < 0) {
             isFacingRightLowerBody = false;
             isFacingRightUpperBody = false;
+        } else {
+
         }
 
         adjustLowerBodyFrameOrientation();
@@ -145,23 +148,18 @@ public class Player {
                 batch.draw(getCurrentLowerBodyFrame(), body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, 64, 64);
             }*/
     public void jump() {
-        body.applyLinearImpulse(new Vector2(0, 250f), body.getWorldCenter(), true);
+        body.applyLinearImpulse(new Vector2(body.getLinearVelocity().x, 250f), body.getWorldCenter(), true);
     }
 
-    public void moveLeft() {
-        if (body.getLinearVelocity().x > 0)
-            body.setLinearVelocity(new Vector2());
-        if (body.getLinearVelocity().x > -500.f)
-            body.applyLinearImpulse(new Vector2(-5f, 0), body.getWorldCenter(), true);   // Move left
+    public void move(float moveInput) {
+        float linearImpulse = 5f * moveInput;
+
+        if (moveInput < 0.1f && moveInput > -0.1f)
+            body.setLinearVelocity(new Vector2(0, body.getLinearVelocity().y));
+
+        body.applyLinearImpulse(new Vector2(linearImpulse, 0), body.getWorldCenter(), true);   // Move left
     }
 
-    public void moveRight() {
-        if (body.getLinearVelocity().x < 0)
-            body.setLinearVelocity(new Vector2());
-        if (body.getLinearVelocity().x < 500.f)
-            body.applyLinearImpulse(new Vector2(5f, 0), body.getWorldCenter(), true);    // Move right
-
-    }
 
     public TextureRegion getCurrentUpperBodyFrame() {
         return animationSetAgent.getLowerBodyFrame(currentAnimationState, stateTime, true);

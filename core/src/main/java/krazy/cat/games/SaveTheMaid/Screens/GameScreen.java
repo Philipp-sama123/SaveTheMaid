@@ -67,7 +67,6 @@ public class GameScreen implements Screen {
 
     public void update(float dt) {
         handleInput(dt);
-
         world.step(1 / 60f, 6, 2);
 
         gameCamera.position.x = player.body.getPosition().x;
@@ -80,53 +79,11 @@ public class GameScreen implements Screen {
 
     private void handleInput(float dt) {
         // Get the x and y coordinates of the touch
-        if (Gdx.input.isTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.input.getY();
+        float joystickPercentX = hud.getMovementJoystick().getKnobPercentX(); // Knob percentage movement on the X-axis
+        player.move(joystickPercentX);
 
-            // Get the width and height of the screen
-            float screenWidth = Gdx.graphics.getWidth();
-            float screenHeight = Gdx.graphics.getHeight();
-
-            // Define boundaries for the middle row (between 33% and 66% height)
-            float rowHeight = screenHeight / 3;
-            float colWidth = screenWidth / 3;
-
-            // Identify the regions
-            boolean topLeft = touchX < colWidth && touchY < rowHeight;
-            boolean topCenter = touchX >= colWidth && touchX < 2 * colWidth && touchY < rowHeight;
-            boolean topRight = touchX >= 2 * colWidth && touchY < rowHeight;
-
-            boolean middleLeft = touchX < colWidth && touchY >= rowHeight && touchY < 2 * rowHeight;
-            boolean middleCenter = touchX >= colWidth && touchX < 2 * colWidth && touchY >= rowHeight && touchY < 2 * rowHeight;
-            boolean middleRight = touchX >= 2 * colWidth && touchY >= rowHeight && touchY < 2 * rowHeight;
-
-            boolean bottomLeft = touchX < colWidth && touchY >= 2 * rowHeight;
-            boolean bottomCenter = touchX >= colWidth && touchX < 2 * colWidth && touchY >= 2 * rowHeight;
-            boolean bottomRight = touchX >= 2 * colWidth && touchY >= 2 * rowHeight;
-
-
-            // Apply different actions based on which region is touched
-            if (topLeft) {
-                //  player.body.applyLinearImpulse(new Vector2(-1f, 4f), player.body.getWorldCenter(), true);  // Move left and jump
-            } else if (topCenter) {
-                player.jump();
-                //    player.body.applyLinearImpulse(new Vector2(0, 4f), player.body.getWorldCenter(), true);    // Jump straight up
-            } else if (topRight) {
-                //   player.body.applyLinearImpulse(new Vector2(1f, 4f), player.body.getWorldCenter(), true);   // Move right and jump
-            } else if (middleLeft) {
-                player.moveLeft();
-            } else if (middleCenter) {
-                //   player.body.applyLinearImpulse(new Vector2(0, 0), player.body.getWorldCenter(), true);     // Idle or stop
-            } else if (middleRight) {
-                player.moveRight();
-            } else if (bottomLeft) {
-                //       player.body.applyLinearImpulse(new Vector2(-1f, -1f), player.body.getWorldCenter(), true); // Move left and crouch (or stop)
-            } else if (bottomCenter) {
-                //       player.body.applyLinearImpulse(new Vector2(0, -1f), player.body.getWorldCenter(), true);   // Crouch
-            } else if (bottomRight) {
-                //       player.body.applyLinearImpulse(new Vector2(1f, -1f), player.body.getWorldCenter(), true);  // Move right and crouch
-            }
+        if (hud.getJumpButton().isPressed()) {
+            player.jump();
         }
     }
 
@@ -146,6 +103,7 @@ public class GameScreen implements Screen {
         //  player.updateAnimationState(game.batch);
         game.batch.end();
 
+        hud.stage.act();
         hud.stage.draw();
     }
 

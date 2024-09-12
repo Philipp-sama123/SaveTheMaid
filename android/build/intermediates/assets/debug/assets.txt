@@ -2,9 +2,13 @@ Tiled/Level_1.tmx
 Tiled/untitled.tiled-session
 Tiled/untitled.tiled-project
 Tiled/PlatformerAssets.tsx
-UiSprites/Joystick/Background.png
-UiSprites/Joystick/Knubble.png
-UiSprites/Joystick/Background_Round.png
+UiSprites/Buttons/Jump.png
+UiSprites/Buttons/JumpPressed.png
+UiSprites/Joystick/2dStick.png
+UiSprites/Joystick/ShootPad.png
+UiSprites/Joystick/MoveStick.png
+UiSprites/Joystick/MovePad.png
+UiSprites/Joystick/ShootStick.png
 PlatformerAssets/BackgroundLayers/Autumn BG/BG_5.png
 PlatformerAssets/BackgroundLayers/Autumn BG/BG_4.png
 PlatformerAssets/BackgroundLayers/Autumn BG/BG_1.png
