@@ -1,0 +1,39 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Level_1.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "Level_1.tmx": {
+            "scale": 0.3637,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 576.024195765741,
+                "y": 6208.413527632663
+            }
+        },
+        "PlatformerAssets.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/PlatformerAssets",
+    "map.height": 200,
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": "3",
+    "map.width": 200,
+    "openFiles": [
+        "PlatformerAssets.tsx",
+        "Level_1.tmx"
+    ],
+    "project": "untitled.tiled-project",
+    "recentFiles": [
+        "PlatformerAssets.tsx",
+        "Level_1.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

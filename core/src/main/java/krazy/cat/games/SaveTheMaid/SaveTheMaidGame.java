@@ -1,0 +1,20 @@
+package krazy.cat.games.SaveTheMaid;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+
+public class SaveTheMaidGame extends Game {
+    public SpriteBatch batch;
+
+    public static final int GAME_WIDTH = 640;
+    public static final int GAME_HEIGHT = 320;
+
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        setScreen(new GameScreen(this));
+    }
+
+}
