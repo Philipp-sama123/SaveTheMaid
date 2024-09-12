@@ -117,18 +117,16 @@ public class GameScreen implements Screen {
             if (topLeft) {
                 //  player.body.applyLinearImpulse(new Vector2(-1f, 4f), player.body.getWorldCenter(), true);  // Move left and jump
             } else if (topCenter) {
-                player.body.applyLinearImpulse(new Vector2(0, 250f), player.body.getWorldCenter(), true);
+                player.jump();
                 //    player.body.applyLinearImpulse(new Vector2(0, 4f), player.body.getWorldCenter(), true);    // Jump straight up
             } else if (topRight) {
                 //   player.body.applyLinearImpulse(new Vector2(1f, 4f), player.body.getWorldCenter(), true);   // Move right and jump
             } else if (middleLeft) {
-                if (player.body.getLinearVelocity().x > -500.f)
-                    player.body.applyLinearImpulse(new Vector2(-5f, 0), player.body.getWorldCenter(), true);   // Move left
+                player.moveLeft();
             } else if (middleCenter) {
                 //   player.body.applyLinearImpulse(new Vector2(0, 0), player.body.getWorldCenter(), true);     // Idle or stop
             } else if (middleRight) {
-                if (player.body.getLinearVelocity().x < 500.f)
-                    player.body.applyLinearImpulse(new Vector2(5f, 0), player.body.getWorldCenter(), true);    // Move right
+                player.moveRight();
             } else if (bottomLeft) {
                 //       player.body.applyLinearImpulse(new Vector2(-1f, -1f), player.body.getWorldCenter(), true); // Move left and crouch (or stop)
             } else if (bottomCenter) {
