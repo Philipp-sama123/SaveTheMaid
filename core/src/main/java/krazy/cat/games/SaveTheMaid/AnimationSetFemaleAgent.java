@@ -18,7 +18,8 @@ public class AnimationSetFemaleAgent {
 
     private final Map<AnimationType, Animation<TextureRegion>> upperBodyAnimations;
     private final Map<AnimationType, Animation<TextureRegion>> lowerBodyAnimations;
-    private boolean flipped = false;
+    private boolean upperBodyFramesFlipped = false;
+    private boolean lowerBodyFramesFlipped = false;
 
     public AnimationSetFemaleAgent(Texture upperBodySpriteSheet, Texture lowerBodySpriteSheet) {
         upperBodyAnimations = CreateUpperBodyAnimations(upperBodySpriteSheet);
@@ -73,6 +74,7 @@ public class AnimationSetFemaleAgent {
         }
         return upperBodyAnimations;
     }
+
     private Map<AnimationType, Animation<TextureRegion>> CreateLowerBodyAnimations(Texture spriteSheet) {
         final Map<AnimationType, Animation<TextureRegion>> lowerBodyAnimations;
         TextureRegion[][] textureRegions = TextureRegion.split(spriteSheet, FRAME_WIDTH, FRAME_HEIGHT);
@@ -132,7 +134,7 @@ public class AnimationSetFemaleAgent {
         return new Animation<>(FRAME_DURATION, frames);
     }
 
-    public TextureRegion getFrame(AnimationType type, float stateTime, boolean looping) {
+    public TextureRegion getUpperBodyFrame(AnimationType type, float stateTime, boolean looping) {
         Animation<TextureRegion> animation = upperBodyAnimations.get(type);
         if (animation == null) {
             throw new IllegalStateException("Animation " + type + " not found");
@@ -140,24 +142,55 @@ public class AnimationSetFemaleAgent {
         return animation.getKeyFrame(stateTime, looping);
     }
 
-    public Animation<TextureRegion> getAnimation(AnimationType type) {
+    public Animation<TextureRegion> getUpperBodyAnimation(AnimationType type) {
         Animation<TextureRegion> animation = upperBodyAnimations.get(type);
         if (animation == null) {
             throw new IllegalStateException("Animation " + type + " not found");
         }
         return animation;
     }
-    public void flipFramesHorizontally() {
+
+    public void flipUpperBodyFramesHorizontally() {
         for (Animation<TextureRegion> animation : upperBodyAnimations.values()) {
             for (TextureRegion frame : animation.getKeyFrames()) {
                 frame.flip(true, false);
             }
         }
-        flipped = !flipped;
+        upperBodyFramesFlipped = !upperBodyFramesFlipped;
     }
 
-    public boolean isFlipped() {
-        return flipped;
+
+    public TextureRegion getLowerBodyFrame(AnimationType type, float stateTime, boolean looping) {
+        Animation<TextureRegion> animation = lowerBodyAnimations.get(type);
+        if (animation == null) {
+            throw new IllegalStateException("Animation " + type + " not found");
+        }
+        return animation.getKeyFrame(stateTime, looping);
+    }
+
+    public Animation<TextureRegion> getLowerBodyAnimation(AnimationType type) {
+        Animation<TextureRegion> animation = lowerBodyAnimations.get(type);
+        if (animation == null) {
+            throw new IllegalStateException("Animation " + type + " not found");
+        }
+        return animation;
+    }
+
+    public void flipLowerBodyFramesHorizontally() {
+        for (Animation<TextureRegion> animation : lowerBodyAnimations.values()) {
+            for (TextureRegion frame : animation.getKeyFrames()) {
+                frame.flip(true, false);
+            }
+        }
+        lowerBodyFramesFlipped = !lowerBodyFramesFlipped;
+    }
+
+    public boolean isLowerBodyFramesFlipped() {
+        return lowerBodyFramesFlipped;
+    }
+
+    public boolean isUpperBodyFramesFlipped() {
+        return upperBodyFramesFlipped;
     }
 
     public void dispose() {

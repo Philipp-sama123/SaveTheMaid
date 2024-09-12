@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
 import krazy.cat.games.SaveTheMaid.Sprites.Player;
+import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 
 public class GameScreen implements Screen {
 
@@ -61,51 +62,7 @@ public class GameScreen implements Screen {
         this.world = new World(new Vector2(0, -100), true);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
-        BodyDef bodyDef = new BodyDef();
-        PolygonShape shape = new PolygonShape();
-        FixtureDef fixtureDef = new FixtureDef();
-        Body body;
-
-        // goes through "Ground" layers to get bodies and create them
-        for (MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2), (rectangle.getY() + rectangle.getHeight() / 2));
-            body = world.createBody(bodyDef);
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
-            fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
-        }
-        // goes through "Pipes" layers to get bodies and create them
-        for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2), (rectangle.getY() + rectangle.getHeight() / 2));
-            body = world.createBody(bodyDef);
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
-            fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
-        }
-        // goes through "Coins" layers to get bodies and create them
-        for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2), (rectangle.getY() + rectangle.getHeight() / 2));
-            body = world.createBody(bodyDef);
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
-            fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
-        }
-        // goes through "Bricks" layers to get bodies and create them
-        for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2), (rectangle.getY() + rectangle.getHeight() / 2));
-            body = world.createBody(bodyDef);
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
-            fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
-        }
+        new Box2dWorldCreator(world, map);
 
         player = new Player(world);
     }
@@ -218,6 +175,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        map.dispose();
+        renderer.dispose();
+        world.dispose();
+        box2DDebugRenderer.dispose();
+        hud.dispose();
     }
 }
