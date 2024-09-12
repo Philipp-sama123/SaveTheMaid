@@ -67,6 +67,7 @@ public class GameScreen implements Screen {
 
     public void update(float dt) {
         handleInput(dt);
+
         world.step(1 / 60f, 6, 2);
 
         gameCamera.position.x = player.body.getPosition().x;
