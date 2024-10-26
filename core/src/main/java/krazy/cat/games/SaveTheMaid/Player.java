@@ -23,8 +23,8 @@ public class Player {
     private float stateTime;
     private AnimationType currentAnimationState = AnimationType.IDLE_CHARISMATIC;
 
-    private boolean isCrouching;
-    private boolean isShooting;
+    private boolean isCrouching = false;
+    private boolean isShooting = false;
     private boolean isFacingRightLowerBody;
     private boolean isFacingRightUpperBody;
 
@@ -71,6 +71,11 @@ public class Player {
             // Check if the shooting animation has finished
             Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
             if (shootAnimation.isAnimationFinished(stateTime)) {
+                float animationDuration = shootAnimation.getAnimationDuration();
+                Gdx.app.log("RESET SHOOT", "RESET SHOOTING!!!!");
+                Gdx.app.log("Animation Duration", "Duration: " + animationDuration);
+                Gdx.app.log("stateTime", "stateTime: " + stateTime);
+
                 isShooting = false;
                 stateTime = 0f;
             }
@@ -120,41 +125,15 @@ public class Player {
         );
     }
 
-    /*
-            public void updateAnimationState(SpriteBatch batch) {
-                if (isShooting) {
-                    // Check if the shooting animation has finished
-                    Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
-                    if (shootAnimation.isAnimationFinished(stateTime)) {
-                        isShooting = false;
-                        stateTime = 0f;
-                    }
-                }
-                if (body.getLinearVelocity().y > 0) {
-                    currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-                } else if (body.getLinearVelocity().y < 0) {
-                    currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
-                } else if (body.getLinearVelocity().x != 0) {
-                    currentAnimationState = isShooting ? (Math.abs(body.getLinearVelocity().x) > 250 ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT) : (Math.abs(body.getLinearVelocity().x) > 250 ? AnimationType.RUN : AnimationType.WALK);
-                } else {
-                    // No Velocity in any direction
-                    if (isCrouching) {
-                        currentAnimationState = isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE;
-                    } else {
-                        currentAnimationState = isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE;
-                    }
-                }
-                batch.draw(getCurrentUpperBodyFrame(),body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, 64, 64);
-                batch.draw(getCurrentLowerBodyFrame(), body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, 64, 64);
-            }*/
     public void jump() {
         body.applyLinearImpulse(new Vector2(body.getLinearVelocity().x, 750), body.getWorldCenter(), true);
+        stateTime = 0;
     }
 
     public void move(float moveInput) {
-        float linearImpulse = 5f * moveInput;
+        float linearImpulse = 2.5f * moveInput;
 
-        if (moveInput < 0.1f && moveInput > -0.1f)
+        if (moveInput < 0.05f && moveInput > -0.05f)
             body.setLinearVelocity(new Vector2(0, body.getLinearVelocity().y));
 
         body.applyLinearImpulse(new Vector2(linearImpulse, 0), body.getWorldCenter(), true);   // Move left
@@ -184,6 +163,13 @@ public class Player {
 
         } else if (!isFacingRightLowerBody && animationSetAgent.isLowerBodyFramesFlipped()) {
             animationSetAgent.flipLowerBodyFramesHorizontally();
+        }
+    }
+
+    public void shoot() {
+        if (!isShooting) {
+            isShooting = true;
+            stateTime = 0f;
         }
     }
 }

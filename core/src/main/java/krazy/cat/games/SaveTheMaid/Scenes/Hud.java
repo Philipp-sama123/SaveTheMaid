@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import javax.swing.ButtonModel;
+
 public class Hud implements Disposable {
     private final InputMultiplexer inputMultiplexer;
     public Stage stage;
@@ -71,8 +73,7 @@ public class Hud implements Disposable {
         stage.addActor(table);
 
         createMovementJoystick();
-        createShootingJoystick();
-        createJumpButton();
+        createButtons();
 
         // Initialize InputMultiplexer
         inputMultiplexer = new InputMultiplexer();
@@ -84,15 +85,16 @@ public class Hud implements Disposable {
         return movementJoystick;
     }
 
-    public Touchpad getShootingJoystick() {
-        return shootingJoystick;
-    }
 
     public ImageButton getJumpButton() {
         return jumpButton;
     }
 
-    private void createJumpButton() {
+    public ImageButton getShootButton() {
+        return shootButton;
+    }
+
+    private void createButtons() {
         // Load texture for pause button
         Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
         Texture jumpTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/JumpPressed.png"));
@@ -103,10 +105,21 @@ public class Hud implements Disposable {
 
         jumpButton = new ImageButton(buttonStylePause);
 
+        Texture shootTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"));
+        Texture shootTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingPressed.png"));
+
+        ImageButton.ImageButtonStyle buttonStyleShoot = new ImageButton.ImageButtonStyle();
+
+        buttonStyleShoot.up = new TextureRegionDrawable(shootTextureUp);
+        buttonStyleShoot.down = new TextureRegionDrawable(shootTextureDown);
+
+        shootButton = new ImageButton(buttonStyleShoot);
+
         // Arrange button in a table
         Table table = new Table();
         table.setFillParent(true);
         table.center().right();
+        table.add(shootButton).size(25, 25).pad(10);
         table.add(jumpButton).size(25, 25).pad(10);
 
         stage.addActor(table);
@@ -157,53 +170,10 @@ public class Hud implements Disposable {
         stage.addActor(table);
     }
 
-    private void createShootingJoystick() {
-        // Load textures for the joystick background and knob
-        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootPad.png"));
-        Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootStick.png"));
-
-        // Check if textures are loaded
-        if (!joystickBackground.getTextureData().isPrepared()) {
-            joystickBackground.getTextureData().prepare();
-        }
-        if (!joystickKnob.getTextureData().isPrepared()) {
-            joystickKnob.getTextureData().prepare();
-        }
-
-        // Create joystick style
-        Touchpad.TouchpadStyle movementJoystickStyle = new Touchpad.TouchpadStyle();
-
-        // Set background and knob using TextureRegionDrawable
-        movementJoystickStyle.background = new TextureRegionDrawable(new TextureRegion(joystickBackground));
-        movementJoystickStyle.knob = new TextureRegionDrawable(new TextureRegion(joystickKnob));
-
-        // Adjust knob size relative to background
-        TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
-        float knobWidth = joystickKnob.getWidth() * 0.125f;  // Scale down the knob width
-        float knobHeight = joystickKnob.getHeight() * 0.125f; // Scale down the knob height
-
-        knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
-        knobDrawable.setMinHeight(knobHeight);
-
-        // Create the Touchpad with a smaller size
-        float joystickWidth = joystickBackground.getWidth() * 0.125f; // Scale down the joystick background width
-        float joystickHeight = joystickBackground.getHeight() * 0.125f; // Scale down the joystick background height
-
-        shootingJoystick = new Touchpad(10, movementJoystickStyle);
-
-        // Place the joystick in the bottom left corner
-        Table table = new Table();
-        table.setFillParent(true);
-        table.bottom().right();
-
-        // Use the scaled size for the joystick
-        table.add(shootingJoystick).size(joystickWidth, joystickHeight);
-
-        stage.addActor(table);
-    }
 
     @Override
     public void dispose() {
         stage.dispose();
     }
+
 }

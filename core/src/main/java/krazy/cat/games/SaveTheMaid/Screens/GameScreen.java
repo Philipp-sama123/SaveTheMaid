@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
-        this.world = new World(new Vector2(0, -250), false);
+        this.world = new World(new Vector2(0, -125), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
         new Box2dWorldCreator(world, map);
@@ -82,18 +82,20 @@ public class GameScreen implements Screen {
         // Get the x and y coordinates of the touch
         float joystickPercentX = hud.getMovementJoystick().getKnobPercentX(); // Knob percentage movement on the X-axis
         player.move(joystickPercentX);
-
         if (hud.getJumpButton().isPressed()) {
             player.jump();
+        }
+        if (hud.getShootButton().isPressed()) {
+            player.shoot();
         }
     }
 
     @Override
     public void render(float dt) {
-        update(dt);
-        player.update(dt);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        update(dt);
+        player.update(dt);
         // render game map
         renderer.render();
         // render Box2D Debug
