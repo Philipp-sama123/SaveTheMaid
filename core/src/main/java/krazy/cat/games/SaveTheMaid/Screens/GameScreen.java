@@ -16,10 +16,15 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import krazy.cat.games.SaveTheMaid.Projectile;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
 import krazy.cat.games.SaveTheMaid.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameScreen implements Screen {
 
@@ -56,6 +61,31 @@ public class GameScreen implements Screen {
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
         new Box2dWorldCreator(world, map);
+
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                // Check if either fixture has a projectile as user data
+                Object fixtureAUserData = contact.getFixtureA().getUserData();
+                Object fixtureBUserData = contact.getFixtureB().getUserData();
+
+                if (fixtureAUserData instanceof Projectile) {
+                    ((Projectile) fixtureAUserData).onCollision();
+                }
+                if (fixtureBUserData instanceof Projectile) {
+                    ((Projectile) fixtureBUserData).onCollision();
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {}
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {}
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {}
+        });
 
         player = new Player(world);
     }

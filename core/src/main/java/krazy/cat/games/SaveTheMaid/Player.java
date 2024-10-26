@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent.AnimationType;
 
@@ -28,6 +29,9 @@ public class Player {
     private boolean isFacingRightLowerBody;
     private boolean isFacingRightUpperBody;
 
+    private Array<Projectile> projectiles;
+    private Texture projectileTexture;
+
     public Player(World world) {
         super();
         this.world = world;
@@ -41,6 +45,16 @@ public class Player {
 
     public void update(float dt) {
         stateTime += dt;
+        // Remove if destroyed
+        for (int i = projectiles.size - 1; i >= 0; i--) {
+            Projectile projectile = projectiles.get(i);
+            projectile.update(dt);
+
+            // Remove if destroyed
+            if (projectile.isDestroyed()) {
+                projectiles.removeIndex(i);
+            }
+        }
     }
 
     private void definePlayer() {
@@ -49,6 +63,8 @@ public class Player {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
+        projectileTexture = new Texture("Characters/FemaleAgent/PixelBullet16x16.png");
+        projectiles = new Array<>();
         // Create a rectangular shape for the player
         PolygonShape rectShape = new PolygonShape();
         float halfWidth = 8f;  // Narrower width
@@ -79,7 +95,7 @@ public class Player {
                 isShooting = false;
                 stateTime = 0f;
             }
-        }
+        }// Setting walking/running animation based on speed
         if (body.getLinearVelocity().y > 0) {
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
         } else if (body.getLinearVelocity().y < 0) {
@@ -123,20 +139,41 @@ public class Player {
             64, // Width of the sprite
             64 // Height of the sprite
         );
+        for (Projectile projectile : projectiles) {
+            projectile.draw(batch);
+        }
+    }
+
+    // Return projectiles array so GameScreen can access if needed
+    public Array<Projectile> getProjectiles() {
+        return projectiles;
     }
 
     public void jump() {
-        body.applyLinearImpulse(new Vector2(body.getLinearVelocity().x, 750), body.getWorldCenter(), true);
-        stateTime = 0;
+        // Only apply vertical impulse for jump, keeping horizontal velocity intact
+      //  if (Math.abs(body.getLinearVelocity().y) < 0.01f) { // Ensure grounded before jumping
+            body.applyLinearImpulse(new Vector2(0, 750), body.getWorldCenter(), true);
+            stateTime = 0;
+     //   }
     }
 
+
     public void move(float moveInput) {
-        float linearImpulse = 2.5f * moveInput;
+        // Maximum speed threshold for running
+        float maxSpeed = 250f;
+        float acceleration = 10f * moveInput;
+        float friction = 5f;
 
-        if (moveInput < 0.05f && moveInput > -0.05f)
-            body.setLinearVelocity(new Vector2(0, body.getLinearVelocity().y));
+        // Apply acceleration up to the max speed
+        if (Math.abs(body.getLinearVelocity().x) < maxSpeed) {
+            body.applyLinearImpulse(new Vector2(acceleration, 0), body.getWorldCenter(), true);
+        }
 
-        body.applyLinearImpulse(new Vector2(linearImpulse, 0), body.getWorldCenter(), true);   // Move left
+        // Apply friction when the input is near zero
+        if (Math.abs(moveInput) < 0.05f) {
+            float newVelocityX = body.getLinearVelocity().x * (1 - friction * Gdx.graphics.getDeltaTime());
+            body.setLinearVelocity(new Vector2(newVelocityX, body.getLinearVelocity().y));
+        }
     }
 
 
@@ -170,6 +207,13 @@ public class Player {
         if (!isShooting) {
             isShooting = true;
             stateTime = 0f;
+            // Spawn Projectile
+
+            // Spawn projectile with animation
+            Vector2 position = body.getPosition().add(isFacingRightUpperBody ? 20 : -20, 10);
+            Vector2 velocity = new Vector2(isFacingRightUpperBody ? 1000 : -1000, 0);
+            Projectile projectile = new Projectile(world, position, velocity, projectileTexture);
+            projectiles.add(projectile);
         }
     }
 }
