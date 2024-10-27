@@ -13,14 +13,18 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import krazy.cat.games.SaveTheMaid.Enemy;
 import krazy.cat.games.SaveTheMaid.Projectile;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
 import krazy.cat.games.SaveTheMaid.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
+import krazy.cat.games.SaveTheMaid.WorldContactListener;
+
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -44,9 +48,12 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
 
+    private Array<Enemy> enemies;
+
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
         this.hud = new Hud(game.batch);
+
 
         this.mapLoader = new TmxMapLoader();
         this.map = mapLoader.load("Tiled/Level_1.tmx");
@@ -59,33 +66,12 @@ public class GameScreen implements Screen {
 
         this.world = new World(new Vector2(0, -125), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
-
         new Box2dWorldCreator(world, map);
+        // Initialize the enemies array and add a sample enemy
+        enemies = new Array<>();
+        enemies.add(new Enemy(world, new Vector2(300, 100))); //
 
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                // Check if either fixture has a projectile as user data
-                Object fixtureAUserData = contact.getFixtureA().getUserData();
-                Object fixtureBUserData = contact.getFixtureB().getUserData();
-
-                if (fixtureAUserData instanceof Projectile) {
-                    ((Projectile) fixtureAUserData).onCollision();
-                }
-                if (fixtureBUserData instanceof Projectile) {
-                    ((Projectile) fixtureBUserData).onCollision();
-                }
-            }
-
-            @Override
-            public void endContact(Contact contact) {}
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {}
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {}
-        });
+        world.setContactListener(new WorldContactListener());
 
         player = new Player(world);
     }
@@ -100,12 +86,17 @@ public class GameScreen implements Screen {
 
         world.step(1 / 60f, 6, 2);
 
+        for (Enemy enemy : enemies) {
+            enemy.update(dt);
+        }
+
         gameCamera.position.x = player.body.getPosition().x;
         gameCamera.position.y = player.body.getPosition().y + 32;
 
         gameCamera.update();
         // just render what the camera can see
         renderer.setView(gameCamera);
+
     }
 
     private void handleInput(float dt) {
@@ -126,6 +117,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         update(dt);
         player.update(dt);
+
+
         // render game map
         renderer.render();
         // render Box2D Debug
@@ -134,6 +127,9 @@ public class GameScreen implements Screen {
         game.batch.begin();
         player.draw(game.batch);
         //  player.updateAnimationState(game.batch);
+        for (Enemy enemy : enemies) {
+            enemy.draw(game.batch);
+        }
         game.batch.end();
 
         hud.stage.act();

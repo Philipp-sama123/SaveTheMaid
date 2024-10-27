@@ -16,6 +16,7 @@ public class Projectile {
     private boolean setToDestroy = false;
 
     private boolean isFacingRight;
+
     public Projectile(World world, Vector2 position, Vector2 velocity, Texture texture) {
         this.world = world;
         stateTime = 0;
@@ -32,6 +33,12 @@ public class Projectile {
             }
         }
         defineProjectile(position, velocity);
+    }
+
+    public void destroy() {
+        // Flag the projectile for removal
+        isDestroyed = true;
+        world.destroyBody(body);
     }
 
     private void defineProjectile(Vector2 position, Vector2 velocity) {
