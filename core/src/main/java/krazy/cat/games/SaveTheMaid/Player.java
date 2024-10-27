@@ -1,6 +1,5 @@
 package krazy.cat.games.SaveTheMaid;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -20,17 +19,20 @@ public class Player {
     private static final int MAX_JUMPS = 3;
     private int jumpCount = 0;
 
+    float slowSpeed = 25;
+    float walkSpeed = 50;
+    float runSpeed = 100;
+
     private final AnimationSetFemaleAgent animationSetAgent;
     public World world;
     public Body body;
 
     private float stateTime;
-    private AnimationType currentAnimationState = AnimationType.IDLE_CHARISMATIC;
+    private AnimationType currentAnimationState = AnimationType.IDLE;
 
     private boolean isCrouching = false;
     private boolean isShooting = false;
-    private boolean isFacingRightLowerBody;
-    private boolean isFacingRightUpperBody;
+    private boolean isFacingRight = false;
 
     private Array<Projectile> projectiles;
     private Texture projectileTexture;
@@ -38,38 +40,22 @@ public class Player {
     private float damageTimer;
 
     public Player(World world) {
-        super();
         this.world = world;
         animationSetAgent = new AnimationSetFemaleAgent(
             new Texture("Characters/FemaleAgent/Body/Black.png"),
             new Texture("Characters/FemaleAgent/Feet/Red.png")
         );
-
         definePlayer();
     }
 
     public void update(float delta) {
         stateTime += delta;
-        // Remove if destroyed
-        for (int i = projectiles.size - 1; i >= 0; i--) {
-            Projectile projectile = projectiles.get(i);
-            projectile.update(delta);
+        updateProjectiles(delta);
+        updateDamageEffect(delta);
+        checkGrounded();
 
-            // Remove if destroyed
-            if (projectile.isDestroyed()) {
-                projectiles.removeIndex(i);
-            }
-        }
-        if (damaged) {
-            damageTimer -= delta;
-            if (damageTimer <= 0) {
-                damaged = false;
-                damageTimer = 0;
-            }
-        }
-        // Check if grounded to reset jump count
-        if (Math.abs(body.getLinearVelocity().y) < 0.01f && jumpCount > 0) {
-            jumpCount = 0;
+        if (isShooting) {
+            handleShootingAnimation();
         }
     }
 
@@ -81,164 +67,67 @@ public class Player {
 
         projectileTexture = new Texture("Characters/FemaleAgent/PixelBullet16x16.png");
         projectiles = new Array<>();
-        // Create a rectangular shape for the player
-        PolygonShape rectShape = new PolygonShape();
-        float halfWidth = 8f;  // Narrower width
-        float halfHeight = 24f;  // Shorter height
-        rectShape.setAsBox(halfWidth, halfHeight);  // Create the rectangle
 
-        // Fixture definition with adjusted properties
+        PolygonShape rectShape = new PolygonShape();
+        rectShape.setAsBox(8f, 24f);
+
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = rectShape;
-        // Attach the fixture to the body
         body.createFixture(fixtureDef).setUserData(this);
 
-        // Clean up the shape to free resources
         rectShape.dispose();
     }
 
     public void draw(Batch batch) {
-        // Draw the upper body animation frame
-        if (isShooting) {
-            // Check if the shooting animation has finished
-            Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
-            if (shootAnimation.isAnimationFinished(stateTime)) {
-                float animationDuration = shootAnimation.getAnimationDuration();
-                Gdx.app.log("RESET SHOOT", "RESET SHOOTING!!!!");
-                Gdx.app.log("Animation Duration", "Duration: " + animationDuration);
-                Gdx.app.log("stateTime", "stateTime: " + stateTime);
-
-                isShooting = false;
-                stateTime = 0f;
-            }
-        }// Setting walking/running animation based on speed
-        if (body.getLinearVelocity().y > 0) {
-            currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-        } else if (body.getLinearVelocity().y < 0) {
-            currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
-        } else if (body.getLinearVelocity().x != 0) {
-            currentAnimationState = isShooting ? (Math.abs(body.getLinearVelocity().x) > 250 ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT) : (Math.abs(body.getLinearVelocity().x) > 250 ? AnimationType.RUN : AnimationType.WALK);
-        } else {
-            // No Velocity in any direction
-            if (isCrouching) {
-                currentAnimationState = isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE;
-            } else {
-                currentAnimationState = isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE;
-            }
-        }
-        if (body.getLinearVelocity().x > 0) {
-            isFacingRightLowerBody = true;
-            isFacingRightUpperBody = true;
-        } else if (body.getLinearVelocity().x < 0) {
-            isFacingRightLowerBody = false;
-            isFacingRightUpperBody = false;
-        } else {
-
-        }
-
-        adjustLowerBodyFrameOrientation();
-        adjustUpperBodyFrameOrientation();
-        if (damaged) {
-            batch.setColor(1, 0, 0, 1);  // Set color to red
-        } else {
-            batch.setColor(1, 1, 1, 1);  // Default color
-        }
-        batch.draw(
-            getCurrentUpperBodyFrame(), // The current upper body frame
-            isFacingRightUpperBody ? body.getPosition().x - 26 : body.getPosition().x - 36, // X position
-            body.getPosition().y - 24, // Y position
-            64, // Width of the sprite
-            64 // Height of the sprite
-        );
-        // Optionally, if you also want to draw the lower body frame:
-        batch.draw(
-            getCurrentLowerBodyFrame(), // The current lower body frame
-            isFacingRightLowerBody ? body.getPosition().x - 26 : body.getPosition().x - 36, // X position
-            body.getPosition().y - 24, // Y position
-            64, // Width of the sprite
-            64 // Height of the sprite
-        );
-        batch.setColor(1, 1, 1, 1);  // Reset color after rendering
-
+        setBatchColorForDamage(batch);
+        drawAnimation(batch, getCurrentUpperBodyFrame(), getCurrentLowerBodyFrame());
+        batch.setColor(1, 1, 1, 1);
 
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
     }
 
-    // Return projectiles array so GameScreen can access if needed
     public Array<Projectile> getProjectiles() {
         return projectiles;
     }
 
     public void jump() {
-        Gdx.app.log("MAX_JUMPS", "jumpCount: " + jumpCount);
-        Gdx.app.log("MAX_JUMPS", "MAX_JUMPS: " + MAX_JUMPS);
-
-        if (jumpCount < MAX_JUMPS) { // Only jump if jumps left
-            body.applyLinearImpulse(new Vector2(0, 1000), body.getWorldCenter(), true);
+        if (jumpCount < MAX_JUMPS) {
+            //  body.applyLinearImpulse(new Vector2(0, 1000), body.getWorldCenter(), true);
+            body.setLinearVelocity(body.getLinearVelocity().x, 500);
             jumpCount++;
             stateTime = 0;
+            currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
         }
     }
-
 
     public void move(float moveInput) {
-        // Maximum speed threshold for running
-        float maxSpeed = 250f;
-        float acceleration = 10f * moveInput;
-        float friction = 5f;
+        float accelerationFactor = 0.1f;
+        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
 
-        // Apply acceleration up to the max speed
-        if (Math.abs(body.getLinearVelocity().x) < maxSpeed) {
-            body.applyLinearImpulse(new Vector2(acceleration, 0), body.getWorldCenter(), true);
+        // Determine the target speed based on input strength
+        float targetSpeed = calculateTargetSpeed(moveInput, isGrounded);
+
+        smoothSpeedTransition(targetSpeed, accelerationFactor);
+
+        // Update facing direction and animation state
+        if (moveInput != 0) {
+            isFacingRight = moveInput > 0;
+            adjustFrameOrientation();
         }
 
-        // Apply friction when the input is near zero
-        if (Math.abs(moveInput) < 0.05f) {
-            float newVelocityX = body.getLinearVelocity().x * (1 - friction * Gdx.graphics.getDeltaTime());
-            body.setLinearVelocity(new Vector2(newVelocityX, body.getLinearVelocity().y));
-        }
-    }
-
-
-    public TextureRegion getCurrentUpperBodyFrame() {
-        return animationSetAgent.getLowerBodyFrame(currentAnimationState, stateTime, true);
-    }
-
-    public TextureRegion getCurrentLowerBodyFrame() {
-        return animationSetAgent.getUpperBodyFrame(currentAnimationState, stateTime, true);
-    }
-
-    private void adjustUpperBodyFrameOrientation() {
-        if (isFacingRightUpperBody && !animationSetAgent.isUpperBodyFramesFlipped()) {
-            animationSetAgent.flipUpperBodyFramesHorizontally();
-
-        } else if (!isFacingRightUpperBody && animationSetAgent.isUpperBodyFramesFlipped()) {
-            animationSetAgent.flipUpperBodyFramesHorizontally();
-        }
-    }
-
-    private void adjustLowerBodyFrameOrientation() {
-        if (isFacingRightLowerBody && !animationSetAgent.isLowerBodyFramesFlipped()) {
-            animationSetAgent.flipLowerBodyFramesHorizontally();
-
-        } else if (!isFacingRightLowerBody && animationSetAgent.isLowerBodyFramesFlipped()) {
-            animationSetAgent.flipLowerBodyFramesHorizontally();
-        }
+        updateAnimationStateBasedOnMovement(targetSpeed);
     }
 
     public void shoot() {
         if (!isShooting) {
             isShooting = true;
             stateTime = 0f;
-            // Spawn Projectile
 
-            // Spawn projectile with animation
-            Vector2 position = body.getPosition().add(isFacingRightUpperBody ? 20 : -20, 10);
-            Vector2 velocity = new Vector2(isFacingRightUpperBody ? 1000 : -1000, 0);
-            Projectile projectile = new Projectile(world, position, velocity, projectileTexture);
-            projectiles.add(projectile);
+            Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, 10);
+            Vector2 velocity = new Vector2(isFacingRight ? 1000 : -1000, 0);
+            projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
 
@@ -251,10 +140,114 @@ public class Player {
         this.damageTimer = duration;
     }
 
-
     public void onEnemyCollision() {
-        Gdx.app.log("onEnemyCollision", "PLAYER: " + this);
         setDamaged(true);
         startRedFlashEffect(2f);
+    }
+
+    private TextureRegion getCurrentUpperBodyFrame() {
+        return animationSetAgent.getUpperBodyFrame(currentAnimationState, stateTime, true);
+    }
+
+    private TextureRegion getCurrentLowerBodyFrame() {
+        return animationSetAgent.getLowerBodyFrame(currentAnimationState, stateTime, true);
+    }
+
+    private void updateProjectiles(float delta) {
+        for (int i = projectiles.size - 1; i >= 0; i--) {
+            Projectile projectile = projectiles.get(i);
+            projectile.update(delta);
+            if (projectile.isDestroyed()) {
+                projectiles.removeIndex(i);
+            }
+        }
+    }
+
+    private void updateDamageEffect(float delta) {
+        if (damaged) {
+            damageTimer -= delta;
+            if (damageTimer <= 0) {
+                damaged = false;
+                damageTimer = 0;
+            }
+        }
+    }
+
+    private void checkGrounded() {
+        if (Math.abs(body.getLinearVelocity().y) < 0.01f && jumpCount > 0) {
+            jumpCount = 0;
+        }
+    }
+
+    private void handleShootingAnimation() {
+        Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
+        if (shootAnimation.isAnimationFinished(stateTime)) {
+            isShooting = false;
+            stateTime = 0f;
+            currentAnimationState = AnimationType.IDLE; // Reset to idle after shooting animation
+        }
+    }
+
+    private float calculateTargetSpeed(float moveInput, boolean isGrounded) {
+        float targetSpeed = 0;
+        float absMoveInput = Math.abs(moveInput);
+
+        if (absMoveInput > 0.05f && absMoveInput < 0.5f) {
+            targetSpeed = slowSpeed * Math.signum(moveInput);
+        } else if (absMoveInput > 0.5f && absMoveInput < 0.75f) {
+            targetSpeed = walkSpeed * Math.signum(moveInput);
+        } else if (Math.abs(moveInput) > 0.75f) {
+            targetSpeed = runSpeed * Math.signum(moveInput);
+        }
+        if (!isGrounded)
+            targetSpeed /= 2;
+        
+        return targetSpeed;
+    }
+
+    private void smoothSpeedTransition(float targetSpeed, float factor) {
+        float currentVelocityX = body.getLinearVelocity().x;
+        float smoothedVelocityX = currentVelocityX + (targetSpeed - currentVelocityX) * factor;
+        body.setLinearVelocity(new Vector2(smoothedVelocityX, body.getLinearVelocity().y));
+    }
+
+    private void setBatchColorForDamage(Batch batch) {
+        if (damaged) {
+            batch.setColor(1, 0, 0, 1);
+        } else {
+            batch.setColor(1, 1, 1, 1);
+        }
+    }
+
+    private void adjustFrameOrientation() {
+        if (isFacingRight != animationSetAgent.isUpperBodyFramesFlipped()) {
+            animationSetAgent.flipUpperBodyFramesHorizontally();
+            animationSetAgent.flipLowerBodyFramesHorizontally();
+        }
+    }
+
+    private void updateAnimationStateBasedOnMovement(float targetSpeed) {
+        int currentVelocityX = Math.round(body.getLinearVelocity().x);
+        int currentVelocityY = Math.round(body.getLinearVelocity().y);
+        if (currentVelocityY > 0) {
+            currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
+        } else if (currentVelocityY < 0) {
+            currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
+        } else if (currentVelocityX != 0) {
+            boolean isRunning = Math.abs(targetSpeed) >= runSpeed;
+            currentAnimationState = isShooting ? (isRunning ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT)
+                : (isRunning ? AnimationType.RUN : AnimationType.WALK);
+        } else {
+            currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
+                : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
+        }
+    }
+
+    private void drawAnimation(Batch batch, TextureRegion upperBodyFrame, TextureRegion lowerBodyFrame) {
+        float posX = isFacingRight ? body.getPosition().x - 26 : body.getPosition().x - 36;
+        float posY = body.getPosition().y - 24;
+
+        batch.draw(upperBodyFrame, posX, posY, 64, 64);
+        batch.draw(lowerBodyFrame, posX, posY, 64, 64);
     }
 }

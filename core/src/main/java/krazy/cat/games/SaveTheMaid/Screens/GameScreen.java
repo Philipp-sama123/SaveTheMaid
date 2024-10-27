@@ -125,7 +125,6 @@ public class GameScreen implements Screen {
         update(dt);
         player.update(dt);
 
-
         // render game map
         renderer.render();
         // render Box2D Debug

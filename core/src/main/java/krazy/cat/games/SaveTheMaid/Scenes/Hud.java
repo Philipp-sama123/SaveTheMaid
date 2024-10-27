@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -147,15 +150,15 @@ public class Hud implements Disposable {
 
         // Adjust knob size relative to background
         TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
-        float knobWidth = joystickKnob.getWidth() * 0.125f;  // Scale down the knob width
-        float knobHeight = joystickKnob.getHeight() * 0.125f; // Scale down the knob height
+        float knobWidth = joystickKnob.getWidth() * .15f;  // Scale down the knob width
+        float knobHeight = joystickKnob.getHeight() * .15f; // Scale down the knob height
 
         knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
         knobDrawable.setMinHeight(knobHeight);
 
         // Create the Touchpad with a smaller size
-        float joystickWidth = joystickBackground.getWidth() * 0.125f; // Scale down the joystick background width
-        float joystickHeight = joystickBackground.getHeight() * 0.125f; // Scale down the joystick background height
+        float joystickWidth = joystickBackground.getWidth() * .15f; // Scale down the joystick background width
+        float joystickHeight = joystickBackground.getHeight() * .15f; // Scale down the joystick background height
 
         movementJoystick = new Touchpad(10, movementJoystickStyle);
 
