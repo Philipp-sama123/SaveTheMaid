@@ -39,6 +39,7 @@ public class Projectile {
         // Flag the projectile for removal
         isDestroyed = true;
         world.destroyBody(body);
+
     }
 
     private void defineProjectile(Vector2 position, Vector2 velocity) {
@@ -66,9 +67,8 @@ public class Projectile {
             body.applyForceToCenter(new Vector2(0, 100), true);  // Adjust the force value as needed
         }
 
-        if (body.getPosition().x > 500 || body.getPosition().x < -500 || body.getPosition().y < -500 || setToDestroy) {
-            isDestroyed = true;
-            world.destroyBody(body);
+        if (setToDestroy) { //ToDo: maximum range for bullets
+            destroy();
         }
     }
 

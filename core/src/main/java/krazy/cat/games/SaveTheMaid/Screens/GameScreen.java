@@ -31,6 +31,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameScreen implements Screen {
+    private boolean jumpPressed = false;
 
     private final SaveTheMaidGame game;
     private final Player player;
@@ -103,8 +104,14 @@ public class GameScreen implements Screen {
         // Get the x and y coordinates of the touch
         float joystickPercentX = hud.getMovementJoystick().getKnobPercentX(); // Knob percentage movement on the X-axis
         player.move(joystickPercentX);
+        // Jump button handling
         if (hud.getJumpButton().isPressed()) {
-            player.jump();
+            if (!jumpPressed) { // If the jump button is pressed for the first time
+                player.jump();
+                jumpPressed = true; // Mark jump as pressed
+            }
+        } else {
+            jumpPressed = false; // Reset when button is released
         }
         if (hud.getShootButton().isPressed()) {
             player.shoot();

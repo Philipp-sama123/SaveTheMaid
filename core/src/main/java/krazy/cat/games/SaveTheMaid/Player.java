@@ -17,6 +17,9 @@ import com.badlogic.gdx.utils.Array;
 import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent.AnimationType;
 
 public class Player {
+    private static final int MAX_JUMPS = 3;
+    private int jumpCount = 0;
+
     private final AnimationSetFemaleAgent animationSetAgent;
     public World world;
     public Body body;
@@ -31,6 +34,8 @@ public class Player {
 
     private Array<Projectile> projectiles;
     private Texture projectileTexture;
+    private boolean damaged;
+    private float damageTimer;
 
     public Player(World world) {
         super();
@@ -43,17 +48,28 @@ public class Player {
         definePlayer();
     }
 
-    public void update(float dt) {
-        stateTime += dt;
+    public void update(float delta) {
+        stateTime += delta;
         // Remove if destroyed
         for (int i = projectiles.size - 1; i >= 0; i--) {
             Projectile projectile = projectiles.get(i);
-            projectile.update(dt);
+            projectile.update(delta);
 
             // Remove if destroyed
             if (projectile.isDestroyed()) {
                 projectiles.removeIndex(i);
             }
+        }
+        if (damaged) {
+            damageTimer -= delta;
+            if (damageTimer <= 0) {
+                damaged = false;
+                damageTimer = 0;
+            }
+        }
+        // Check if grounded to reset jump count
+        if (Math.abs(body.getLinearVelocity().y) < 0.01f && jumpCount > 0) {
+            jumpCount = 0;
         }
     }
 
@@ -75,7 +91,7 @@ public class Player {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = rectShape;
         // Attach the fixture to the body
-        body.createFixture(fixtureDef);
+        body.createFixture(fixtureDef).setUserData(this);
 
         // Clean up the shape to free resources
         rectShape.dispose();
@@ -122,7 +138,11 @@ public class Player {
 
         adjustLowerBodyFrameOrientation();
         adjustUpperBodyFrameOrientation();
-
+        if (damaged) {
+            batch.setColor(1, 0, 0, 1);  // Set color to red
+        } else {
+            batch.setColor(1, 1, 1, 1);  // Default color
+        }
         batch.draw(
             getCurrentUpperBodyFrame(), // The current upper body frame
             isFacingRightUpperBody ? body.getPosition().x - 26 : body.getPosition().x - 36, // X position
@@ -130,7 +150,6 @@ public class Player {
             64, // Width of the sprite
             64 // Height of the sprite
         );
-
         // Optionally, if you also want to draw the lower body frame:
         batch.draw(
             getCurrentLowerBodyFrame(), // The current lower body frame
@@ -139,6 +158,9 @@ public class Player {
             64, // Width of the sprite
             64 // Height of the sprite
         );
+        batch.setColor(1, 1, 1, 1);  // Reset color after rendering
+
+
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
@@ -150,11 +172,14 @@ public class Player {
     }
 
     public void jump() {
-        // Only apply vertical impulse for jump, keeping horizontal velocity intact
-      //  if (Math.abs(body.getLinearVelocity().y) < 0.01f) { // Ensure grounded before jumping
-            body.applyLinearImpulse(new Vector2(0, 750), body.getWorldCenter(), true);
+        Gdx.app.log("MAX_JUMPS", "jumpCount: " + jumpCount);
+        Gdx.app.log("MAX_JUMPS", "MAX_JUMPS: " + MAX_JUMPS);
+
+        if (jumpCount < MAX_JUMPS) { // Only jump if jumps left
+            body.applyLinearImpulse(new Vector2(0, 1000), body.getWorldCenter(), true);
+            jumpCount++;
             stateTime = 0;
-     //   }
+        }
     }
 
 
@@ -215,5 +240,21 @@ public class Player {
             Projectile projectile = new Projectile(world, position, velocity, projectileTexture);
             projectiles.add(projectile);
         }
+    }
+
+    public void setDamaged(boolean damaged) {
+        this.damaged = damaged;
+    }
+
+    public void startRedFlashEffect(float duration) {
+        this.damaged = true;
+        this.damageTimer = duration;
+    }
+
+
+    public void onEnemyCollision() {
+        Gdx.app.log("onEnemyCollision", "PLAYER: " + this);
+        setDamaged(true);
+        startRedFlashEffect(2f);
     }
 }

@@ -5,10 +5,6 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
-
-import krazy.cat.games.SaveTheMaid.Projectile;
-import krazy.cat.games.SaveTheMaid.Enemy;
 
 public class WorldContactListener implements ContactListener {
 
@@ -17,14 +13,21 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        // Check if either fixture is a Projectile
         if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Enemy) {
             handleProjectileHit((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Enemy) {
             handleProjectileHit((Projectile) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
         }
+        else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Enemy) {
+            handlePlayerEnemyCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
+        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof Enemy) {
+            handlePlayerEnemyCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
+        }
     }
-
+    private void handlePlayerEnemyCollision(Player player, Enemy enemy) {
+        player.onEnemyCollision(); // Define an `onHit()` method in `Player` to handle damage, knockback, etc.
+        enemy.onPlayerCollision(); // Handle enemy response, if any, to the collision
+    }
     private void handleProjectileHit(Projectile projectile, Enemy enemy) {
         // Flag the projectile and enemy for destruction or update their states
         projectile.onCollision();

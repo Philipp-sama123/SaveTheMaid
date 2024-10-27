@@ -140,4 +140,8 @@ public class Enemy {
             body = null;
         }
     }
+
+    public void onPlayerCollision() {
+        Gdx.app.log("onEnemyCollision", "PLAYER: "+ this);
+    }
 }
