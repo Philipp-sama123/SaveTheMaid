@@ -98,7 +98,7 @@ public class GameScreen implements Screen {
         world.step(1 / 60f, 6, 2);
 
         for (Enemy enemy : enemies) {
-            enemy.update(dt);
+            enemy.update(dt,player.body.getPosition());
         }
 
         gameCamera.position.x = player.body.getPosition().x;

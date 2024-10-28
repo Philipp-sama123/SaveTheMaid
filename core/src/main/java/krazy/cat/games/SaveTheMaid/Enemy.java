@@ -10,8 +10,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-
 public class Enemy {
+    private static final float ATTACK_RANGE = 50f; // Adjust for attack range
+    private static final float MOVEMENT_SPEED = 15f; // Adjust for desired speed
+
     private World world;
     public Body body;
     private AnimationSetZombie animationSet;
@@ -50,13 +52,11 @@ public class Enemy {
         shape.dispose();
     }
 
-    public void update(float dt) {
+    public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed && !deathAnimationCompleted()) {
-            // Continue death animation
             stateTime += dt;
             return;
         } else if (isDestroyed && deathAnimationCompleted()) {
-            // Mark for removal from world and dispose of resources
             readyToDispose = true;
             dispose();
             return;
@@ -64,20 +64,36 @@ public class Enemy {
 
         stateTime += dt;
 
-        // If in HIT state, check if animation has completed before returning to previous state
         if (isHit && animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime)) {
             currentState = previousState;
             isHit = false;
             stateTime = 0f;
-        } else if (!isHit) { // Only update state if not hit
-            if (body.getLinearVelocity().x != 0) {
-                currentState = AnimationSetZombie.ZombieAnimationType.WALK;
+        } else if (!isHit) {
+            if (isPlayerInRange(playerPosition)) {
+                currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
+                body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop moving while attacking
             } else {
-                currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+                moveToPlayer(playerPosition);
             }
         }
 
         adjustFacingDirection();
+    }
+
+    private void moveToPlayer(Vector2 playerPosition) {
+        // Calculate direction vector to the player
+        Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
+        direction.scl(MOVEMENT_SPEED); // Scale by movement speed
+
+        // Set enemy velocity in the direction of the player
+        body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
+
+        // Update state to WALK if the enemy is moving
+        if (direction.len() > 0) {
+            currentState = AnimationSetZombie.ZombieAnimationType.WALK;
+        } else {
+            currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+        }
     }
 
     private boolean deathAnimationCompleted() {
@@ -92,6 +108,10 @@ public class Enemy {
             isFacingRight = false;
             animationSet.flipFramesHorizontally();
         }
+    }
+
+    private boolean isPlayerInRange(Vector2 playerPosition) {
+        return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
     }
 
     public void draw(Batch batch) {
@@ -109,14 +129,14 @@ public class Enemy {
     }
 
     public void takeDamage(int damage) {
-        if (isDestroyed || isHit) return; // Avoid further hits if already destroyed or in HIT state
+        if (isDestroyed || isHit) return;
         Gdx.app.log("DAMAGE", "Damage enemy " + damage);
         health -= damage;
         if (health <= 0) {
             health = 0;
             currentState = AnimationSetZombie.ZombieAnimationType.DEATH;
             isDestroyed = true;
-            stateTime = 0f; // Reset state time to start DEATH animation
+            stateTime = 0f;
         } else {
             previousState = currentState;
             currentState = AnimationSetZombie.ZombieAnimationType.HIT;
@@ -126,7 +146,7 @@ public class Enemy {
     }
 
     public void onHit() {
-        takeDamage(20);  // Adjust damage value based on your game mechanics
+        takeDamage(20);
     }
 
     public boolean isReadyToDispose() {
@@ -142,6 +162,6 @@ public class Enemy {
     }
 
     public void onPlayerCollision() {
-        Gdx.app.log("onEnemyCollision", "PLAYER: "+ this);
+        Gdx.app.log("onEnemyCollision", "PLAYER: " + this);
     }
 }
