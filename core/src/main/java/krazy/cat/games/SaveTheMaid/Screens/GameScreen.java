@@ -7,7 +7,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -57,7 +60,17 @@ public class GameScreen implements Screen {
 
 
         this.mapLoader = new TmxMapLoader();
+        // fix for map background artifacts
         this.map = mapLoader.load("Tiled/Level_1.tmx");
+        for (TiledMapTileSet tileSet : map.getTileSets()) {
+            for (TiledMapTile tile : tileSet) {
+                if (tile.getTextureRegion() != null) {
+                    tile.getTextureRegion().getTexture().setFilter(
+                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
+                    );
+                }
+            }
+        }
         this.renderer = new OrthogonalTiledMapRenderer(map, 1);
 
         this.gameCamera = new OrthographicCamera();
@@ -67,10 +80,10 @@ public class GameScreen implements Screen {
 
         this.world = new World(new Vector2(0, -125), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
-        new Box2dWorldCreator(world, map);
+        var b2dWorld = new Box2dWorldCreator(world, map);
         // Initialize the enemies array and add a sample enemy
-        enemies = new Array<>();
-        enemies.add(new Enemy(world, new Vector2(300, 100))); //
+        enemies = b2dWorld.getEnemies();
+        //enemies.add(new Enemy(world, new Vector2(300, 100))); //
 
         world.setContactListener(new WorldContactListener());
 

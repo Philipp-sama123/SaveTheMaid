@@ -4,18 +4,22 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
+import krazy.cat.games.SaveTheMaid.Enemy;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Coin;
 
 public class Box2dWorldCreator {
-    public Box2dWorldCreator(World world, TiledMap map) {
+    private Array<Enemy> enemies = new Array<>();
 
+    public Box2dWorldCreator(World world, TiledMap map) {
         BodyDef bodyDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
@@ -50,7 +54,13 @@ public class Box2dWorldCreator {
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             new Brick(world, map, rectangle);
+        }     // goes through "Bricks" layers to get bodies and create them
+        for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
+            enemies.add(new Enemy(world, new Vector2(rectangle.x, rectangle.y)));
         }
-
+    }
+    public Array<Enemy> getEnemies() {
+        return enemies;
     }
 }
