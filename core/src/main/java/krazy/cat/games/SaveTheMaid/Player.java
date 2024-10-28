@@ -108,7 +108,6 @@ public class Player {
 
         // Determine the target speed based on input strength
         float targetSpeed = calculateTargetSpeed(moveInput, isGrounded);
-
         smoothSpeedTransition(targetSpeed, accelerationFactor);
 
         // Update facing direction and animation state
@@ -117,7 +116,7 @@ public class Player {
             adjustFrameOrientation();
         }
 
-        updateAnimationStateBasedOnMovement(targetSpeed);
+        updateAnimationStateBasedOnMovement();
     }
 
     public void shoot() {
@@ -184,7 +183,7 @@ public class Player {
         if (shootAnimation.isAnimationFinished(stateTime)) {
             isShooting = false;
             stateTime = 0f;
-            currentAnimationState = AnimationType.IDLE; // Reset to idle after shooting animation
+            updateAnimationStateBasedOnMovement();
         }
     }
 
@@ -201,7 +200,7 @@ public class Player {
         }
         if (!isGrounded)
             targetSpeed /= 2;
-        
+
         return targetSpeed;
     }
 
@@ -226,7 +225,7 @@ public class Player {
         }
     }
 
-    private void updateAnimationStateBasedOnMovement(float targetSpeed) {
+    private void updateAnimationStateBasedOnMovement() {
         int currentVelocityX = Math.round(body.getLinearVelocity().x);
         int currentVelocityY = Math.round(body.getLinearVelocity().y);
         if (currentVelocityY > 0) {
@@ -234,7 +233,7 @@ public class Player {
         } else if (currentVelocityY < 0) {
             currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
         } else if (currentVelocityX != 0) {
-            boolean isRunning = Math.abs(targetSpeed) >= runSpeed;
+            boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
             currentAnimationState = isShooting ? (isRunning ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT)
                 : (isRunning ? AnimationType.RUN : AnimationType.WALK);
         } else {
