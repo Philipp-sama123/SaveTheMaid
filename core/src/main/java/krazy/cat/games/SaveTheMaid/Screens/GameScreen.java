@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
 
-    private Array<Enemy> enemies;
+    private Array<Enemy> enemies = new Array<>();
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
@@ -74,17 +74,14 @@ public class GameScreen implements Screen {
         this.renderer = new OrthogonalTiledMapRenderer(map, 1);
 
         this.gameCamera = new OrthographicCamera();
-        this.gameViewport = new FitViewport((float) GAME_WIDTH, (float) GAME_HEIGHT, gameCamera);
+        this.gameViewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, gameCamera);
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
         this.world = new World(new Vector2(0, -125), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
-        var b2dWorld = new Box2dWorldCreator(world, map);
-        // Initialize the enemies array and add a sample enemy
-        enemies = b2dWorld.getEnemies();
-        //enemies.add(new Enemy(world, new Vector2(300, 100))); //
-
+        // Initializes also the enemies
+        new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
 
         player = new Player(world);
@@ -182,5 +179,9 @@ public class GameScreen implements Screen {
         world.dispose();
         box2DDebugRenderer.dispose();
         hud.dispose();
+    }
+
+    public void addEnemy(Enemy enemy) {
+        enemies.add(enemy);
     }
 }

@@ -13,13 +13,12 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 import krazy.cat.games.SaveTheMaid.Enemy;
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Coin;
 
 public class Box2dWorldCreator {
-    private Array<Enemy> enemies = new Array<>();
-
-    public Box2dWorldCreator(World world, TiledMap map) {
+    public Box2dWorldCreator(World world, TiledMap map, GameScreen gameScreen) {
         BodyDef bodyDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
@@ -57,10 +56,8 @@ public class Box2dWorldCreator {
         }     // goes through "Bricks" layers to get bodies and create them
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            enemies.add(new Enemy(world, new Vector2(rectangle.x, rectangle.y)));
+            gameScreen.addEnemy(new Enemy(world, new Vector2(rectangle.x, rectangle.y)));
         }
     }
-    public Array<Enemy> getEnemies() {
-        return enemies;
-    }
+
 }
