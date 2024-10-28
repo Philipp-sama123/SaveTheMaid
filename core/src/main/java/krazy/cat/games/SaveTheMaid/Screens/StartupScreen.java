@@ -1,0 +1,102 @@
+package krazy.cat.games.SaveTheMaid.Screens;
+
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
+import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
+
+public class StartupScreen implements Screen {
+
+    private final SaveTheMaidGame game;
+    private final Stage stage;
+    private final Viewport viewport;
+
+    public StartupScreen(SaveTheMaidGame game) {
+        this.game = game;
+
+        viewport = new FitViewport(SaveTheMaidGame.GAME_WIDTH, SaveTheMaidGame.GAME_HEIGHT);
+
+        stage = new Stage(viewport, game.batch);
+
+        // Load button textures
+        Texture playTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/PlayButton.png"));
+        Texture playPressedTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/PlayButtonPressed.png")); // Add pressed texture
+        Texture customizeTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/SettingsButton.png"));
+        Texture customizePressedTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/SettingsButtonPressed.png")); // Add pressed texture
+
+
+        // Set up Play button
+        ImageButton playButton = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
+        playButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new GameScreen(game));
+            }
+        });
+
+        // Set up Customize button
+        ImageButton customizeButton = new ImageButton(new TextureRegionDrawable(customizeTexture), new TextureRegionDrawable(customizePressedTexture));
+        customizeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new CustomizeScreen(game));
+            }
+        });
+
+        // Layout buttons in a table
+        Table table = new Table();
+        table.center();
+        table.setFillParent(true);
+        table.add(playButton).size(50).pad(20);
+        table.add(customizeButton).size(50).pad(20);
+
+        stage.addActor(table);
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    @Override
+    public void show() {
+    }
+
+    @Override
+    public void render(float delta) {
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+}

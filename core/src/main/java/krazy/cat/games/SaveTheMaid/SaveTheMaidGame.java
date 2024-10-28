@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
 
 public class SaveTheMaidGame extends Game {
     public SpriteBatch batch;
@@ -14,7 +15,7 @@ public class SaveTheMaidGame extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        setScreen(new GameScreen(this));
+        setScreen(new StartupScreen(this));
     }
 
 }
