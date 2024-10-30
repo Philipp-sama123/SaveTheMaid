@@ -13,9 +13,9 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getUserData() instanceof Player && "attack".equals(fixtureB.getUserData())) {
+        if (fixtureA.getUserData() instanceof Player && "EnemyAttack".equals(fixtureB.getUserData())) {
             handleAttackCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getBody().getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && "attack".equals(fixtureA.getUserData())) {
+        } else if (fixtureB.getUserData() instanceof Player && "EnemyAttack".equals(fixtureA.getUserData())) {
             handleAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getBody().getUserData());
         } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Enemy) {
             handleProjectileHit((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());

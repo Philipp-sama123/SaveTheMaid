@@ -49,7 +49,11 @@ public class Enemy {
         fixtureDef.shape = shape;
         body.createFixture(fixtureDef).setUserData(this);
         shape.dispose();
+
+        // Initialize the attack collider as a sensor initially
+        createAttackCollider();
     }
+
     public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed && !deathAnimationCompleted()) {
             stateTime += dt;
@@ -67,34 +71,72 @@ public class Enemy {
             isHit = false;
             stateTime = 0f;
         } else if (isHit) {
-            // Stop moving while hit (optional)
             body.setLinearVelocity(0, body.getLinearVelocity().y);
         } else {
             if (isPlayerInRange(playerPosition)) {
                 currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
                 body.setLinearVelocity(0, body.getLinearVelocity().y);
+
+                // Enable attack collider while attacking
+                if (!attackColliderActive) {
+                    activateAttackCollider();
+                }
             } else {
                 moveToPlayer(playerPosition);
+                if (attackColliderActive) {
+                    deactivateAttackCollider();
+                }
             }
         }
-        // Adjust facing direction based on velocity
         adjustFacingDirection();
     }
-    // No `flipped` flag needed anymore.
+
+    private void createAttackCollider() {
+        PolygonShape attackShape = new PolygonShape();
+        float xOffset = isFacingLeft ? -12f : 12f;
+        attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
+
+        FixtureDef attackFixtureDef = new FixtureDef();
+        attackFixtureDef.shape = attackShape;
+        attackFixtureDef.isSensor = true; // Ensure it’s always a sensor
+
+        attackCollider = body.createFixture(attackFixtureDef);
+        attackCollider.setUserData("EnemyAttack");
+        attackShape.dispose();
+
+        attackColliderActive = false;
+    }
+
     private void adjustFacingDirection() {
         float velocityX = body.getLinearVelocity().x;
 
         if (velocityX < 0 && !isFacingLeft) {
-            // Moving left and not facing left, flip frames to face left
             animationSet.flipFramesHorizontally();
             isFacingLeft = true;
+            recreateAttackCollider(); // Reposition the collider when facing left
         } else if (velocityX > 0 && isFacingLeft) {
-            // Moving right and facing left, flip frames to face right
             animationSet.flipFramesHorizontally();
             isFacingLeft = false;
+            recreateAttackCollider(); // Reposition the collider when facing right
         }
     }
 
+    private void recreateAttackCollider() {
+        if (attackCollider != null) {
+            body.destroyFixture(attackCollider);
+        }
+        createAttackCollider();
+    }
+
+    private void activateAttackCollider() {
+        attackCollider.setSensor(true); // Keep it as a sensor
+        attackColliderActive = true;
+    }
+
+    private void deactivateAttackCollider() {
+        attackCollider.setSensor(true); // Ensure it remains a sensor when deactivated
+        attackColliderActive = false;
+    }
 
     private void moveToPlayer(Vector2 playerPosition) {
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
@@ -113,7 +155,6 @@ public class Enemy {
         return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.DEATH).isAnimationFinished(stateTime);
     }
 
-
     private boolean isPlayerInRange(Vector2 playerPosition) {
         return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
     }
@@ -124,16 +165,14 @@ public class Enemy {
         boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
-        // Draw frame based on isFacingLeft; remove position adjustment, rely on `flipFramesHorizontally`
         batch.draw(
             currentFrame,
-            body.getPosition().x - 32, // Adjust for position only
+            body.getPosition().x - 32,
             body.getPosition().y - 20,
-            64,                         // Width of frame
-            64                          // Height of frame
+            64,
+            64
         );
     }
-
 
     public void takeDamage(int damage) {
         if (isDestroyed || isHit) return;
@@ -163,6 +202,7 @@ public class Enemy {
     public void dispose() {
         animationSet.dispose();
         if (world != null && body != null) {
+            if (attackCollider != null) body.destroyFixture(attackCollider);
             world.destroyBody(body);
             body = null;
         }
