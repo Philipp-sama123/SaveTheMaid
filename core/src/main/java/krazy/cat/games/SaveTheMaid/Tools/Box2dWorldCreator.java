@@ -32,7 +32,7 @@ public class Box2dWorldCreator {
             body = world.createBody(bodyDef);
             shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
             fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
+            body.createFixture(fixtureDef).setUserData("environment");
         }
         // goes through "Pipes" layers to get bodies and create them
         for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
@@ -42,7 +42,7 @@ public class Box2dWorldCreator {
             body = world.createBody(bodyDef);
             shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
             fixtureDef.shape = shape;
-            body.createFixture(fixtureDef);
+            body.createFixture(fixtureDef).setUserData("environment");
         }
         // goes through "Coins" layers to get bodies and create them
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {

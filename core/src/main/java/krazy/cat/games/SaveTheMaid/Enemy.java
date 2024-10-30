@@ -5,14 +5,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
+
 public class Enemy {
-    private static final float ATTACK_RANGE = 50f; // Adjust for attack range
-    private static final float MOVEMENT_SPEED = 15f; // Adjust for desired speed
+    private static final float ATTACK_RANGE = 25f;
+    private static final float MOVEMENT_SPEED = 15f;
 
     private World world;
     public Body body;
@@ -20,11 +17,13 @@ public class Enemy {
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
     private float stateTime;
-    private boolean isFacingRight = true;
+    private boolean isFacingLeft = true;
     private int health = 100;
     private boolean isDestroyed = false;
     private boolean isHit = false;
     private boolean readyToDispose = false;
+    private Fixture attackCollider;
+    private boolean attackColliderActive = false;
 
     public Enemy(World world, Vector2 position) {
         this.world = world;
@@ -52,6 +51,19 @@ public class Enemy {
         shape.dispose();
     }
 
+    private void createAttackCollider() {
+        PolygonShape attackShape = new PolygonShape();
+        attackShape.setAsBox(10f, 20f, new Vector2(isFacingLeft ? 20f : -20f, 0), 0); // Position in front of enemy
+
+        FixtureDef attackFixtureDef = new FixtureDef();
+        attackFixtureDef.shape = attackShape;
+        attackFixtureDef.isSensor = true; // Set as sensor to detect collision without physical response
+
+        attackCollider = body.createFixture(attackFixtureDef);
+        attackCollider.setUserData("attack"); // Tag it for identification in collision handling
+        attackShape.dispose();
+    }
+
     public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed && !deathAnimationCompleted()) {
             stateTime += dt;
@@ -68,12 +80,23 @@ public class Enemy {
             currentState = previousState;
             isHit = false;
             stateTime = 0f;
-        } else if (!isHit) {
+        } else if (isHit) {
+            body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop moving while hit
+        } else {
             if (isPlayerInRange(playerPosition)) {
                 currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
                 body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop moving while attacking
+
+                if (!attackColliderActive) {
+                    createAttackCollider();
+                    attackColliderActive = true;
+                }
             } else {
                 moveToPlayer(playerPosition);
+                if (attackColliderActive) {
+                    body.destroyFixture(attackCollider); // Remove the collider when not attacking
+                    attackColliderActive = false;
+                }
             }
         }
 
@@ -81,14 +104,11 @@ public class Enemy {
     }
 
     private void moveToPlayer(Vector2 playerPosition) {
-        // Calculate direction vector to the player
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
-        direction.scl(MOVEMENT_SPEED); // Scale by movement speed
+        direction.scl(MOVEMENT_SPEED);
 
-        // Set enemy velocity in the direction of the player
         body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
 
-        // Update state to WALK if the enemy is moving
         if (direction.len() > 0) {
             currentState = AnimationSetZombie.ZombieAnimationType.WALK;
         } else {
@@ -101,14 +121,17 @@ public class Enemy {
     }
 
     private void adjustFacingDirection() {
-        if (body.getLinearVelocity().x > 0 && !isFacingRight) {
-            isFacingRight = true;
-            animationSet.flipFramesHorizontally();
-        } else if (body.getLinearVelocity().x < 0 && isFacingRight) {
-            isFacingRight = false;
-            animationSet.flipFramesHorizontally();
+        boolean movingLeft = body.getLinearVelocity().x < 0;
+        if (movingLeft != isFacingLeft) {
+            // Update the facing direction
+            isFacingLeft = movingLeft;
+            // Flip frames only if the direction has actually changed
+            if (animationSet.isFlipped() != movingLeft) {
+                animationSet.flipFramesHorizontally();
+            }
         }
     }
+
 
     private boolean isPlayerInRange(Vector2 playerPosition) {
         return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
@@ -121,9 +144,9 @@ public class Enemy {
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
         batch.draw(
             currentFrame,
-            isFacingRight ? body.getPosition().x - 32 : body.getPosition().x + 32,
+            isFacingLeft ? body.getPosition().x - 32 : body.getPosition().x + 32,
             body.getPosition().y - 20,
-            isFacingRight ? 64 : -64,
+            isFacingLeft ? 64 : -64,
             64
         );
     }

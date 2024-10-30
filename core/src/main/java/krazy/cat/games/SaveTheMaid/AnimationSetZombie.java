@@ -79,15 +79,20 @@ public class AnimationSetZombie {
         }
         return animation;
     }
-
     public void flipFramesHorizontally() {
         for (Animation<TextureRegion> animation : animations.values()) {
             for (TextureRegion frame : animation.getKeyFrames()) {
-                frame.flip(true, false);
+                // Flip only if it hasn't already been flipped
+                if (frame.isFlipX() != flipped) {
+                    frame.flip(true, false);
+                }
             }
         }
-        flipped = !flipped;
+        flipped = !flipped; // Toggle flipped state
+        System.out.println("Flipped frames horizontally. Now facing: " + (flipped ? "left" : "right"));
     }
+
+
 
     public boolean isFlipped() {
         return flipped;
