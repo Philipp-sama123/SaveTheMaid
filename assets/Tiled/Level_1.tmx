@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="48">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="59">
  <tileset firstgid="1" source="PlatformerAssets.tsx"/>
  <layer id="1" name="Background" width="200" height="200">
   <data encoding="csv">
@@ -427,5 +427,16 @@
   <object id="44" x="3226.66" y="6331.02" width="38.7281" height="32.6131"/>
   <object id="45" x="5468.81" y="6335.1" width="34.6514" height="32.6131"/>
   <object id="46" x="4987.77" y="6335.1" width="38.7281" height="32.6131"/>
+  <object id="48" x="2364.86" y="6049.28" width="35.7711" height="26.8283"/>
+  <object id="49" x="2749.4" y="6336.45" width="34.7774" height="27.8219"/>
+  <object id="50" x="2558.62" y="6334.46" width="36.7647" height="32.7901"/>
+  <object id="51" x="2302.27" y="6333.47" width="41.7329" height="32.7901"/>
+  <object id="52" x="5854.53" y="6329.49" width="46.7011" height="35.7711"/>
+  <object id="53" x="5989.67" y="6332.47" width="44.7138" height="34.7774"/>
+  <object id="54" x="5658.78" y="6330.48" width="55.6439" height="36.7647"/>
+  <object id="55" x="5768.08" y="6338.43" width="31.7965" height="29.8092"/>
+  <object id="56" x="6082.07" y="6342.41" width="43.7202" height="23.8474"/>
+  <object id="57" x="98.3704" y="6337.44" width="30.8029" height="27.8219"/>
+  <object id="58" x="672.695" y="6333.47" width="33.7838" height="34.7774"/>
  </objectgroup>
 </map>
