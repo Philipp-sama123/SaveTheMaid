@@ -98,7 +98,7 @@ public class GameScreen implements Screen {
         world.step(1 / 60f, 6, 2);
 
         for (Enemy enemy : enemies) {
-            enemy.update(dt,player.body.getPosition());
+            enemy.update(dt, player.body.getPosition());
         }
 
         gameCamera.position.x = player.body.getPosition().x;
@@ -107,7 +107,7 @@ public class GameScreen implements Screen {
         gameCamera.update();
         // just render what the camera can see
         renderer.setView(gameCamera);
-
+        hud.update(dt);
     }
 
     private void handleInput(float dt) {
@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
         player.move(joystickPercentX);
         // Jump button handling
         if (hud.getJumpButton().isPressed()) {
-            if (!jumpPressed) { // If the jump button is pressed for the first time
+            if (!jumpPressed ) { // If the jump button is pressed for the first time
                 player.jump();
                 jumpPressed = true; // Mark jump as pressed
             }
@@ -125,6 +125,9 @@ public class GameScreen implements Screen {
         }
         if (hud.getShootButton().isPressed()) {
             player.shoot();
+        }
+        if (hud.getShootUpButton().isPressed()) {
+            player.shootUp();
         }
     }
 

@@ -16,6 +16,7 @@ public class Projectile {
     private boolean setToDestroy = false;
 
     private boolean isFacingRight;
+    private boolean isShootingUp; // New flag to indicate upward shooting
 
     public Projectile(World world, Vector2 position, Vector2 velocity, Texture texture) {
         this.world = world;
@@ -27,9 +28,11 @@ public class Projectile {
 
         // Set direction based on velocity
         isFacingRight = velocity.x > 0;
+        isShootingUp = velocity.y > 0;  // Determine if shooting upwards
+
         if (isFacingRight) {
             for (TextureRegion frame : frames[0]) {
-                frame.flip(true, false); // Flip horizontally for left-facing
+                frame.flip(true, false); // Flip horizontally if facing left
             }
         }
         defineProjectile(position, velocity);
@@ -39,7 +42,6 @@ public class Projectile {
         // Flag the projectile for removal
         isDestroyed = true;
         world.destroyBody(body);
-
     }
 
     private void defineProjectile(Vector2 position, Vector2 velocity) {
@@ -74,7 +76,14 @@ public class Projectile {
 
     public void draw(Batch batch) {
         if (!isDestroyed) {
-            batch.draw(animation.getKeyFrame(stateTime), body.getPosition().x - 8, body.getPosition().y - 6, 16, 12);
+            TextureRegion frame = animation.getKeyFrame(stateTime);
+
+            // Draw rotated frame if shooting upwards
+            if (isShootingUp) {
+                batch.draw(frame, body.getPosition().x - 8, body.getPosition().y - 6, 8, 6, 16, 12, 1, 1, -90);
+            } else {
+                batch.draw(frame, body.getPosition().x - 8, body.getPosition().y - 6, 16, 12);
+            }
         }
     }
 

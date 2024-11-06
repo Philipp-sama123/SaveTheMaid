@@ -24,8 +24,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import javax.swing.ButtonModel;
-
 public class Hud implements Disposable {
     private final InputMultiplexer inputMultiplexer;
     public Stage stage;
@@ -41,13 +39,14 @@ public class Hud implements Disposable {
     Label levelLabel;
     Label worldLabel;
     Label playerLabel;
+
     private ImageButton jumpButton;
     private ImageButton shootButton;
+    private ImageButton shootUpButton;
     private Touchpad movementJoystick;
-    private Touchpad shootingJoystick;
 
     public Hud(SpriteBatch spriteBatch) {
-        worldTimer = 300;
+        worldTimer = 0;
         timeCount = 0;
         score = 0;
 
@@ -93,6 +92,10 @@ public class Hud implements Disposable {
         return jumpButton;
     }
 
+    public ImageButton getShootUpButton() {
+        return shootUpButton;
+    }
+
     public ImageButton getShootButton() {
         return shootButton;
     }
@@ -117,13 +120,16 @@ public class Hud implements Disposable {
         buttonStyleShoot.down = new TextureRegionDrawable(shootTextureDown);
 
         shootButton = new ImageButton(buttonStyleShoot);
+        shootUpButton = new ImageButton(buttonStyleShoot);
 
         // Arrange button in a table
         Table table = new Table();
         table.setFillParent(true);
         table.center().right();
+
+        table.add(jumpButton).size(25, 25).pad(10).row();
+        table.add(shootUpButton).size(25, 25).pad(10).row();
         table.add(shootButton).size(25, 25).pad(10);
-        table.add(jumpButton).size(25, 25).pad(10);
 
         stage.addActor(table);
     }
@@ -173,6 +179,15 @@ public class Hud implements Disposable {
         stage.addActor(table);
     }
 
+    // Method to update the timer and display in the HUD
+    public void update(float deltaTime) {
+        timeCount += deltaTime;
+        if (timeCount >= 1) {  // Decrement timer every second
+            worldTimer++;
+            countdownLabel.setText(String.format("%03d", worldTimer));  // Update label
+            timeCount = 0;
+        }
+    }
 
     @Override
     public void dispose() {

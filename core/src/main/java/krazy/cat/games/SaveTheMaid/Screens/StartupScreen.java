@@ -24,19 +24,20 @@ public class StartupScreen implements Screen {
     private final SaveTheMaidGame game;
     private final Stage stage;
     private final Viewport viewport;
+    Texture backgroundTexture;
 
     public StartupScreen(SaveTheMaidGame game) {
         this.game = game;
-
+        backgroundTexture = new Texture("Characters/FemaleAgent/Portrait/Red.png");
         viewport = new FitViewport(SaveTheMaidGame.GAME_WIDTH, SaveTheMaidGame.GAME_HEIGHT);
 
         stage = new Stage(viewport, game.batch);
 
         // Load button textures
-        Texture playTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/PlayButton.png"));
-        Texture playPressedTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/PlayButtonPressed.png")); // Add pressed texture
-        Texture customizeTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/SettingsButton.png"));
-        Texture customizePressedTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/SettingsButtonPressed.png")); // Add pressed texture
+        Texture playTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Simple right.png"));
+        Texture playPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Simple right.png")); // Add pressed texture
+        Texture customizeTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Settings.png"));
+        Texture customizePressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Settings.png")); // Add pressed texture
 
 
         // Set up Play button
@@ -56,7 +57,6 @@ public class StartupScreen implements Screen {
                 game.setScreen(new CustomizeScreen(game));
             }
         });
-
         // Layout buttons in a table
         Table table = new Table();
         table.center();
@@ -74,6 +74,12 @@ public class StartupScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        // Draw the background
+        game.batch.begin();
+        game.batch.draw(backgroundTexture, 0, 0, backgroundTexture.getWidth(), backgroundTexture.getHeight());
+        game.batch.draw(backgroundTexture, GAME_WIDTH-backgroundTexture.getWidth(), 0, backgroundTexture.getWidth(), backgroundTexture.getHeight());
+        game.batch.end();
+
         stage.act(delta);
         stage.draw();
     }

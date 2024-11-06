@@ -32,6 +32,7 @@ public class Player {
 
     private boolean isCrouching = false;
     private boolean isShooting = false;
+    private boolean isShootingUp = false;
     private boolean isFacingRight = false;
 
     private Array<Projectile> projectiles;
@@ -56,6 +57,9 @@ public class Player {
 
         if (isShooting) {
             handleShootingAnimation();
+        }
+        if (isShootingUp) {
+            handleShootingUpAnimation();
         }
     }
 
@@ -119,13 +123,31 @@ public class Player {
         updateAnimationStateBasedOnMovement();
     }
 
+    public void shootUp() {
+        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
+
+        if (isGrounded &&!isShootingUp && !isShooting) {
+            isShootingUp = true;
+            stateTime = 0f;
+
+            // Spawn above the character and set velocity straight up
+            Vector2 position = body.getPosition().add(0, 20); // Adjust height if necessary
+            Vector2 velocity = new Vector2(0, 1000);           // Set to move vertically up
+
+            projectiles.add(new Projectile(world, position, velocity, projectileTexture));
+        }
+    }
+
     public void shoot() {
-        if (!isShooting) {
+        if (!isShooting && !isShootingUp) {
             isShooting = true;
             stateTime = 0f;
 
+            // Determine position offset and velocity based on facing direction
             Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, 10);
             Vector2 velocity = new Vector2(isFacingRight ? 1000 : -1000, 0);
+
+            // Add a new projectile with specified rotation
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
@@ -187,6 +209,15 @@ public class Player {
         }
     }
 
+    private void handleShootingUpAnimation() {
+        Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
+        if (shootAnimation.isAnimationFinished(stateTime)) {
+            isShootingUp = false;
+            stateTime = 0f;
+            updateAnimationStateBasedOnMovement();
+        }
+    }
+
     private float calculateTargetSpeed(float moveInput, boolean isGrounded) {
         float targetSpeed = 0;
         float absMoveInput = Math.abs(moveInput);
@@ -228,17 +259,31 @@ public class Player {
     private void updateAnimationStateBasedOnMovement() {
         int currentVelocityX = Math.round(body.getLinearVelocity().x);
         int currentVelocityY = Math.round(body.getLinearVelocity().y);
-        if (currentVelocityY > 0) {
-            currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-        } else if (currentVelocityY < 0) {
-            currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
-        } else if (currentVelocityX != 0) {
-            boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
-            currentAnimationState = isShooting ? (isRunning ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT)
-                : (isRunning ? AnimationType.RUN : AnimationType.WALK);
+        if (isShootingUp) {
+            if (currentVelocityY > 0) {
+                currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
+            } else if (currentVelocityY < 0) {
+                currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
+            } else if (currentVelocityX != 0) {
+                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
+                currentAnimationState = isRunning ? AnimationType.RUN_SHOOT_UP : AnimationType.WALK_SHOOT_UP;
+            } else {
+                currentAnimationState = isCrouching ? AnimationType.CROUCH_SHOOT_UP : AnimationType.STAND_SHOOT_UP;
+            }
         } else {
-            currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
-                : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
+            if (currentVelocityY > 0) {
+                currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
+            } else if (currentVelocityY < 0) {
+                currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
+            } else if (currentVelocityX != 0) {
+                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
+                currentAnimationState = isShooting ? (isRunning ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT)
+                    : (isRunning ? AnimationType.RUN : AnimationType.WALK);
+            } else {
+                currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
+                    : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
+            }
+
         }
     }
 
@@ -249,4 +294,5 @@ public class Player {
         batch.draw(upperBodyFrame, posX, posY, 64, 64);
         batch.draw(lowerBodyFrame, posX, posY, 64, 64);
     }
+
 }

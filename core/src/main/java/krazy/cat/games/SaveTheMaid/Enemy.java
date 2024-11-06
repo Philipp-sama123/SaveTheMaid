@@ -21,7 +21,6 @@ public class Enemy {
     private int health = 100;
     private boolean isDestroyed = false;
     private boolean isHit = false;
-    private boolean readyToDispose = false;
     private Fixture attackCollider;
     private boolean attackColliderActive = false;
 
@@ -36,34 +35,14 @@ public class Enemy {
         defineEnemy(position);
     }
 
-    private void defineEnemy(Vector2 position) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(position);
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        body = world.createBody(bodyDef);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(8f, 20f);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        body.createFixture(fixtureDef).setUserData(this);
-        shape.dispose();
-
-        // Initialize the attack collider as a sensor initially
-        createAttackCollider();
-    }
-
     public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed && !deathAnimationCompleted()) {
             stateTime += dt;
             return;
         } else if (isDestroyed && deathAnimationCompleted()) {
-            readyToDispose = true;
             dispose();
             return;
         }
-
         stateTime += dt;
 
         if (isHit && animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime)) {
@@ -89,6 +68,40 @@ public class Enemy {
             }
         }
         adjustFacingDirection();
+    }
+
+    public void draw(Batch batch) {
+        if (isDestroyed && deathAnimationCompleted()) return;
+
+        boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
+        TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
+
+        batch.draw(
+            currentFrame,
+            body.getPosition().x - 32,
+            body.getPosition().y - 20,
+            64,
+            64
+        );
+    }
+
+
+    private void defineEnemy(Vector2 position) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(position);
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(8f, 20f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        body.createFixture(fixtureDef).setUserData(this);
+        shape.dispose();
+
+        // Initialize the attack collider as a sensor initially
+        createAttackCollider();
     }
 
     private void createAttackCollider() {
@@ -159,21 +172,6 @@ public class Enemy {
         return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
     }
 
-    public void draw(Batch batch) {
-        if (isDestroyed && deathAnimationCompleted()) return;
-
-        boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
-        TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
-
-        batch.draw(
-            currentFrame,
-            body.getPosition().x - 32,
-            body.getPosition().y - 20,
-            64,
-            64
-        );
-    }
-
     public void takeDamage(int damage) {
         if (isDestroyed || isHit) return;
         Gdx.app.log("DAMAGE", "Damage enemy " + damage);
@@ -195,12 +193,7 @@ public class Enemy {
         takeDamage(20);
     }
 
-    public boolean isReadyToDispose() {
-        return readyToDispose;
-    }
-
     public void dispose() {
-        animationSet.dispose();
         if (world != null && body != null) {
             if (attackCollider != null) body.destroyFixture(attackCollider);
             world.destroyBody(body);
