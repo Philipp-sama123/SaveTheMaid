@@ -18,9 +18,13 @@ public class WorldContactListener implements ContactListener {
         } else if (fixtureB.getUserData() instanceof Player && "EnemyAttack".equals(fixtureA.getUserData())) {
             handleAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getBody().getUserData());
         } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Enemy) {
-            handleProjectileHit((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
+            handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Enemy) {
-            handleProjectileHit((Projectile) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
+            handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
+        }else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Player) {
+            handleProjectileHitPlayer((Projectile) fixtureA.getUserData(), (Player) fixtureB.getUserData());
+        } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Player) {
+            handleProjectileHitPlayer((Projectile) fixtureB.getUserData(), (Player) fixtureA.getUserData());
         } else if (fixtureA.getUserData() instanceof Projectile && "environment".equals(fixtureB.getUserData())) {
             handleProjectileEnvironmentCollision((Projectile) fixtureA.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && "environment".equals(fixtureA.getUserData())) {
@@ -45,10 +49,16 @@ public class WorldContactListener implements ContactListener {
         player.onEnemyCollision(); // Apply damage to the player
     }
 
-    private void handleProjectileHit(Projectile projectile, Enemy enemy) {
+    private void handleProjectileHitEnemy(Projectile projectile, Enemy enemy) {
         // Flag the projectile and enemy for destruction or update their states
         projectile.onCollision();
         enemy.onHit();  // Ensure `onHit` method is in your `Enemy` class for handling hit logic
+    }
+
+    private void handleProjectileHitPlayer(Projectile projectile, Player player) {
+        // Flag the projectile and enemy for destruction or update their states
+        projectile.onCollision();
+        player.onEnemyCollision();
     }
 
     @Override

@@ -131,7 +131,7 @@ public class Player {
             stateTime = 0f;
 
             // Spawn above the character and set velocity straight up
-            Vector2 position = body.getPosition().add(0, 20); // Adjust height if necessary
+            Vector2 position = body.getPosition().add(0, 40); // Adjust height if necessary
             Vector2 velocity = new Vector2(0, 1000);           // Set to move vertically up
 
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
