@@ -35,6 +35,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameScreen implements Screen {
     private boolean jumpPressed = false;
+    private boolean debugPressed = false;
 
     private final SaveTheMaidGame game;
     private final Player player;
@@ -53,6 +54,7 @@ public class GameScreen implements Screen {
     private Box2DDebugRenderer box2DDebugRenderer;
 
     private Array<Enemy> enemies = new Array<>();
+    public boolean isShowBox2dDebug;
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
@@ -116,7 +118,7 @@ public class GameScreen implements Screen {
         player.move(joystickPercentX);
         // Jump button handling
         if (hud.getJumpButton().isPressed()) {
-            if (!jumpPressed ) { // If the jump button is pressed for the first time
+            if (!jumpPressed) { // If the jump button is pressed for the first time
                 player.jump();
                 jumpPressed = true; // Mark jump as pressed
             }
@@ -128,6 +130,14 @@ public class GameScreen implements Screen {
         }
         if (hud.getShootUpButton().isPressed()) {
             player.shootUp();
+        }
+        if (hud.getDebugButton().isPressed()) {
+            if (!debugPressed) {
+                isShowBox2dDebug = !isShowBox2dDebug;
+                debugPressed = true; // Mark debug as pressed
+            }
+        } else {
+            debugPressed = false; // Reset when button is released
         }
     }
 
@@ -141,7 +151,8 @@ public class GameScreen implements Screen {
         // render game map
         renderer.render();
         // render Box2D Debug
-        box2DDebugRenderer.render(world, gameCamera.combined);
+        if (isShowBox2dDebug)
+            box2DDebugRenderer.render(world, gameCamera.combined);
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
         player.draw(game.batch);

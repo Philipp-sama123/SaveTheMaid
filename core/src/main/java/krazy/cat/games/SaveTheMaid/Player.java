@@ -40,12 +40,26 @@ public class Player {
     private boolean damaged;
     private float damageTimer;
 
+    private Animation<TextureRegion> jumpEffectAnimation;
+    private float jumpEffectTime;
+    private boolean showJumpEffect;
+
+
     public Player(World world) {
         this.world = world;
         animationSetAgent = new AnimationSetFemaleAgent(
             new Texture("Characters/FemaleAgent/Body/Black.png"),
             new Texture("Characters/FemaleAgent/Feet/Red.png")
         );
+
+        Array<TextureRegion> jumpEffectFrames = new Array<>();
+        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_01.png")));
+        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_02.png")));
+        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_03.png")));
+        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_04.png")));
+
+        jumpEffectAnimation = new Animation<>(0.05f, jumpEffectFrames, Animation.PlayMode.NORMAL);
+
         definePlayer();
     }
 
@@ -60,6 +74,13 @@ public class Player {
         }
         if (isShootingUp) {
             handleShootingUpAnimation();
+        }
+        // Update jump effect animation
+        if (showJumpEffect) {
+            jumpEffectTime += delta;
+            if (jumpEffectAnimation.isAnimationFinished(jumpEffectTime)) {
+                showJumpEffect = false;
+            }
         }
     }
 
@@ -90,6 +111,14 @@ public class Player {
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
+        // Draw the jump effect
+        if (showJumpEffect) {
+            TextureRegion jumpEffectFrame = jumpEffectAnimation.getKeyFrame(jumpEffectTime);
+            float effectPosX = body.getPosition().x - 16;  // Adjust position as needed
+            float effectPosY = body.getPosition().y - 24;  // Place slightly below the player
+            batch.draw(jumpEffectFrame, effectPosX, effectPosY, 32, 32);
+        }
+
     }
 
     public Array<Projectile> getProjectiles() {
@@ -103,6 +132,10 @@ public class Player {
             jumpCount++;
             stateTime = 0;
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
+
+            // Start jump effect animation
+            jumpEffectTime = 0;
+            showJumpEffect = true;
         }
     }
 
@@ -126,7 +159,7 @@ public class Player {
     public void shootUp() {
         boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
 
-        if (isGrounded &&!isShootingUp && !isShooting) {
+        if (isGrounded && !isShootingUp && !isShooting) {
             isShootingUp = true;
             stateTime = 0f;
 

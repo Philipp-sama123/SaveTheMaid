@@ -43,6 +43,7 @@ public class Hud implements Disposable {
     private ImageButton jumpButton;
     private ImageButton shootButton;
     private ImageButton shootUpButton;
+    private ImageButton debugButton;
     private Touchpad movementJoystick;
 
     public Hud(SpriteBatch spriteBatch) {
@@ -96,6 +97,10 @@ public class Hud implements Disposable {
         return shootUpButton;
     }
 
+    public ImageButton getDebugButton() {
+        return debugButton;
+    }
+
     public ImageButton getShootButton() {
         return shootButton;
     }
@@ -122,16 +127,29 @@ public class Hud implements Disposable {
         shootButton = new ImageButton(buttonStyleShoot);
         shootUpButton = new ImageButton(buttonStyleShoot);
 
-        // Arrange button in a table
-        Table table = new Table();
-        table.setFillParent(true);
-        table.center().right();
+        Texture debugButtonTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Buttons/Notifications.png"));
+        Texture debugButtonTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Notifications.png"));
 
-        table.add(jumpButton).size(25, 25).pad(10).row();
-        table.add(shootUpButton).size(25, 25).pad(10).row();
-        table.add(shootButton).size(25, 25).pad(10);
+        ImageButton.ImageButtonStyle buttonStyleDebugButton = new ImageButton.ImageButtonStyle();
 
-        stage.addActor(table);
+        buttonStyleDebugButton.up = new TextureRegionDrawable(debugButtonTextureUp);
+        buttonStyleDebugButton.down = new TextureRegionDrawable(debugButtonTextureDown);
+
+        debugButton = new ImageButton(buttonStyleDebugButton);
+        // Arrange main buttons in a right-aligned table
+        Table buttonTable = new Table();
+        buttonTable.setFillParent(true);
+        buttonTable.center().right();
+        buttonTable.add(jumpButton).size(25, 25).pad(10).row();
+        buttonTable.add(shootUpButton).size(25, 25).pad(10).row();
+        buttonTable.add(shootButton).size(25, 25).pad(10);
+        stage.addActor(buttonTable);
+
+        Table debugTable = new Table();
+        debugTable.setFillParent(true);
+        debugTable.top().left();
+        debugTable.add(debugButton).size(25, 25).pad(10);
+        stage.addActor(debugTable);
     }
 
     private void createMovementJoystick() {
