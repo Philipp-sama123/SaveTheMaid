@@ -1,5 +1,8 @@
 package krazy.cat.games.SaveTheMaid;
 
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -56,6 +59,10 @@ public class Projectile {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.isSensor = true;
+
+        fixtureDef.filter.categoryBits = CATEGORY_PROJECTILE;
+        fixtureDef.filter.maskBits = MASK_PROJECTILE;
+
         body.createFixture(fixtureDef).setUserData(this);
 
         body.setLinearVelocity(velocity);

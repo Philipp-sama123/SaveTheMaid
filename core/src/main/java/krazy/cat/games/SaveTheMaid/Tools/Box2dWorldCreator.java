@@ -1,5 +1,10 @@
 package krazy.cat.games.SaveTheMaid.Tools;
 
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_GROUND;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
+
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -32,6 +37,9 @@ public class Box2dWorldCreator {
             body = world.createBody(bodyDef);
             shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
             fixtureDef.shape = shape;
+            fixtureDef.filter.categoryBits = CATEGORY_GROUND;
+            fixtureDef.filter.maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_PROJECTILE; // Collides with player, enemies, and projectiles
+
             body.createFixture(fixtureDef).setUserData("environment");
         }
         // goes through "Pipes" layers to get bodies and create them
@@ -42,6 +50,9 @@ public class Box2dWorldCreator {
             body = world.createBody(bodyDef);
             shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
             fixtureDef.shape = shape;
+            fixtureDef.filter.categoryBits = CATEGORY_GROUND;
+            fixtureDef.filter.maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_PROJECTILE; // Collides with player, enemies, and projectiles
+
             body.createFixture(fixtureDef).setUserData("environment");
         }
         // goes through "Coins" layers to get bodies and create them

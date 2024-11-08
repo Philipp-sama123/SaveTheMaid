@@ -1,5 +1,11 @@
 package krazy.cat.games.SaveTheMaid;
 
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_NONE;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -10,10 +16,13 @@ import com.badlogic.gdx.physics.box2d.*;
 public class Enemy {
     private static final float ATTACK_RANGE = 25f;
     private static final float MOVEMENT_SPEED = 15f;
+    private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
+    private static final float ATTACK_COLLIDER_UPDATE_DELAY = 1.4f; // Delay in seconds for updating the collider position
 
     private World world;
     public Body body;
     private AnimationSetZombie animationSet;
+
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
     private float stateTime;
@@ -23,6 +32,10 @@ public class Enemy {
     private boolean isHit = false;
     private Fixture attackCollider;
     private boolean attackColliderActive = false;
+    private float attackAnimationDuration;
+
+    private float attackCooldownTimer = 0f;
+    private float attackColliderUpdateTimer = 0f; // Timer to keep track of elapsed time
 
     public Enemy(World world, Vector2 position) {
         this.world = world;
@@ -31,8 +44,10 @@ public class Enemy {
 
         Texture spriteSheet = new Texture("Characters/Zombie/Colors/Grey.png");
         this.animationSet = new AnimationSetZombie(spriteSheet);
+        attackAnimationDuration = animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).getAnimationDuration();
 
         defineEnemy(position);
+        deactivateAttackCollider();
     }
 
     public void update(float dt, Vector2 playerPosition) {
@@ -53,21 +68,60 @@ public class Enemy {
             body.setLinearVelocity(0, body.getLinearVelocity().y);
         } else {
             if (isPlayerInRange(playerPosition)) {
-                currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
-                body.setLinearVelocity(0, body.getLinearVelocity().y);
+                attackColliderUpdateTimer += dt;
 
-                // Enable attack collider while attacking
-                if (!attackColliderActive) {
-                    activateAttackCollider();
+                if (attackCooldownTimer <= 0) {
+                    currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
+                    body.setLinearVelocity(0, body.getLinearVelocity().y);
+
+                    // Enable attack collider while attacking
+                    if (!attackColliderActive) {
+                        attackColliderUpdateTimer = 0f;
+                        activateAttackCollider();
+                        stateTime = 0;
+                    }
+
+                    // Once attack animation finishes, retreat attack collider and start cooldown
+                    if (animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).isAnimationFinished(stateTime)) {
+                        startCooldown();
+                        currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+                        deactivateAttackCollider(); // <-- Ensure collider is off after attack ends
+                    }
                 }
             } else {
                 moveToPlayer(playerPosition);
+
+                // Deactivate attack collider immediately when switching to movement
                 if (attackColliderActive) {
-                    deactivateAttackCollider();
+                    deactivateAttackCollider(); // <-- Ensure collider is off when moving
                 }
             }
+
+
+        }
+        // Deactivate attack collider if the enemy is no longer attacking
+        if (currentState != AnimationSetZombie.ZombieAnimationType.ATTACK && attackColliderActive) {
+            deactivateAttackCollider();
+        }
+        // Handle attack cooldown
+        if (attackCooldownTimer > 0) {
+            attackCooldownTimer -= dt;
         }
         adjustFacingDirection();
+
+        if (attackColliderUpdateTimer >= ATTACK_COLLIDER_UPDATE_DELAY) {
+            updateAttackColliderPosition();
+            attackColliderUpdateTimer = 0f; // Reset the timer after updating
+        }
+    }
+
+    private void startCooldown() {
+        attackCooldownTimer = ATTACK_COOLDOWN;
+        deactivateAttackCollider(); // Ensure the collider is off during cooldown
+    }
+
+    public boolean getAttackColliderActive() {
+        return attackColliderActive;
     }
 
     public void draw(Batch batch) {
@@ -97,11 +151,23 @@ public class Enemy {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
+
+        fixtureDef.filter.categoryBits = CATEGORY_ENEMY;
+        fixtureDef.filter.maskBits = MASK_ENEMY;
         body.createFixture(fixtureDef).setUserData(this);
         shape.dispose();
 
         // Initialize the attack collider as a sensor initially
         createAttackCollider();
+    }
+
+    // Method to change the mask of the attack collider
+    public void setAttackColliderMask(short maskBits) {
+        if (attackCollider != null) {
+            Filter filter = attackCollider.getFilterData();
+            filter.maskBits = maskBits;
+            attackCollider.setFilterData(filter); // Apply the new filter settings
+        }
     }
 
     private void createAttackCollider() {
@@ -113,11 +179,30 @@ public class Enemy {
         attackFixtureDef.shape = attackShape;
         attackFixtureDef.isSensor = true; // Ensure it’s always a sensor
 
+        attackFixtureDef.filter.categoryBits = CATEGORY_PROJECTILE;
+        attackFixtureDef.filter.maskBits = MASK_PROJECTILE;
         attackCollider = body.createFixture(attackFixtureDef);
-        attackCollider.setUserData("EnemyAttack");
+        attackCollider.setUserData(this);
         attackShape.dispose();
 
         attackColliderActive = false;
+    }
+
+    private void updateAttackColliderPosition() {
+        if (attackCollider == null) return;
+        if (attackColliderActive) {
+            // Calculate the offset based on facing direction
+            float xOffset = isFacingLeft ? -12f : 12f;
+            float yOffset = 0f; // Adjust Y offset if necessary
+
+            // Move the collider to the attack position relative to the enemy's body
+            PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
+            attackShape.setAsBox(6f, 6f, new Vector2(xOffset, yOffset), 0);
+        } else {
+            // this is a hack for "disabling" the collider
+            PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
+            attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
+        }
     }
 
     private void adjustFacingDirection() {
@@ -126,29 +211,24 @@ public class Enemy {
         if (velocityX < 0 && !isFacingLeft) {
             animationSet.flipFramesHorizontally();
             isFacingLeft = true;
-            recreateAttackCollider(); // Reposition the collider when facing left
         } else if (velocityX > 0 && isFacingLeft) {
             animationSet.flipFramesHorizontally();
             isFacingLeft = false;
-            recreateAttackCollider(); // Reposition the collider when facing right
         }
-    }
-
-    private void recreateAttackCollider() {
-        if (attackCollider != null) {
-            body.destroyFixture(attackCollider);
-        }
-        createAttackCollider();
     }
 
     private void activateAttackCollider() {
-        attackCollider.setSensor(true); // Keep it as a sensor
         attackColliderActive = true;
+        setAttackColliderMask(MASK_PROJECTILE);
     }
 
     private void deactivateAttackCollider() {
-        attackCollider.setSensor(true); // Ensure it remains a sensor when deactivated
         attackColliderActive = false;
+        setAttackColliderMask(MASK_NONE);
+
+        PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
+        attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
+
     }
 
     private void moveToPlayer(Vector2 playerPosition) {

@@ -1,5 +1,10 @@
 package krazy.cat.games.SaveTheMaid;
 
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -36,7 +41,6 @@ public class Player {
 
     private Array<Projectile> projectiles;
     private Texture projectileTexture;
-    private boolean damaged;
     private float damageTimer;
 
     private Animation<TextureRegion> jumpEffectAnimation;
@@ -45,8 +49,6 @@ public class Player {
     private Animation<TextureRegion> bloodEffectAnimation;
     private float bloodEffectTime;
     private boolean showBloodEffect;
-
-    public boolean isBeingDamagedContinous = false;
 
     public Player(World world) {
         this.world = world;
@@ -90,7 +92,6 @@ public class Player {
     public void update(float delta) {
         stateTime += delta;
         updateProjectiles(delta);
-        updateDamageEffect(delta);
         checkGrounded();
 
         if (isShooting) {
@@ -100,9 +101,6 @@ public class Player {
             handleShootingUpAnimation();
         }
 
-        if (isBeingDamagedContinous) {
-            takeDamage();
-        }
         // Update jump effect animation
         if (showJumpEffect) {
             jumpEffectTime += delta;
@@ -130,9 +128,11 @@ public class Player {
         PolygonShape rectShape = new PolygonShape();
         rectShape.setAsBox(8f, 24f);
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = rectShape;
-        body.createFixture(fixtureDef).setUserData(this);
+        FixtureDef playerFixtureDef = new FixtureDef();
+        playerFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        playerFixtureDef.filter.maskBits = MASK_PLAYER;
+        playerFixtureDef.shape = rectShape;
+        body.createFixture(playerFixtureDef).setUserData(this);
 
         rectShape.dispose();
     }
@@ -226,40 +226,13 @@ public class Player {
         }
     }
 
-    public void setDamaged(boolean damaged) {
-        this.damaged = damaged;
-    }
 
     // Updated takeDamage method
     private void takeDamage() {
-        System.out.println("Player takes damage!" + damaged);
+        // Reset blood effect animation timer and enable it
+        bloodEffectTime = 0;
+        showBloodEffect = true;
 
-        if (!damaged) {
-            setDamaged(true);
-
-            // Start the red flash effect and blood effect
-            setDamaged(2);
-
-            // Reset blood effect animation timer and enable it
-            bloodEffectTime = 0;
-            showBloodEffect = true;
-        }
-    }
-
-    public void setDamaged(float duration) {
-        this.damaged = true;
-        this.damageTimer = duration; // Set damage cooldown equal to the blood effect duration
-    }
-
-    // Updated updateDamageEffect method
-    private void updateDamageEffect(float delta) {
-        if (damaged) {
-            damageTimer -= delta;
-            if (damageTimer <= 0) {
-                damaged = false;
-                damageTimer = 0;
-            }
-        }
     }
 
     private TextureRegion getCurrentUpperBodyFrame() {
@@ -382,14 +355,8 @@ public class Player {
         batch.draw(lowerBodyFrame, posX, posY, 64, 64);
     }
 
-    public void onEndEnemyAttackCollision() {
-        System.out.println("endEnemyCollision!");
-        isBeingDamagedContinous = false;
-    }
-
     public void onStartEnemyAttackCollision() {
         System.out.println("onEnemyCollision!");
-        isBeingDamagedContinous = true;
         takeDamage();  // Perform actual hit logic here, e.g., reducing health
     }
 

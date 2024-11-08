@@ -8,17 +8,22 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class WorldContactListener implements ContactListener {
+    public static final short CATEGORY_PLAYER = 0x0001;
+    public static final short CATEGORY_ENEMY = 0x0002;
+    public static final short CATEGORY_PROJECTILE = 0x0004;
+    public static final short CATEGORY_GROUND = 0x0008;
+
+    public static final short MASK_NONE = 0x0000;
+    public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE;
+    public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
+    public static final short MASK_PROJECTILE = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_GROUND;
 
     @Override
     public void beginContact(Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getUserData() instanceof Player && "EnemyAttack".equals(fixtureB.getUserData())) {
-            handleAttackCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getBody().getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && "EnemyAttack".equals(fixtureA.getUserData())) {
-            handleAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getBody().getUserData());
-        } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Enemy) {
+        if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Enemy) {
             handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Enemy) {
             handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
@@ -31,22 +36,14 @@ public class WorldContactListener implements ContactListener {
         } else if (fixtureB.getUserData() instanceof Projectile && "environment".equals(fixtureA.getUserData())) {
             handleProjectileEnvironmentCollision((Projectile) fixtureB.getUserData());
         } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Enemy) {
-            handlePlayerEnemyCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
+            handleAttackCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof Enemy) {
-            handlePlayerEnemyCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
+            handleAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
         }
     }
 
     @Override
     public void endContact(Contact contact) {
-        Fixture fixtureA = contact.getFixtureA();
-        Fixture fixtureB = contact.getFixtureB();
-
-        if (fixtureA.getUserData() instanceof Player && "EnemyAttack".equals(fixtureB.getUserData())) {
-            handleEndAttackCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getBody().getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && "EnemyAttack".equals(fixtureA.getUserData())) {
-            handleEndAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getBody().getUserData());
-        }
     }
 
 
@@ -54,12 +51,8 @@ public class WorldContactListener implements ContactListener {
         projectile.onCollision(); // Set the projectile for destruction when it hits the environment
     }
 
-    private void handlePlayerEnemyCollision(Player player, Enemy enemy) {
-        Gdx.app.log("handlePlayerEnemyCollision", "PLAYER: " + this);
-        enemy.onPlayerCollision(); // Handle enemy response, if any, to the collision
-    }
-
     private void handleAttackCollision(Player player, Enemy enemy) {
+        Gdx.app.log("ENEMY", "Attack State: " + enemy.getAttackColliderActive());
         player.onStartEnemyAttackCollision(); // Apply damage to the player
     }
 
@@ -73,10 +66,6 @@ public class WorldContactListener implements ContactListener {
         // Flag the projectile and enemy for destruction or update their states
         projectile.onCollision();
         player.onStartEnemyAttackCollision();
-    }
-
-    private void handleEndAttackCollision(Player player, Enemy enemy) {
-        player.onEndEnemyAttackCollision();
     }
 
     @Override
