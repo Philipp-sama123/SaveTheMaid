@@ -155,8 +155,8 @@ public class Player {
         // Draw the blood effect
         if (showBloodEffect) {
             TextureRegion bloodEffectFrame = bloodEffectAnimation.getKeyFrame(bloodEffectTime);
-            float effectPosX = body.getPosition().x - (float) bloodEffectFrame.getRegionWidth() / 2;
-            float effectPosY = body.getPosition().y - 40;  // Place slightly below the player
+            float effectPosX = body.getPosition().x - (float) bloodEffectFrame.getRegionWidth() / 2 + 25;
+            float effectPosY = body.getPosition().y;  // Place slightly below the player
             batch.draw(bloodEffectFrame, effectPosX, effectPosY, bloodEffectFrame.getRegionWidth(), bloodEffectFrame.getRegionHeight());
         }
 
@@ -386,6 +386,7 @@ public class Player {
         System.out.println("endEnemyCollision!");
         isBeingDamagedContinous = false;
     }
+
     public void onStartEnemyAttackCollision() {
         System.out.println("onEnemyCollision!");
         isBeingDamagedContinous = true;
