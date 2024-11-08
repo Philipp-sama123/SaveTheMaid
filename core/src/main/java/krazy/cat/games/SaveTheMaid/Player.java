@@ -1,6 +1,5 @@
 package krazy.cat.games.SaveTheMaid;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -43,7 +42,11 @@ public class Player {
     private Animation<TextureRegion> jumpEffectAnimation;
     private float jumpEffectTime;
     private boolean showJumpEffect;
+    private Animation<TextureRegion> bloodEffectAnimation;
+    private float bloodEffectTime;
+    private boolean showBloodEffect;
 
+    public boolean isBeingDamagedContinous = false;
 
     public Player(World world) {
         this.world = world;
@@ -52,13 +55,34 @@ public class Player {
             new Texture("Characters/FemaleAgent/Feet/Red.png")
         );
 
-        Array<TextureRegion> jumpEffectFrames = new Array<>();
-        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_01.png")));
-        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_02.png")));
-        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_03.png")));
-        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_04.png")));
+//        Array<TextureRegion> jumpEffectFrames = new Array<>();
+//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_01.png")));
+//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_02.png")));
+//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_03.png")));
+//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_04.png")));
+//        jumpEffectAnimation = new Animation<>(0.05f, jumpEffectFrames, Animation.PlayMode.NORMAL);
 
-        jumpEffectAnimation = new Animation<>(0.05f, jumpEffectFrames, Animation.PlayMode.NORMAL);
+        // Load jump sprite sheet and split into frames
+        Texture jumpSpriteSheet = new Texture("JumpEffect.png");
+        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
+
+        // Convert the 2D array to a 1D array of TextureRegion for Animation
+        Array<TextureRegion> jumpFrames = new Array<>();
+        for (int i = 0; i < 4; i++) {
+            jumpFrames.add(tmpFrames[0][i]);  // Assuming there's only one row with four frames
+        }
+
+        // Create the jump animation with a frame duration (adjust duration as needed)
+        jumpEffectAnimation = new Animation<>(0.1f, jumpFrames, Animation.PlayMode.NORMAL);
+        // Load jump sprite sheet and split into frames
+        Texture bloodSpriteSheet = new Texture("PlayerBloodEffect.png");
+        TextureRegion[][] tmpFramesBlood = TextureRegion.split(bloodSpriteSheet, 110, 86);
+
+        Array<TextureRegion> bloodFrames = new Array<>();
+        for (int i = 0; i < 4; i++) {
+            bloodFrames.add(tmpFramesBlood[0][i]);  // Assuming there's only one row with four frames
+        }
+        bloodEffectAnimation = new Animation<>(0.1f, bloodFrames, Animation.PlayMode.NORMAL);
 
         definePlayer();
     }
@@ -75,11 +99,21 @@ public class Player {
         if (isShootingUp) {
             handleShootingUpAnimation();
         }
+
+        if (isBeingDamagedContinous) {
+            takeDamage();
+        }
         // Update jump effect animation
         if (showJumpEffect) {
             jumpEffectTime += delta;
             if (jumpEffectAnimation.isAnimationFinished(jumpEffectTime)) {
                 showJumpEffect = false;
+            }
+        }
+        if (showBloodEffect) {
+            bloodEffectTime += delta;
+            if (bloodEffectAnimation.isAnimationFinished(bloodEffectTime)) {
+                showBloodEffect = false;
             }
         }
     }
@@ -114,9 +148,16 @@ public class Player {
         // Draw the jump effect
         if (showJumpEffect) {
             TextureRegion jumpEffectFrame = jumpEffectAnimation.getKeyFrame(jumpEffectTime);
-            float effectPosX = body.getPosition().x - 16;  // Adjust position as needed
-            float effectPosY = body.getPosition().y - 24;  // Place slightly below the player
-            batch.draw(jumpEffectFrame, effectPosX, effectPosY, 32, 32);
+            float effectPosX = body.getPosition().x - (float) jumpEffectFrame.getRegionWidth() / 2;
+            float effectPosY = body.getPosition().y - 40;  // Place slightly below the player
+            batch.draw(jumpEffectFrame, effectPosX, effectPosY, jumpEffectFrame.getRegionWidth(), jumpEffectFrame.getRegionHeight());
+        }
+        // Draw the blood effect
+        if (showBloodEffect) {
+            TextureRegion bloodEffectFrame = bloodEffectAnimation.getKeyFrame(bloodEffectTime);
+            float effectPosX = body.getPosition().x - (float) bloodEffectFrame.getRegionWidth() / 2;
+            float effectPosY = body.getPosition().y - 40;  // Place slightly below the player
+            batch.draw(bloodEffectFrame, effectPosX, effectPosY, bloodEffectFrame.getRegionWidth(), bloodEffectFrame.getRegionHeight());
         }
 
     }
@@ -189,14 +230,36 @@ public class Player {
         this.damaged = damaged;
     }
 
-    public void startRedFlashEffect(float duration) {
-        this.damaged = true;
-        this.damageTimer = duration;
+    // Updated takeDamage method
+    private void takeDamage() {
+        System.out.println("Player takes damage!" + damaged);
+
+        if (!damaged) {
+            setDamaged(true);
+
+            // Start the red flash effect and blood effect
+            setDamaged(2);
+
+            // Reset blood effect animation timer and enable it
+            bloodEffectTime = 0;
+            showBloodEffect = true;
+        }
     }
 
-    public void onEnemyCollision() {
-        setDamaged(true);
-        startRedFlashEffect(2f);
+    public void setDamaged(float duration) {
+        this.damaged = true;
+        this.damageTimer = duration; // Set damage cooldown equal to the blood effect duration
+    }
+
+    // Updated updateDamageEffect method
+    private void updateDamageEffect(float delta) {
+        if (damaged) {
+            damageTimer -= delta;
+            if (damageTimer <= 0) {
+                damaged = false;
+                damageTimer = 0;
+            }
+        }
     }
 
     private TextureRegion getCurrentUpperBodyFrame() {
@@ -217,15 +280,6 @@ public class Player {
         }
     }
 
-    private void updateDamageEffect(float delta) {
-        if (damaged) {
-            damageTimer -= delta;
-            if (damageTimer <= 0) {
-                damaged = false;
-                damageTimer = 0;
-            }
-        }
-    }
 
     private void checkGrounded() {
         if (Math.abs(body.getLinearVelocity().y) < 0.01f && jumpCount > 0) {
@@ -275,7 +329,7 @@ public class Player {
     }
 
     private void setBatchColorForDamage(Batch batch) {
-        if (damaged) {
+        if (showBloodEffect) {
             batch.setColor(1, 0, 0, 1);
         } else {
             batch.setColor(1, 1, 1, 1);
@@ -326,6 +380,16 @@ public class Player {
 
         batch.draw(upperBodyFrame, posX, posY, 64, 64);
         batch.draw(lowerBodyFrame, posX, posY, 64, 64);
+    }
+
+    public void onEndEnemyAttackCollision() {
+        System.out.println("endEnemyCollision!");
+        isBeingDamagedContinous = false;
+    }
+    public void onStartEnemyAttackCollision() {
+        System.out.println("onEnemyCollision!");
+        isBeingDamagedContinous = true;
+        takeDamage();  // Perform actual hit logic here, e.g., reducing health
     }
 
 }

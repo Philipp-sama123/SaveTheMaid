@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -21,7 +22,7 @@ public class WorldContactListener implements ContactListener {
             handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (Enemy) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Enemy) {
             handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (Enemy) fixtureA.getUserData());
-        }else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Player) {
+        } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Player) {
             handleProjectileHitPlayer((Projectile) fixtureA.getUserData(), (Player) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Player) {
             handleProjectileHitPlayer((Projectile) fixtureB.getUserData(), (Player) fixtureA.getUserData());
@@ -36,17 +37,30 @@ public class WorldContactListener implements ContactListener {
         }
     }
 
+    @Override
+    public void endContact(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        if (fixtureA.getUserData() instanceof Player && "EnemyAttack".equals(fixtureB.getUserData())) {
+            handleEndAttackCollision((Player) fixtureA.getUserData(), (Enemy) fixtureB.getBody().getUserData());
+        } else if (fixtureB.getUserData() instanceof Player && "EnemyAttack".equals(fixtureA.getUserData())) {
+            handleEndAttackCollision((Player) fixtureB.getUserData(), (Enemy) fixtureA.getBody().getUserData());
+        }
+    }
+
+
     private void handleProjectileEnvironmentCollision(Projectile projectile) {
         projectile.onCollision(); // Set the projectile for destruction when it hits the environment
     }
 
     private void handlePlayerEnemyCollision(Player player, Enemy enemy) {
-        player.onEnemyCollision(); // Define an `onHit()` method in `Player` to handle damage, knockback, etc.
+        Gdx.app.log("handlePlayerEnemyCollision", "PLAYER: " + this);
         enemy.onPlayerCollision(); // Handle enemy response, if any, to the collision
     }
 
     private void handleAttackCollision(Player player, Enemy enemy) {
-        player.onEnemyCollision(); // Apply damage to the player
+        player.onStartEnemyAttackCollision(); // Apply damage to the player
     }
 
     private void handleProjectileHitEnemy(Projectile projectile, Enemy enemy) {
@@ -58,12 +72,11 @@ public class WorldContactListener implements ContactListener {
     private void handleProjectileHitPlayer(Projectile projectile, Player player) {
         // Flag the projectile and enemy for destruction or update their states
         projectile.onCollision();
-        player.onEnemyCollision();
+        player.onStartEnemyAttackCollision();
     }
 
-    @Override
-    public void endContact(Contact contact) {
-        // You can handle end contact here if needed
+    private void handleEndAttackCollision(Player player, Enemy enemy) {
+        player.onEndEnemyAttackCollision();
     }
 
     @Override
