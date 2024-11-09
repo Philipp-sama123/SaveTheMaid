@@ -1,6 +1,5 @@
 package krazy.cat.games.SaveTheMaid;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -13,7 +12,7 @@ public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_PROJECTILE = 0x0004;
     public static final short CATEGORY_GROUND = 0x0008;
 
-    public static final short MASK_NONE = 0x0000;
+    public static final short MASK_GROUND_ONLY = CATEGORY_GROUND;
     public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE;
     public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
     public static final short MASK_PROJECTILE = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_GROUND;
@@ -52,7 +51,6 @@ public class WorldContactListener implements ContactListener {
     }
 
     private void handleAttackCollision(Player player, Enemy enemy) {
-        Gdx.app.log("ENEMY", "Attack State: " + enemy.getAttackColliderActive());
         player.onStartEnemyAttackCollision(); // Apply damage to the player
     }
 

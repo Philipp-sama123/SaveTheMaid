@@ -3,7 +3,7 @@ package krazy.cat.games.SaveTheMaid;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_NONE;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
 import com.badlogic.gdx.Gdx;
@@ -17,7 +17,7 @@ public class Enemy {
     private static final float ATTACK_RANGE = 25f;
     private static final float MOVEMENT_SPEED = 15f;
     private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
-    private static final float ATTACK_COLLIDER_UPDATE_DELAY = 1.4f; // Delay in seconds for updating the collider position
+    private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
     private World world;
     public Body body;
@@ -53,6 +53,7 @@ public class Enemy {
     public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed && !deathAnimationCompleted()) {
             stateTime += dt;
+            disableCollision();
             return;
         } else if (isDestroyed && deathAnimationCompleted()) {
             dispose();
@@ -115,13 +116,17 @@ public class Enemy {
         }
     }
 
+    private void disableCollision() {
+        body.getFixtureList().forEach(fixture -> {
+           Filter filter =  fixture.getFilterData();
+            filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
+            fixture.setFilterData(filter);
+        });
+    }
+
     private void startCooldown() {
         attackCooldownTimer = ATTACK_COOLDOWN;
         deactivateAttackCollider(); // Ensure the collider is off during cooldown
-    }
-
-    public boolean getAttackColliderActive() {
-        return attackColliderActive;
     }
 
     public void draw(Batch batch) {
@@ -161,15 +166,6 @@ public class Enemy {
         createAttackCollider();
     }
 
-    // Method to change the mask of the attack collider
-    public void setAttackColliderMask(short maskBits) {
-        if (attackCollider != null) {
-            Filter filter = attackCollider.getFilterData();
-            filter.maskBits = maskBits;
-            attackCollider.setFilterData(filter); // Apply the new filter settings
-        }
-    }
-
     private void createAttackCollider() {
         PolygonShape attackShape = new PolygonShape();
         float xOffset = isFacingLeft ? -12f : 12f;
@@ -181,6 +177,7 @@ public class Enemy {
 
         attackFixtureDef.filter.categoryBits = CATEGORY_PROJECTILE;
         attackFixtureDef.filter.maskBits = MASK_PROJECTILE;
+
         attackCollider = body.createFixture(attackFixtureDef);
         attackCollider.setUserData(this);
         attackShape.dispose();
@@ -219,16 +216,12 @@ public class Enemy {
 
     private void activateAttackCollider() {
         attackColliderActive = true;
-        setAttackColliderMask(MASK_PROJECTILE);
     }
 
     private void deactivateAttackCollider() {
         attackColliderActive = false;
-        setAttackColliderMask(MASK_NONE);
-
         PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
         attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
-
     }
 
     private void moveToPlayer(Vector2 playerPosition) {
