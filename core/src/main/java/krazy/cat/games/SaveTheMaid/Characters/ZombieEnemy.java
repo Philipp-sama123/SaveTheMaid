@@ -21,9 +21,6 @@ import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
 public class ZombieEnemy extends BaseEnemy {
-    private static final float MOVEMENT_SPEED = 15f;
-    private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-
     private final AnimationSetZombie animationSet;
 
     private AnimationSetZombie.ZombieAnimationType currentState;
@@ -188,10 +185,12 @@ public class ZombieEnemy extends BaseEnemy {
     public boolean isDeathAnimationComplete() {
         return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.DEATH).isAnimationFinished(stateTime);
     }
+
     @Override
     public boolean isAttackAnimationFinished() {
         return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).isAnimationFinished(stateTime);
     }
+
     @Override
     public boolean isHitAnimationFinished() {
         return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime);

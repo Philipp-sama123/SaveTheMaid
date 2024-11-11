@@ -11,9 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -31,10 +28,10 @@ public class Hud implements Disposable {
 
     private Integer worldTimer;
     private float timeCount;
-    private Integer score;
+    private Integer health;
 
     Label countdownLabel;
-    Label scoreLabel;
+    public Label healthLabel;
     Label timeLabel;
     Label levelLabel;
     Label worldLabel;
@@ -49,7 +46,7 @@ public class Hud implements Disposable {
     public Hud(SpriteBatch spriteBatch) {
         worldTimer = 0;
         timeCount = 0;
-        score = 0;
+        health = 0;
 
         viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, spriteBatch);
@@ -59,17 +56,17 @@ public class Hud implements Disposable {
         BitmapFont font = new BitmapFont();
         font.getData().setScale(0.5f);  // Scale down the font size to 50%
         countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
-        scoreLabel = new Label(String.format("%06d", score), new Label.LabelStyle(font, Color.WHITE));
+        healthLabel = new Label(String.format("%06d", health), new Label.LabelStyle(font, Color.WHITE));
         timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
         levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
         worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
-        playerLabel = new Label("PLAYER", new Label.LabelStyle(font, Color.WHITE));
+        playerLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
 
         table.add(playerLabel).expandX();
         table.add(worldLabel).expandX();
         table.add(timeLabel).expandX();
         table.row();
-        table.add(scoreLabel).expandX();
+        table.add(healthLabel).expandX();
         table.add(levelLabel).expandX();
         table.add(countdownLabel).expandX();
 

@@ -51,8 +51,8 @@ public class Player {
     private float bloodEffectTime;
     private boolean showBloodEffect;
 
-    private final int maxHealth = 100;         // Max health value
-    private int currentHealth = maxHealth;
+    public final int maxHealth = 100;         // Max health value
+    public int currentHealth = maxHealth;
     private boolean isDead = false;
 
     public Player(World world) {
@@ -170,7 +170,6 @@ public class Player {
 
     public void jump() {
         if (jumpCount < MAX_JUMPS) {
-            //  body.applyLinearImpulse(new Vector2(0, 1000), body.getWorldCenter(), true);
             body.setLinearVelocity(body.getLinearVelocity().x, 500);
             jumpCount++;
             stateTime = 0;
@@ -205,7 +204,7 @@ public class Player {
     public void crouch(boolean isCrouching) {
         if (isDead)
             return;
-        
+
         this.isCrouching = isCrouching;
         if (isCrouching)
             body.setLinearVelocity(0, body.getLinearVelocity().y);
@@ -401,7 +400,7 @@ public class Player {
     }
 
     public void onStartEnemyAttackCollision() {
-        takeDamage(10);  // Perform actual hit logic here, e.g., reducing health
+        takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
     }
 
 }

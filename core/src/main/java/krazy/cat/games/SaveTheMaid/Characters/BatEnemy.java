@@ -21,9 +21,6 @@ import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
 public class BatEnemy extends BaseEnemy {
-    private static final float MOVEMENT_SPEED = 15f;
-    private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-
     private final AnimationSetBat animationSet;
 
     private AnimationSetBat.BatAnimationType currentState;
@@ -186,7 +183,7 @@ public class BatEnemy extends BaseEnemy {
 
     @Override
     public void setAnimation(AnimationSetRat.RatAnimationType type) {
-        
+
     }
 
     @Override

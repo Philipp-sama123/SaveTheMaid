@@ -5,6 +5,7 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -151,14 +153,15 @@ public class GameScreen implements Screen {
         // render Box2D Debug
         if (isShowBox2dDebug)
             box2DDebugRenderer.render(world, gameCamera.combined);
+
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
         //  player.updateAnimationState(game.batch);
+        player.draw(game.batch);
         for (BaseEnemy enemy : enemies) {
             enemy.draw(game.batch);
         }
-        player.draw(game.batch);
-
+        hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
         game.batch.end();
 
         hud.stage.act();

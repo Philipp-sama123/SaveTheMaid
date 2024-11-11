@@ -17,8 +17,11 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
 public abstract class BaseEnemy {
-    private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
-    private static final float ATTACK_RANGE = 25f;
+    protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
+    protected static  float ATTACK_RANGE = 25f;
+    protected static final float MOVEMENT_SPEED = 15f;
+    protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
+
 
     public boolean isDestroyed;
     public int health = 100;

@@ -22,9 +22,6 @@ import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
 public class RatEnemy extends BaseEnemy {
-    private static final float MOVEMENT_SPEED = 15f;
-    private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-
     private final AnimationSetRat animationSet;
 
     private AnimationSetRat.RatAnimationType currentState;
@@ -41,6 +38,7 @@ public class RatEnemy extends BaseEnemy {
 
         Texture spriteSheet = new Texture("Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png");
         this.animationSet = new AnimationSetRat(spriteSheet);
+        ATTACK_RANGE = 30f;
     }
 
     public void update(float dt, Vector2 playerPosition) {
