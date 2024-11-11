@@ -8,9 +8,9 @@ import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
 public class IdleState implements State {
     @Override
     public void enter(BaseEnemy enemy) {
-        enemy.setAnimation(AnimationSetZombie.ZombieAnimationType.IDLE);
-        enemy.getBody().setLinearVelocity(0, 0);
+        enemy.idle();
     }
+
 
 
     @Override

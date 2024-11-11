@@ -20,8 +20,7 @@ public class HitState implements State {
             enemy.getStateMachine().changeState(new DeathState());
         } else {
             // Set the enemy's animation to the hit animation
-            enemy.setAnimation(AnimationSetZombie.ZombieAnimationType.HIT);
-            enemy.getBody().setLinearVelocity(0, enemy.getBody().getLinearVelocity().y); // Stop horizontal movement
+            enemy.hit();
             animationStarted = true;
         }
         enemy.startAttackCooldown();

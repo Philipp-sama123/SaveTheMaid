@@ -9,14 +9,12 @@ public class AttackState implements State {
     @Override
     public void enter(BaseEnemy enemy) {
         if (enemy.canAttack()) {
-            enemy.setAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK);
-            enemy.activateAttackCollider();
-            enemy.updateAttackColliderPosition();
-            enemy.startAttackCooldown(); // Start the cooldown after initiating the attack
+            enemy.attack();
         } else {
             enemy.getStateMachine().changeState(new IdleState()); // Switch back if cooldown is active
         }
     }
+
 
     @Override
     public void update(BaseEnemy enemy, float deltaTime, Vector2 playerPosition) {

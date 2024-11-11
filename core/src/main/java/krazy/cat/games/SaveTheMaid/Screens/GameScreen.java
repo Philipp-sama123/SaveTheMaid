@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.BatEnemy;
 import krazy.cat.games.SaveTheMaid.Characters.ZombieEnemy;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
@@ -47,7 +49,8 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
 
-    private Array<ZombieEnemy> enemies = new Array<>();
+    // private Array<ZombieEnemy> enemies = new Array<>();
+    private Array<BaseEnemy> enemies = new Array<>();
     public boolean isShowBox2dDebug;
 
     public GameScreen(SaveTheMaidGame game) {
@@ -93,9 +96,12 @@ public class GameScreen implements Screen {
 
         world.step(1 / 60f, 6, 2);
 
-        for (ZombieEnemy zombieEnemy : enemies) {
-            zombieEnemy.update(dt, player.body.getPosition());
+        for (BaseEnemy enemy : enemies) {
+            enemy.update(dt, player.body.getPosition());
         }
+//        for (ZombieEnemy zombieEnemy : enemies) {
+//            zombieEnemy.update(dt, player.body.getPosition());
+//        }
 
         gameCamera.position.x = player.body.getPosition().x;
         gameCamera.position.y = player.body.getPosition().y + 32;
@@ -151,9 +157,12 @@ public class GameScreen implements Screen {
         game.batch.begin();
         player.draw(game.batch);
         //  player.updateAnimationState(game.batch);
-        for (ZombieEnemy zombieEnemy : enemies) {
-            zombieEnemy.draw(game.batch);
+        for (BaseEnemy enemy : enemies) {
+            enemy.draw(game.batch);
         }
+//        for (ZombieEnemy zombieEnemy : enemies) {
+//            zombieEnemy.draw(game.batch);
+//        }
         game.batch.end();
 
         hud.stage.act();
@@ -189,7 +198,10 @@ public class GameScreen implements Screen {
         hud.dispose();
     }
 
-    public void addEnemy(ZombieEnemy zombieEnemy) {
-        enemies.add(zombieEnemy);
+    //    public void addEnemy(ZombieEnemy zombieEnemy) {
+//        enemies.add(zombieEnemy);
+//    }
+    public void addEnemy(BaseEnemy enemy) {
+        enemies.add(enemy);
     }
 }

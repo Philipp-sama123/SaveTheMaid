@@ -6,12 +6,14 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
@@ -23,21 +25,15 @@ public class ZombieEnemy extends BaseEnemy {
     private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
-    public Body body;
-    private AnimationSetZombie animationSet;
+    private final AnimationSetZombie animationSet;
 
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
+
     public float stateTime;
+    public boolean attackColliderActive = false;
     private boolean isFacingLeft = true;
     public boolean isDestroyed = false;
-    private boolean isHit = false;
-    private Fixture attackCollider;
-    public boolean attackColliderActive = false;
-
-    public float attackCooldownTimer = 0f;
-    public float attackColliderUpdateTimer = 0f; // Timer to keep track of elapsed time
-    private final StateMachine stateMachine;
 
     public ZombieEnemy(World world, Vector2 position) {
         super(world, position);
@@ -45,22 +41,18 @@ public class ZombieEnemy extends BaseEnemy {
 
         Texture spriteSheet = new Texture("Characters/Zombie/Colors/Grey.png");
         this.animationSet = new AnimationSetZombie(spriteSheet);
-
-        stateMachine = new StateMachine(this);
-        stateMachine.changeState(new IdleState());
     }
 
     public void update(float dt, Vector2 playerPosition) {
-        if (isDestroyed && !isDeathAnimationComplete()) {
+        if (isDestroyed) {
             disableCollision();
             return;
         }
-        if (isDestroyed) {
-            return;
-        }
+
         stateTime += dt;
 
         stateMachine.update(dt, playerPosition);
+
         // Handle attack cooldown
         if (attackCooldownTimer > 0) {
             attackCooldownTimer -= dt;
@@ -89,6 +81,7 @@ public class ZombieEnemy extends BaseEnemy {
         attackCooldownTimer = ATTACK_COOLDOWN; // Reset cooldown timer
     }
 
+    @Override
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
 
@@ -206,15 +199,17 @@ public class ZombieEnemy extends BaseEnemy {
         }
     }
 
-    public void onHit() {
-        stateMachine.changeState(new HitState());
-    }
-
+    @Override
     public void setAnimation(AnimationSetZombie.ZombieAnimationType type) {
         currentState = type;
         stateTime = 0;
     }
 
+    @Override
+    public void setAnimation(AnimationSetBat.BatAnimationType type) {
+    }
+
+    @Override
     public boolean isInAttackRange(Vector2 playerPosition) {
         return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
     }
@@ -239,8 +234,35 @@ public class ZombieEnemy extends BaseEnemy {
         return body;
     }
 
-    public StateMachine getStateMachine() {
-        return stateMachine;
+    @Override
+    public void attack() {
+        setAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK);
+        activateAttackCollider();
+        updateAttackColliderPosition();
+        startAttackCooldown(); // Start the cooldown after initiating the attack
+    }
+
+    @Override
+    public void chase() {
+        setAnimation(AnimationSetZombie.ZombieAnimationType.WALK);
+    }
+
+    @Override
+    public void die() {
+        setAnimation(AnimationSetZombie.ZombieAnimationType.DEATH);
+        disableCollision();
+    }
+
+    @Override
+    public void hit() {
+        setAnimation(AnimationSetZombie.ZombieAnimationType.HIT);
+        body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop horizontal movement
+    }
+
+    @Override
+    public void idle() {
+        setAnimation(AnimationSetZombie.ZombieAnimationType.IDLE);
+        body.setLinearVelocity(0, 0);
     }
 
     public void dispose() {

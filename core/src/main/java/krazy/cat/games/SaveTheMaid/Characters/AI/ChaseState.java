@@ -8,7 +8,7 @@ import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
 public class ChaseState implements State {
     @Override
     public void enter(BaseEnemy enemy) {
-        enemy.setAnimation(AnimationSetZombie.ZombieAnimationType.WALK);
+        enemy.chase();
     }
 
     @Override
