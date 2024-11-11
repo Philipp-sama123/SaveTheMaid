@@ -3,6 +3,7 @@ package krazy.cat.games.SaveTheMaid.Characters;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -34,7 +35,7 @@ public class Player {
     private float stateTime;
     private AnimationType currentAnimationState = AnimationType.IDLE;
 
-    private boolean isCrouching = false;
+    public boolean isCrouching = false;
     private boolean isShooting = false;
     private boolean isShootingUp = false;
     private boolean isFacingRight = false;
@@ -50,20 +51,16 @@ public class Player {
     private float bloodEffectTime;
     private boolean showBloodEffect;
 
+    private final int maxHealth = 100;         // Max health value
+    private int currentHealth = maxHealth;
+    private boolean isDead = false;
+
     public Player(World world) {
         this.world = world;
         animationSetAgent = new AnimationSetFemaleAgent(
             new Texture("Characters/FemaleAgent/Body/Black.png"),
             new Texture("Characters/FemaleAgent/Feet/Red.png")
         );
-
-//        Array<TextureRegion> jumpEffectFrames = new Array<>();
-//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_01.png")));
-//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_02.png")));
-//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_03.png")));
-//        jumpEffectFrames.add(new TextureRegion(new Texture("JumpEffect/FX052_04.png")));
-//        jumpEffectAnimation = new Animation<>(0.05f, jumpEffectFrames, Animation.PlayMode.NORMAL);
-
         // Load jump sprite sheet and split into frames
         Texture jumpSpriteSheet = new Texture("JumpEffect.png");
         TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
@@ -90,7 +87,12 @@ public class Player {
     }
 
     public void update(float delta) {
+        if (isDead) {
+            handleDeath();
+        }
+
         stateTime += delta;
+
         updateProjectiles(delta);
         checkGrounded();
 
@@ -180,13 +182,49 @@ public class Player {
         }
     }
 
+    private void onDeath() {
+        // Reset jump, movement, or shooting states
+        jumpCount = 0;
+        isShooting = false;
+        isShootingUp = false;
+
+        // Set an animation type to dying or idle if you have one
+        currentAnimationState = AnimationType.DEATH;  // Assuming a 'DEAD' animation type exists
+        stateTime = 0;
+        body.setLinearVelocity(0, body.getLinearVelocity().y);
+    }
+
+    private void handleDeath() {
+        if (animationSetAgent.getUpperBodyAnimation(currentAnimationState).isAnimationFinished(stateTime)) {
+            stateTime = animationSetAgent.getUpperBodyAnimation(currentAnimationState).getAnimationDuration();
+            // Additional logic here, like setting the player's speed to zero or triggering game over
+        }
+        Gdx.app.log("handleDeath", "ToDo: Handle Death!!");
+    }
+
+    public void crouch(boolean isCrouching) {
+        if (isDead)
+            return;
+        
+        this.isCrouching = isCrouching;
+        if (isCrouching)
+            body.setLinearVelocity(0, body.getLinearVelocity().y);
+    }
+
     public void move(float moveInput) {
+        if (isDead)
+            return;
+
         float accelerationFactor = 0.1f;
         boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
 
         // Determine the target speed based on input strength
-        float targetSpeed = calculateTargetSpeed(moveInput, isGrounded);
-        smoothSpeedTransition(targetSpeed, accelerationFactor);
+        if (!isCrouching) {
+            float targetSpeed = calculateTargetSpeed(moveInput, isGrounded);
+            smoothSpeedTransition(targetSpeed, accelerationFactor);
+        } else {
+            smoothSpeedTransition(0, accelerationFactor);
+        }
 
         // Update facing direction and animation state
         if (moveInput != 0) {
@@ -218,7 +256,7 @@ public class Player {
             stateTime = 0f;
 
             // Determine position offset and velocity based on facing direction
-            Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, 10);
+            Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, isCrouching ? 2 : 10);
             Vector2 velocity = new Vector2(isFacingRight ? 1000 : -1000, 0);
 
             // Add a new projectile with specified rotation
@@ -226,12 +264,19 @@ public class Player {
         }
     }
 
+    private void takeDamage(float damage) {
+        if (isDead) return;  // Ignore damage if already dead
 
-    // Updated takeDamage method
-    private void takeDamage() {
-        // Reset blood effect animation timer and enable it
+        currentHealth -= damage;
+        showBloodEffect = true;  // Trigger blood effect for feedback
         bloodEffectTime = 0;
-        showBloodEffect = true;
+
+
+        if (currentHealth <= 0) {
+            currentHealth = 0;
+            isDead = true;
+            onDeath();
+        }
 
     }
 
@@ -302,7 +347,7 @@ public class Player {
     }
 
     private void setBatchColorForDamage(Batch batch) {
-        if (showBloodEffect) {
+        if (showBloodEffect && !isDead) {
             batch.setColor(1, 0, 0, 1);
         } else {
             batch.setColor(1, 1, 1, 1);
@@ -356,8 +401,7 @@ public class Player {
     }
 
     public void onStartEnemyAttackCollision() {
-        System.out.println("onEnemyCollision!");
-        takeDamage();  // Perform actual hit logic here, e.g., reducing health
+        takeDamage(10);  // Perform actual hit logic here, e.g., reducing health
     }
 
 }

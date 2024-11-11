@@ -99,10 +99,6 @@ public class GameScreen implements Screen {
         for (BaseEnemy enemy : enemies) {
             enemy.update(dt, player.body.getPosition());
         }
-//        for (ZombieEnemy zombieEnemy : enemies) {
-//            zombieEnemy.update(dt, player.body.getPosition());
-//        }
-
         gameCamera.position.x = player.body.getPosition().x;
         gameCamera.position.y = player.body.getPosition().y + 32;
 
@@ -115,7 +111,9 @@ public class GameScreen implements Screen {
     private void handleInput(float dt) {
         // Get the x and y coordinates of the touch
         float joystickPercentX = hud.getMovementJoystick().getKnobPercentX(); // Knob percentage movement on the X-axis
+        Gdx.app.log("handleInput ", "hud.getMovementJoystick().getKnobPercentY() " + hud.getMovementJoystick().getKnobPercentY());
         player.move(joystickPercentX);
+        player.crouch(hud.getMovementJoystick().getKnobPercentY() < -0.75);
         // Jump button handling
         if (hud.getJumpButton().isPressed()) {
             if (!jumpPressed) { // If the jump button is pressed for the first time
@@ -155,14 +153,12 @@ public class GameScreen implements Screen {
             box2DDebugRenderer.render(world, gameCamera.combined);
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
-        player.draw(game.batch);
         //  player.updateAnimationState(game.batch);
         for (BaseEnemy enemy : enemies) {
             enemy.draw(game.batch);
         }
-//        for (ZombieEnemy zombieEnemy : enemies) {
-//            zombieEnemy.draw(game.batch);
-//        }
+        player.draw(game.batch);
+
         game.batch.end();
 
         hud.stage.act();
