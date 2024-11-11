@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.BatEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.RatEnemy;
 import krazy.cat.games.SaveTheMaid.Characters.ZombieEnemy;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
@@ -67,8 +68,9 @@ public class Box2dWorldCreator {
         }     // goes through "Bricks" layers to get bodies and create them
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            gameScreen.addEnemy(new BatEnemy(world, new Vector2(rectangle.x, rectangle.y + 100)));
+            gameScreen.addEnemy(new BatEnemy(world, new Vector2(rectangle.x + 100, rectangle.y + 100)));
             gameScreen.addEnemy(new ZombieEnemy(world, new Vector2(rectangle.x, rectangle.y)));
+            gameScreen.addEnemy(new RatEnemy(world, new Vector2(rectangle.x + 100, rectangle.y)));
         }
     }
 

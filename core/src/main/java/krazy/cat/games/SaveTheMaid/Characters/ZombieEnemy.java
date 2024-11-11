@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetBat;
+import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
 public class ZombieEnemy extends BaseEnemy {
@@ -176,6 +177,11 @@ public class ZombieEnemy extends BaseEnemy {
 
     @Override
     public void setAnimation(AnimationSetBat.BatAnimationType type) {
+    }
+
+    @Override
+    public void setAnimation(AnimationSetRat.RatAnimationType type) {
+
     }
 
     @Override

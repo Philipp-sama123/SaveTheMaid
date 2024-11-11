@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
+import static krazy.cat.games.SaveTheMaid.AnimationSetRat.FRAME_WIDTH;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
@@ -20,26 +21,26 @@ import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
-public class BatEnemy extends BaseEnemy {
+public class RatEnemy extends BaseEnemy {
     private static final float MOVEMENT_SPEED = 15f;
     private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
-    private final AnimationSetBat animationSet;
+    private final AnimationSetRat animationSet;
 
-    private AnimationSetBat.BatAnimationType currentState;
-    private AnimationSetBat.BatAnimationType previousState;
+    private AnimationSetRat.RatAnimationType currentState;
+    private AnimationSetRat.RatAnimationType previousState;
 
     public float stateTime;
 
     private boolean isFacingLeft = false;
     public boolean isDestroyed = false;
 
-    public BatEnemy(World world, Vector2 position) {
+    public RatEnemy(World world, Vector2 position) {
         super(world, position);
-        this.currentState = AnimationSetBat.BatAnimationType.MOVE1;
+        this.currentState = AnimationSetRat.RatAnimationType.IDLE;
 
-        Texture spriteSheet = new Texture("Characters/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png");
-        this.animationSet = new AnimationSetBat(spriteSheet);
+        Texture spriteSheet = new Texture("Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png");
+        this.animationSet = new AnimationSetRat(spriteSheet);
     }
 
     public void update(float dt, Vector2 playerPosition) {
@@ -71,15 +72,15 @@ public class BatEnemy extends BaseEnemy {
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
 
-        boolean looping = currentState != AnimationSetBat.BatAnimationType.DEATH2;
+        boolean looping = currentState != AnimationSetRat.RatAnimationType.DEATH_1;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
         batch.draw(
             currentFrame,
-            body.getPosition().x - 21,
-            body.getPosition().y - 20,
-            40,
-            42
+            body.getPosition().x - (float) AnimationSetRat.FRAME_WIDTH / 2,
+            body.getPosition().y - 12,
+            AnimationSetRat.FRAME_WIDTH,
+            AnimationSetRat.FRAME_HEIGHT
         );
     }
 
@@ -91,7 +92,7 @@ public class BatEnemy extends BaseEnemy {
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(10f, 10f);
+        shape.setAsBox(14f, 10f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -102,8 +103,6 @@ public class BatEnemy extends BaseEnemy {
         shape.dispose();
         // Initialize the attack collider as a sensor initially
         createAttackCollider();
-
-        body.setGravityScale(0f);
     }
 
     @Override
@@ -111,9 +110,14 @@ public class BatEnemy extends BaseEnemy {
 
     }
 
+    @Override
+    public void setAnimation(AnimationSetBat.BatAnimationType type) {
+
+    }
+
     private void createAttackCollider() {
         PolygonShape attackShape = new PolygonShape();
-        float xOffset = isFacingLeft ? -12f : 12f;
+        float xOffset = isFacingLeft ? -16f : 16f;
         attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
 
         FixtureDef attackFixtureDef = new FixtureDef();
@@ -170,43 +174,38 @@ public class BatEnemy extends BaseEnemy {
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
         direction.scl(MOVEMENT_SPEED);
 
-        body.setLinearVelocity(direction.x, direction.y);
+        body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
 
         if (direction.len() > 0) {
-            currentState = AnimationSetBat.BatAnimationType.MOVE2;
+            currentState = AnimationSetRat.RatAnimationType.MOVE_1;
         } else {
-            currentState = AnimationSetBat.BatAnimationType.MOVE1;
+            currentState = AnimationSetRat.RatAnimationType.IDLE;
         }
     }
 
-    public void setAnimation(AnimationSetBat.BatAnimationType type) {
+    public void setAnimation(AnimationSetRat.RatAnimationType type) {
         currentState = type;
         stateTime = 0;
     }
 
     @Override
-    public void setAnimation(AnimationSetRat.RatAnimationType type) {
-        
-    }
-
-    @Override
     public boolean isDeathAnimationComplete() {
-        return animationSet.getAnimation(AnimationSetBat.BatAnimationType.DEATH2).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetRat.RatAnimationType.DEATH_1).isAnimationFinished(stateTime);
     }
 
     @Override
     public boolean isAttackAnimationFinished() {
-        return animationSet.getAnimation(AnimationSetBat.BatAnimationType.GRAB).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetRat.RatAnimationType.ATTACK_1).isAnimationFinished(stateTime);
     }
 
     @Override
     public boolean isHitAnimationFinished() {
-        return animationSet.getAnimation(AnimationSetBat.BatAnimationType.HIT).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetRat.RatAnimationType.HIT).isAnimationFinished(stateTime);
     }
 
     @Override
     public void attack() {
-        setAnimation(AnimationSetBat.BatAnimationType.GRAB);
+        setAnimation(AnimationSetRat.RatAnimationType.ATTACK_1);
         activateAttackCollider();
         updateAttackColliderPosition();
         startAttackCooldown(); // Start the cooldown after initiating the attack
@@ -214,24 +213,24 @@ public class BatEnemy extends BaseEnemy {
 
     @Override
     public void chase() {
-        setAnimation(AnimationSetBat.BatAnimationType.MOVE1);
+        setAnimation(AnimationSetRat.RatAnimationType.MOVE_1);
     }
 
     @Override
     public void die() {
-        setAnimation(AnimationSetBat.BatAnimationType.DEATH2);
+        setAnimation(AnimationSetRat.RatAnimationType.DEATH_1);
         disableCollision();
     }
 
     @Override
     public void hit() {
-        setAnimation(AnimationSetBat.BatAnimationType.HIT);
+        setAnimation(AnimationSetRat.RatAnimationType.HIT);
         body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop horizontal movement
     }
 
     @Override
     public void idle() {
-        setAnimation(AnimationSetBat.BatAnimationType.MOVE1);
+        setAnimation(AnimationSetRat.RatAnimationType.IDLE);
         body.setLinearVelocity(0, 0);
     }
 

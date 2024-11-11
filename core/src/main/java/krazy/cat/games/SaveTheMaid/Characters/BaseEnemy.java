@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetBat;
+import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
@@ -92,6 +93,8 @@ public abstract class BaseEnemy {
     public abstract void setAnimation(AnimationSetZombie.ZombieAnimationType type);
 
     public abstract void setAnimation(AnimationSetBat.BatAnimationType type);
+
+    public abstract void setAnimation(AnimationSetRat.RatAnimationType type);
 
     public abstract void moveToPlayer(Vector2 playerPosition);
 
