@@ -10,33 +10,26 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
-import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
-import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
-import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
 public class BatEnemy extends BaseEnemy {
-    private static final float ATTACK_RANGE = 25f;
     private static final float MOVEMENT_SPEED = 15f;
-    private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
     private final AnimationSetBat animationSet;
 
     private AnimationSetBat.BatAnimationType currentState;
     private AnimationSetBat.BatAnimationType previousState;
+
     public float stateTime;
 
-    public boolean attackColliderActive = false;
     private boolean isFacingLeft = false;
     public boolean isDestroyed = false;
 
@@ -53,9 +46,11 @@ public class BatEnemy extends BaseEnemy {
             disableCollision();
             return;
         }
-        if (isDestroyed) {
+        if (isDestroyed && isDeathAnimationComplete()) {
+            dispose();
             return;
         }
+
         stateTime += dt;
 
         stateMachine.update(dt, playerPosition);
@@ -69,22 +64,6 @@ public class BatEnemy extends BaseEnemy {
             updateAttackColliderPosition();
             attackColliderUpdateTimer = 0f; // Reset the timer after updating
         }
-    }
-
-    public void disableCollision() {
-        body.getFixtureList().forEach(fixture -> {
-            Filter filter = fixture.getFilterData();
-            filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
-            fixture.setFilterData(filter);
-        });
-    }
-
-    public boolean canAttack() {
-        return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
-    }
-
-    public void startAttackCooldown() {
-        attackCooldownTimer = ATTACK_COOLDOWN; // Reset cooldown timer
     }
 
     @Override
@@ -185,19 +164,7 @@ public class BatEnemy extends BaseEnemy {
         }
     }
 
-    public void activateAttackCollider() {
-        attackColliderActive = true;
-    }
-
-    public void deactivateAttackCollider() {
-        attackColliderActive = false;
-        PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
-        attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
-        Filter filter = attackCollider.getFilterData();
-        filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
-        attackCollider.setFilterData(filter);
-    }
-
+    @Override
     public void moveToPlayer(Vector2 playerPosition) {
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
         direction.scl(MOVEMENT_SPEED);
@@ -216,22 +183,17 @@ public class BatEnemy extends BaseEnemy {
         stateTime = 0;
     }
 
-    public boolean isInAttackRange(Vector2 playerPosition) {
-        return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
-    }
-
-    public boolean isPlayerInRange(Vector2 playerPosition) {
-        return body.getPosition().dst(playerPosition) < 500;
-    }
-
+    @Override
     public boolean isDeathAnimationComplete() {
         return animationSet.getAnimation(AnimationSetBat.BatAnimationType.DEATH2).isAnimationFinished(stateTime);
     }
 
+    @Override
     public boolean isAttackAnimationFinished() {
         return animationSet.getAnimation(AnimationSetBat.BatAnimationType.GRAB).isAnimationFinished(stateTime);
     }
 
+    @Override
     public boolean isHitAnimationFinished() {
         return animationSet.getAnimation(AnimationSetBat.BatAnimationType.HIT).isAnimationFinished(stateTime);
     }
@@ -268,15 +230,12 @@ public class BatEnemy extends BaseEnemy {
     }
 
     @Override
-    public Body getBody() {
-        return body;
-    }
-
     public void dispose() {
         if (world != null && body != null) {
             if (attackCollider != null) body.destroyFixture(attackCollider);
             world.destroyBody(body);
             body = null;
         }
+        animationSet.dispose();
     }
 }

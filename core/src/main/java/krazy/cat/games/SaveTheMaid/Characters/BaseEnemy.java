@@ -1,10 +1,11 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
-import com.badlogic.gdx.graphics.Texture;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
+
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -15,6 +16,9 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
 public abstract class BaseEnemy {
+    private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
+    private static final float ATTACK_RANGE = 25f;
+
     public boolean isDestroyed;
     public int health = 100;
     public int currentDamage = 20;
@@ -28,6 +32,7 @@ public abstract class BaseEnemy {
 
     protected Body body;
     protected Fixture attackCollider;
+    protected boolean attackColliderActive;
 
     public BaseEnemy(World world, Vector2 position) {
         this.world = world;
@@ -39,17 +44,48 @@ public abstract class BaseEnemy {
         stateMachine.changeState(new IdleState());
     }
 
-    public StateMachine getStateMachine() {
-        return stateMachine;
+    public void disableCollision() {
+        body.getFixtureList().forEach(fixture -> {
+            Filter filter = fixture.getFilterData();
+            filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
+            fixture.setFilterData(filter);
+        });
     }
 
     public void onHit() {
         stateMachine.changeState(new HitState());
     }
 
-    public abstract void deactivateAttackCollider();
+    public void activateAttackCollider() {
+        attackColliderActive = true;
+    }
 
-    public abstract void draw(Batch batch);
+    public void deactivateAttackCollider() {
+        attackColliderActive = false;
+        Filter filter = attackCollider.getFilterData();
+        filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
+        attackCollider.setFilterData(filter);
+    }
+
+    public boolean canAttack() {
+        return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
+    }
+
+    public StateMachine getStateMachine() {
+        return stateMachine;
+    }
+
+    public void startAttackCooldown() {
+        attackCooldownTimer = ATTACK_COOLDOWN; // Reset cooldown timer
+    }
+
+    public boolean isInAttackRange(Vector2 playerPosition) {
+        return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
+    }
+
+    public boolean isPlayerInRange(Vector2 playerPosition) {
+        return body.getPosition().dst(playerPosition) < 500;
+    }
 
     protected abstract void defineEnemy(Vector2 position);
 
@@ -57,27 +93,13 @@ public abstract class BaseEnemy {
 
     public abstract void setAnimation(AnimationSetBat.BatAnimationType type);
 
-    public abstract boolean isPlayerInRange(Vector2 playerPosition);
-
-    public abstract boolean isInAttackRange(Vector2 playerPosition);
-
     public abstract void moveToPlayer(Vector2 playerPosition);
 
-    public abstract boolean canAttack();
-
     public abstract void updateAttackColliderPosition();
-
-    public abstract void activateAttackCollider();
-
-    public abstract void startAttackCooldown();
 
     public abstract boolean isAttackAnimationFinished();
 
     public abstract boolean isDeathAnimationComplete();
-
-    public abstract void disableCollision();
-
-    public abstract Body getBody();
 
     public abstract boolean isHitAnimationFinished();
 
@@ -92,6 +114,8 @@ public abstract class BaseEnemy {
     public abstract void idle();
 
     public abstract void update(float dt, Vector2 position);
+
+    public abstract void draw(Batch batch);
 
     public abstract void dispose();
 }
