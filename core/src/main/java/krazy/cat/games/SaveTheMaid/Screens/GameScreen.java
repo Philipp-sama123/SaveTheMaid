@@ -20,18 +20,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import krazy.cat.games.SaveTheMaid.Enemy;
-import krazy.cat.games.SaveTheMaid.Projectile;
+import krazy.cat.games.SaveTheMaid.Characters.Enemy;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
-import krazy.cat.games.SaveTheMaid.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
-
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameScreen implements Screen {
     private boolean jumpPressed = false;

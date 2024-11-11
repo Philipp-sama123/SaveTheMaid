@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid;
+package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
@@ -13,11 +13,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
+import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
+import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
+import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
+
 public class Enemy {
     private static final float ATTACK_RANGE = 25f;
     private static final float MOVEMENT_SPEED = 15f;
     private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
+    public int currentDamage = 25;
 
     private World world;
     public Body body;
@@ -25,17 +31,17 @@ public class Enemy {
 
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
-    private float stateTime;
+    public float stateTime;
     private boolean isFacingLeft = true;
-    private int health = 100;
-    private boolean isDestroyed = false;
+    public int health = 100;
+    public boolean isDestroyed = false;
     private boolean isHit = false;
     private Fixture attackCollider;
-    private boolean attackColliderActive = false;
-    private float attackAnimationDuration;
+    public boolean attackColliderActive = false;
 
-    private float attackCooldownTimer = 0f;
-    private float attackColliderUpdateTimer = 0f; // Timer to keep track of elapsed time
+    public float attackCooldownTimer = 0f;
+    public float attackColliderUpdateTimer = 0f; // Timer to keep track of elapsed time
+    private final StateMachine stateMachine;
 
     public Enemy(World world, Vector2 position) {
         this.world = world;
@@ -44,66 +50,24 @@ public class Enemy {
 
         Texture spriteSheet = new Texture("Characters/Zombie/Colors/Grey.png");
         this.animationSet = new AnimationSetZombie(spriteSheet);
-        attackAnimationDuration = animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).getAnimationDuration();
 
         defineEnemy(position);
         deactivateAttackCollider();
+        stateMachine = new StateMachine(this);
+        stateMachine.changeState(new IdleState());
     }
 
     public void update(float dt, Vector2 playerPosition) {
-        if (isDestroyed && !deathAnimationCompleted()) {
-            stateTime += dt;
+        if (isDestroyed && !isDeathAnimationComplete()) {
             disableCollision();
             return;
-        } else if (isDestroyed && deathAnimationCompleted()) {
-            dispose();
+        }
+        if (isDestroyed) {
             return;
         }
         stateTime += dt;
 
-        if (isHit && animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime)) {
-            currentState = previousState;
-            isHit = false;
-            stateTime = 0f;
-        } else if (isHit) {
-            body.setLinearVelocity(0, body.getLinearVelocity().y);
-        } else {
-            if (isPlayerInRange(playerPosition)) {
-                attackColliderUpdateTimer += dt;
-
-                if (attackCooldownTimer <= 0) {
-                    currentState = AnimationSetZombie.ZombieAnimationType.ATTACK;
-                    body.setLinearVelocity(0, body.getLinearVelocity().y);
-
-                    // Enable attack collider while attacking
-                    if (!attackColliderActive) {
-                        attackColliderUpdateTimer = 0f;
-                        activateAttackCollider();
-                        stateTime = 0;
-                    }
-
-                    // Once attack animation finishes, retreat attack collider and start cooldown
-                    if (animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).isAnimationFinished(stateTime)) {
-                        startCooldown();
-                        currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
-                        deactivateAttackCollider(); // <-- Ensure collider is off after attack ends
-                    }
-                }
-            } else {
-                moveToPlayer(playerPosition);
-
-                // Deactivate attack collider immediately when switching to movement
-                if (attackColliderActive) {
-                    deactivateAttackCollider(); // <-- Ensure collider is off when moving
-                }
-            }
-
-
-        }
-        // Deactivate attack collider if the enemy is no longer attacking
-        if (currentState != AnimationSetZombie.ZombieAnimationType.ATTACK && attackColliderActive) {
-            deactivateAttackCollider();
-        }
+        stateMachine.update(dt, playerPosition);
         // Handle attack cooldown
         if (attackCooldownTimer > 0) {
             attackCooldownTimer -= dt;
@@ -116,21 +80,23 @@ public class Enemy {
         }
     }
 
-    private void disableCollision() {
+    public void disableCollision() {
         body.getFixtureList().forEach(fixture -> {
-           Filter filter =  fixture.getFilterData();
+            Filter filter = fixture.getFilterData();
             filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
             fixture.setFilterData(filter);
         });
     }
+    public boolean canAttack() {
+        return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
+    }
 
-    private void startCooldown() {
-        attackCooldownTimer = ATTACK_COOLDOWN;
-        deactivateAttackCollider(); // Ensure the collider is off during cooldown
+    public void startAttackCooldown() {
+        attackCooldownTimer = ATTACK_COOLDOWN; // Reset cooldown timer
     }
 
     public void draw(Batch batch) {
-        if (isDestroyed && deathAnimationCompleted()) return;
+        if (isDestroyed && isDeathAnimationComplete()) return;
 
         boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
@@ -185,7 +151,7 @@ public class Enemy {
         attackColliderActive = false;
     }
 
-    private void updateAttackColliderPosition() {
+    public void updateAttackColliderPosition() {
         if (attackCollider == null) return;
         if (attackColliderActive) {
             // Calculate the offset based on facing direction
@@ -195,10 +161,16 @@ public class Enemy {
             // Move the collider to the attack position relative to the enemy's body
             PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
             attackShape.setAsBox(6f, 6f, new Vector2(xOffset, yOffset), 0);
+            Filter filter = attackCollider.getFilterData();
+            filter.categoryBits = CATEGORY_PROJECTILE;
+            filter.maskBits = MASK_PROJECTILE;
+            attackCollider.setFilterData(filter);
+
         } else {
             // this is a hack for "disabling" the collider
-            PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
-            attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
+            Filter filter = attackCollider.getFilterData();
+            filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
+            attackCollider.setFilterData(filter);
         }
     }
 
@@ -214,17 +186,20 @@ public class Enemy {
         }
     }
 
-    private void activateAttackCollider() {
+    public void activateAttackCollider() {
         attackColliderActive = true;
     }
 
-    private void deactivateAttackCollider() {
+    public void deactivateAttackCollider() {
         attackColliderActive = false;
         PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
         attackShape.setAsBox(0, 0, new Vector2(0, 0), 0);
+        Filter filter = attackCollider.getFilterData();
+        filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
+        attackCollider.setFilterData(filter);
     }
 
-    private void moveToPlayer(Vector2 playerPosition) {
+    public void moveToPlayer(Vector2 playerPosition) {
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
         direction.scl(MOVEMENT_SPEED);
 
@@ -237,33 +212,41 @@ public class Enemy {
         }
     }
 
-    private boolean deathAnimationCompleted() {
-        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.DEATH).isAnimationFinished(stateTime);
+    public void onHit() {
+        stateMachine.changeState(new HitState());
     }
 
-    private boolean isPlayerInRange(Vector2 playerPosition) {
+    public void setAnimation(AnimationSetZombie.ZombieAnimationType type) {
+        currentState = type;
+        stateTime = 0;
+    }
+
+    public boolean isInAttackRange(Vector2 playerPosition) {
         return body.getPosition().dst(playerPosition) < ATTACK_RANGE;
     }
 
-    public void takeDamage(int damage) {
-        if (isDestroyed || isHit) return;
-        Gdx.app.log("DAMAGE", "Damage enemy " + damage);
-        health -= damage;
-        if (health <= 0) {
-            health = 0;
-            currentState = AnimationSetZombie.ZombieAnimationType.DEATH;
-            isDestroyed = true;
-            stateTime = 0f;
-        } else {
-            previousState = currentState;
-            currentState = AnimationSetZombie.ZombieAnimationType.HIT;
-            isHit = true;
-            stateTime = 0f;
-        }
+    public boolean isPlayerInRange(Vector2 playerPosition) {
+        return body.getPosition().dst(playerPosition) < 500;
     }
 
-    public void onHit() {
-        takeDamage(20);
+    public boolean isDeathAnimationComplete() {
+        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.DEATH).isAnimationFinished(stateTime);
+    }
+
+    public boolean isAttackAnimationFinished() {
+        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).isAnimationFinished(stateTime);
+    }
+
+    public boolean isHitAnimationFinished() {
+        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime);
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public StateMachine getStateMachine() {
+        return stateMachine;
     }
 
     public void dispose() {
@@ -272,9 +255,5 @@ public class Enemy {
             world.destroyBody(body);
             body = null;
         }
-    }
-
-    public void onPlayerCollision() {
-        Gdx.app.log("onEnemyCollision", "PLAYER: " + this);
     }
 }

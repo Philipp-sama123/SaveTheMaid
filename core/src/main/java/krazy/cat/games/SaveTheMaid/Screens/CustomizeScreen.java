@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import krazy.cat.games.SaveTheMaid.Player; // Import Player class
+import krazy.cat.games.SaveTheMaid.Characters.Player; // Import Player class
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class CustomizeScreen implements Screen {

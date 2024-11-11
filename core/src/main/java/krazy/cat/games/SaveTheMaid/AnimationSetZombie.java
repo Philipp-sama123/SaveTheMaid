@@ -90,6 +90,6 @@ public class AnimationSetZombie {
     }
 
     public void dispose() {
-
+        animations.clear();
     }
 }

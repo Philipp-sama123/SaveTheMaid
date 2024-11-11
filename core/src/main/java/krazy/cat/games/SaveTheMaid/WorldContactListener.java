@@ -6,6 +6,9 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
+import krazy.cat.games.SaveTheMaid.Characters.Enemy;
+import krazy.cat.games.SaveTheMaid.Characters.Player;
+
 public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_PLAYER = 0x0001;
     public static final short CATEGORY_ENEMY = 0x0002;

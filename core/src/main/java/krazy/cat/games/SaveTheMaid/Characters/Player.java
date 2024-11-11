@@ -1,8 +1,6 @@
-package krazy.cat.games.SaveTheMaid;
+package krazy.cat.games.SaveTheMaid.Characters;
 
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +15,9 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent.AnimationType;
+import krazy.cat.games.SaveTheMaid.Projectile;
 
 public class Player {
     private static final int MAX_JUMPS = 3;

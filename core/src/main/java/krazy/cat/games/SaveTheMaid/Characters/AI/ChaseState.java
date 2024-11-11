@@ -1,0 +1,31 @@
+package krazy.cat.games.SaveTheMaid.Characters.AI;
+
+import com.badlogic.gdx.math.Vector2;
+
+import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
+import krazy.cat.games.SaveTheMaid.Characters.Enemy;
+
+public class ChaseState implements State {
+    @Override
+    public void enter(Enemy enemy) {
+        enemy.setAnimation(AnimationSetZombie.ZombieAnimationType.WALK);
+    }
+
+    @Override
+    public void update(Enemy enemy, float deltaTime, Vector2 playerPosition) {
+        if (enemy.isPlayerInRange(playerPosition)) {
+            if (enemy.isInAttackRange(playerPosition)) {
+                enemy.getStateMachine().changeState(new AttackState());
+            } else {
+                enemy.moveToPlayer(playerPosition);
+            }
+        } else {
+            enemy.getStateMachine().changeState(new IdleState());
+        }
+    }
+
+    @Override
+    public void exit(Enemy enemy) {
+        // Cleanup or stop movement if necessary
+    }
+}
