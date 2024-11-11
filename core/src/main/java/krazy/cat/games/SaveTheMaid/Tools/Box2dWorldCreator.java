@@ -16,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.Enemy;
+import krazy.cat.games.SaveTheMaid.Characters.ZombieEnemy;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Coin;
@@ -66,7 +66,7 @@ public class Box2dWorldCreator {
         }     // goes through "Bricks" layers to get bodies and create them
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            gameScreen.addEnemy(new Enemy(world, new Vector2(rectangle.x, rectangle.y)));
+            gameScreen.addEnemy(new ZombieEnemy(world, new Vector2(rectangle.x, rectangle.y)));
         }
     }
 

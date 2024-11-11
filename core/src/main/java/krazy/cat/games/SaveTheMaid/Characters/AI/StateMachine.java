@@ -3,13 +3,13 @@ package krazy.cat.games.SaveTheMaid.Characters.AI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
-import krazy.cat.games.SaveTheMaid.Characters.Enemy;
+import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
 
 public class StateMachine {
     private State currentState;
-    private Enemy enemy;
+    private BaseEnemy enemy;
 
-    public StateMachine(Enemy enemy) {
+    public StateMachine(BaseEnemy enemy) {
         this.enemy = enemy;
     }
 

@@ -6,7 +6,6 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,14 +17,12 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
-public class Enemy {
+public class ZombieEnemy extends BaseEnemy {
     private static final float ATTACK_RANGE = 25f;
     private static final float MOVEMENT_SPEED = 15f;
     private static final float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     private static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-    public int currentDamage = 25;
 
-    private World world;
     public Body body;
     private AnimationSetZombie animationSet;
 
@@ -33,7 +30,6 @@ public class Enemy {
     private AnimationSetZombie.ZombieAnimationType previousState;
     public float stateTime;
     private boolean isFacingLeft = true;
-    public int health = 100;
     public boolean isDestroyed = false;
     private boolean isHit = false;
     private Fixture attackCollider;
@@ -43,16 +39,13 @@ public class Enemy {
     public float attackColliderUpdateTimer = 0f; // Timer to keep track of elapsed time
     private final StateMachine stateMachine;
 
-    public Enemy(World world, Vector2 position) {
-        this.world = world;
-        this.stateTime = 0f;
+    public ZombieEnemy(World world, Vector2 position) {
+        super(world, position);
         this.currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
 
         Texture spriteSheet = new Texture("Characters/Zombie/Colors/Grey.png");
         this.animationSet = new AnimationSetZombie(spriteSheet);
 
-        defineEnemy(position);
-        deactivateAttackCollider();
         stateMachine = new StateMachine(this);
         stateMachine.changeState(new IdleState());
     }
@@ -87,6 +80,7 @@ public class Enemy {
             fixture.setFilterData(filter);
         });
     }
+
     public boolean canAttack() {
         return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
     }
@@ -111,7 +105,7 @@ public class Enemy {
     }
 
 
-    private void defineEnemy(Vector2 position) {
+    protected void defineEnemy(Vector2 position) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(position);
         bodyDef.type = BodyDef.BodyType.DynamicBody;

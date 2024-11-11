@@ -5,15 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
-import krazy.cat.games.SaveTheMaid.Characters.Enemy;
-import krazy.cat.games.SaveTheMaid.Characters.AI.State;
-import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
+import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
 
 public class HitState implements State {
     private boolean animationStarted = false;
 
     @Override
-    public void enter(Enemy enemy) {
+    public void enter(BaseEnemy enemy) {
         Gdx.app.log("HitState", "Enemy has entered HitState.");
 
         enemy.health -= enemy.currentDamage;
@@ -30,7 +28,7 @@ public class HitState implements State {
     }
 
     @Override
-    public void update(Enemy enemy, float dt, Vector2 playerPosition) {
+    public void update(BaseEnemy enemy, float dt, Vector2 playerPosition) {
         // Wait for the hit animation to complete
         if (animationStarted && enemy.isHitAnimationFinished()) {
             animationStarted = false;
@@ -49,7 +47,7 @@ public class HitState implements State {
     }
 
     @Override
-    public void exit(Enemy enemy) {
+    public void exit(BaseEnemy enemy) {
         Gdx.app.log("HitState", "Enemy is exiting HitState.");
     }
 }
