@@ -11,15 +11,22 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
+import krazy.cat.games.SaveTheMaid.Screens.CustomizeScreen;
+import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
 
 public class Hud implements Disposable {
     private final InputMultiplexer inputMultiplexer;
@@ -41,6 +48,7 @@ public class Hud implements Disposable {
     private ImageButton shootButton;
     private ImageButton shootUpButton;
     private ImageButton debugButton;
+    private ImageButton restartButton;
     private Touchpad movementJoystick;
 
     public Hud(SpriteBatch spriteBatch) {
@@ -102,16 +110,20 @@ public class Hud implements Disposable {
         return shootButton;
     }
 
+    public Button getRestartButton() {
+        return restartButton;
+    }
+
     private void createButtons() {
         // Load texture for pause button
         Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
         Texture jumpTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/JumpPressed.png"));
-        ImageButton.ImageButtonStyle buttonStylePause = new ImageButton.ImageButtonStyle();
+        ImageButton.ImageButtonStyle buttonStyleJump = new ImageButton.ImageButtonStyle();
 
-        buttonStylePause.up = new TextureRegionDrawable(jumpTextureUp);
-        buttonStylePause.down = new TextureRegionDrawable(jumpTextureDown);
+        buttonStyleJump.up = new TextureRegionDrawable(jumpTextureUp);
+        buttonStyleJump.down = new TextureRegionDrawable(jumpTextureDown);
 
-        jumpButton = new ImageButton(buttonStylePause);
+        jumpButton = new ImageButton(buttonStyleJump);
 
         Texture shootTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"));
         Texture shootTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingPressed.png"));
@@ -133,6 +145,16 @@ public class Hud implements Disposable {
         buttonStyleDebugButton.down = new TextureRegionDrawable(debugButtonTextureDown);
 
         debugButton = new ImageButton(buttonStyleDebugButton);
+
+        Texture restartTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Buttons/Repeat.png"));
+        Texture restartTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Repeat.png"));
+        ImageButton.ImageButtonStyle buttonStyleRestartButton = new ImageButton.ImageButtonStyle();
+
+        buttonStyleRestartButton.up = new TextureRegionDrawable(restartTextureUp);
+        buttonStyleRestartButton.down = new TextureRegionDrawable(restartTextureDown);
+
+        restartButton = new ImageButton(buttonStyleRestartButton);
+
         // Arrange main buttons in a right-aligned table
         Table buttonTable = new Table();
         buttonTable.setFillParent(true);
@@ -145,7 +167,8 @@ public class Hud implements Disposable {
         Table debugTable = new Table();
         debugTable.setFillParent(true);
         debugTable.top().left();
-        debugTable.add(debugButton).size(25, 25).pad(10);
+        debugTable.add(debugButton).size(25, 25).pad(10).row();
+        debugTable.add(restartButton).size(25, 25).pad(10);
         stage.addActor(debugTable);
     }
 

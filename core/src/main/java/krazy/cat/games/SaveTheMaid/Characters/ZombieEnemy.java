@@ -38,6 +38,7 @@ public class ZombieEnemy extends BaseEnemy {
         this.animationSet = new AnimationSetZombie(spriteSheet);
     }
 
+    @Override
     public void update(float dt, Vector2 playerPosition) {
         if (isDestroyed) {
             disableCollision();
@@ -76,7 +77,7 @@ public class ZombieEnemy extends BaseEnemy {
         );
     }
 
-
+    @Override
     protected void defineEnemy(Vector2 position) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(position);
@@ -98,25 +99,7 @@ public class ZombieEnemy extends BaseEnemy {
         createAttackCollider();
     }
 
-    private void createAttackCollider() {
-        PolygonShape attackShape = new PolygonShape();
-        float xOffset = isFacingLeft ? -12f : 12f;
-        attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
-
-        FixtureDef attackFixtureDef = new FixtureDef();
-        attackFixtureDef.shape = attackShape;
-        attackFixtureDef.isSensor = true; // Ensure it’s always a sensor
-
-        attackFixtureDef.filter.categoryBits = CATEGORY_PROJECTILE;
-        attackFixtureDef.filter.maskBits = MASK_PROJECTILE;
-
-        attackCollider = body.createFixture(attackFixtureDef);
-        attackCollider.setUserData(this);
-        attackShape.dispose();
-
-        attackColliderActive = false;
-    }
-
+    @Override
     public void updateAttackColliderPosition() {
         if (attackCollider == null) return;
         if (attackColliderActive) {
@@ -140,19 +123,7 @@ public class ZombieEnemy extends BaseEnemy {
         }
     }
 
-    private void adjustFacingDirection() {
-        float velocityX = body.getLinearVelocity().x;
-
-        if (velocityX < 0 && !isFacingLeft) {
-            animationSet.flipFramesHorizontally();
-            isFacingLeft = true;
-        } else if (velocityX > 0 && isFacingLeft) {
-            animationSet.flipFramesHorizontally();
-            isFacingLeft = false;
-        }
-    }
-
-
+    @Override
     public void moveToPlayer(Vector2 playerPosition) {
         Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
         direction.scl(MOVEMENT_SPEED);
@@ -178,7 +149,6 @@ public class ZombieEnemy extends BaseEnemy {
 
     @Override
     public void setAnimation(AnimationSetRat.RatAnimationType type) {
-
     }
 
     @Override
@@ -235,4 +205,36 @@ public class ZombieEnemy extends BaseEnemy {
             body = null;
         }
     }
+
+    private void createAttackCollider() {
+        PolygonShape attackShape = new PolygonShape();
+        float xOffset = isFacingLeft ? -12f : 12f;
+        attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
+
+        FixtureDef attackFixtureDef = new FixtureDef();
+        attackFixtureDef.shape = attackShape;
+        attackFixtureDef.isSensor = true; // Ensure it’s always a sensor
+
+        attackFixtureDef.filter.categoryBits = CATEGORY_PROJECTILE;
+        attackFixtureDef.filter.maskBits = MASK_PROJECTILE;
+
+        attackCollider = body.createFixture(attackFixtureDef);
+        attackCollider.setUserData(this);
+        attackShape.dispose();
+
+        attackColliderActive = false;
+    }
+
+    private void adjustFacingDirection() {
+        float velocityX = body.getLinearVelocity().x;
+
+        if (velocityX < 0 && !isFacingLeft) {
+            animationSet.flipFramesHorizontally();
+            isFacingLeft = true;
+        } else if (velocityX > 0 && isFacingLeft) {
+            animationSet.flipFramesHorizontally();
+            isFacingLeft = false;
+        }
+    }
+
 }

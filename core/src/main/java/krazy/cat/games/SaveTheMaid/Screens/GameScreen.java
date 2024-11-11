@@ -5,7 +5,6 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,14 +16,11 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
-import krazy.cat.games.SaveTheMaid.Characters.BatEnemy;
-import krazy.cat.games.SaveTheMaid.Characters.ZombieEnemy;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
@@ -139,6 +135,9 @@ public class GameScreen implements Screen {
         } else {
             debugPressed = false; // Reset when button is released
         }
+        if (hud.getRestartButton().isPressed()) {
+            restart();
+        }
     }
 
     @Override
@@ -197,10 +196,12 @@ public class GameScreen implements Screen {
         hud.dispose();
     }
 
-    //    public void addEnemy(ZombieEnemy zombieEnemy) {
-//        enemies.add(zombieEnemy);
-//    }
     public void addEnemy(BaseEnemy enemy) {
         enemies.add(enemy);
+    }
+
+    // ToDO.. not sure of all this recreating always ...
+    public void restart() {
+        game.setScreen(new StartupScreen(game));
     }
 }
