@@ -108,7 +108,6 @@ public class Player {
             handleShootingUpAnimation();
         }
 
-        // Update jump effect animation
         if (showJumpEffect) {
             jumpEffectTime += delta;
             if (jumpEffectAnimation.isAnimationFinished(jumpEffectTime)) {
@@ -124,10 +123,8 @@ public class Player {
         if (isSliding) {
             slideTime += delta;
 
-            // Reset slide state after the duration finishes
             if (slideTime >= SLIDE_DURATION) {
                 isSliding = false;
-                updateAnimationStateBasedOnMovement(); // Update based on current motion
             }
         }
     }
@@ -183,6 +180,7 @@ public class Player {
     }
 
     public void jump() {
+        if (isSliding) return;
         if (jumpCount < MAX_JUMPS) {
             body.setLinearVelocity(body.getLinearVelocity().x, 500);
             jumpCount++;
@@ -262,7 +260,7 @@ public class Player {
     public void shootUp() {
         boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
 
-        if (isGrounded && !isShootingUp && !isShooting) {
+        if (isGrounded && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
 
@@ -281,8 +279,13 @@ public class Player {
 
             // Determine position offset and velocity based on facing direction
             Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, isCrouching ? 2 : 10);
+            // TODO: MAYBE WITH AN IMPULSE (!)
             Vector2 velocity = new Vector2(isFacingRight ? 1000 : -1000, 0);
 
+            if (isSliding) {
+                position.y -= 16;
+                currentAnimationState = AnimationType.SLIDE_SHOOT;
+            }
             // Add a new projectile with specified rotation
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
@@ -330,6 +333,7 @@ public class Player {
     }
 
     private void handleShootingAnimation() {
+
         Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
         if (shootAnimation.isAnimationFinished(stateTime)) {
             isShooting = false;
@@ -414,6 +418,7 @@ public class Player {
                 currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
                     : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
             }
+            Gdx.app.log("ANIM", currentAnimationState + " currentanim");
         }
     }
 
@@ -422,6 +427,7 @@ public class Player {
         float posY = body.getPosition().y - 24;
         if (isSliding) {
             batch.draw(upperBodyFrame, posX, body.getPosition().y - 36, 64, 64);
+            batch.draw(lowerBodyFrame, posX, body.getPosition().y - 36, 64, 64);
         } else {
             batch.draw(upperBodyFrame, posX, posY, 64, 64);
             batch.draw(lowerBodyFrame, posX, posY, 64, 64);

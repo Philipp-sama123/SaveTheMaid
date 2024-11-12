@@ -181,8 +181,8 @@ public class Hud implements Disposable {
         Table debugTable = new Table();
         debugTable.setFillParent(true);
         debugTable.top().left();
-        debugTable.add(debugButton).size(15, 15).pad(2.5f).row();
         debugTable.add(restartButton).size(15, 15).pad(2.5f);
+        debugTable.add(debugButton).size(15, 15).pad(2.5f);
         stage.addActor(debugTable);
     }
 

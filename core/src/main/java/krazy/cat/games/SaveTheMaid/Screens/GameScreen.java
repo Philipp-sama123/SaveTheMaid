@@ -114,7 +114,7 @@ public class GameScreen implements Screen {
         Gdx.app.log("handleInput ", "hud.getMovementJoystick().getKnobPercentY() " + hud.getMovementJoystick().getKnobPercentY());
         player.move(joystickPercentX);
         player.crouch(hud.getMovementJoystick().getKnobPercentY() < -0.75);
-        // Jump button handling
+
         if (hud.getJumpButton().isPressed()) {
             if (!jumpPressed) { // If the jump button is pressed for the first time
                 player.jump();
@@ -122,12 +122,6 @@ public class GameScreen implements Screen {
             }
         } else {
             jumpPressed = false; // Reset when button is released
-        }
-        if (hud.getShootButton().isPressed()) {
-            player.shoot();
-        }
-        if (hud.getShootUpButton().isPressed()) {
-            player.shootUp();
         }
         if (hud.getDebugButton().isPressed()) {
             if (!debugPressed) {
@@ -137,9 +131,6 @@ public class GameScreen implements Screen {
         } else {
             debugPressed = false; // Reset when button is released
         }
-        if (hud.getRestartButton().isPressed()) {
-            restart();
-        }
         if (hud.getSlideButton().isPressed()) {
             if (!slidePressed) { // If the jump button is pressed for the first time
                 player.slide();
@@ -147,6 +138,16 @@ public class GameScreen implements Screen {
             }
         } else {
             slidePressed = false; // Reset when button is released
+        }
+
+        if (hud.getRestartButton().isPressed()) {
+            restart();
+        }
+        if (hud.getShootButton().isPressed()) {
+            player.shoot();
+        }
+        if (hud.getShootUpButton().isPressed()) {
+            player.shootUp();
         }
     }
 
