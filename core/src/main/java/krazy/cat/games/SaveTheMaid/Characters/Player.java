@@ -55,6 +55,11 @@ public class Player {
     public int currentHealth = maxHealth;
     private boolean isDead = false;
 
+    private static final float SLIDE_IMPULSE = 700;        // Set desired slide speed
+    private static final float SLIDE_DURATION = 1.f;    // Duration of the slide in seconds
+    private boolean isSliding = false;                   // Check if currently sliding
+    private float slideTime;                             // Track slide duration
+
     public Player(World world) {
         this.world = world;
         animationSetAgent = new AnimationSetFemaleAgent(
@@ -114,6 +119,15 @@ public class Player {
             bloodEffectTime += delta;
             if (bloodEffectAnimation.isAnimationFinished(bloodEffectTime)) {
                 showBloodEffect = false;
+            }
+        }
+        if (isSliding) {
+            slideTime += delta;
+
+            // Reset slide state after the duration finishes
+            if (slideTime >= SLIDE_DURATION) {
+                isSliding = false;
+                updateAnimationStateBasedOnMovement(); // Update based on current motion
             }
         }
     }
@@ -181,6 +195,17 @@ public class Player {
         }
     }
 
+    public void slide() {
+        if (isSliding || isDead) return;  // Do not slide if already sliding or dead
+
+        isSliding = true;
+        slideTime = 0;
+
+        float slideImpulseX = isFacingRight ? SLIDE_IMPULSE : -SLIDE_IMPULSE;
+        body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);        // Set animation state to slide or slide+shoot
+        currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
+    }
+
     private void onDeath() {
         // Reset jump, movement, or shooting states
         jumpCount = 0;
@@ -211,7 +236,7 @@ public class Player {
     }
 
     public void move(float moveInput) {
-        if (isDead)
+        if (isDead || isSliding)
             return;
 
         float accelerationFactor = 0.1f;
@@ -363,7 +388,9 @@ public class Player {
     private void updateAnimationStateBasedOnMovement() {
         int currentVelocityX = Math.round(body.getLinearVelocity().x);
         int currentVelocityY = Math.round(body.getLinearVelocity().y);
-        if (isShootingUp) {
+        if (isSliding) {
+            currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
+        } else if (isShootingUp) {
             if (currentVelocityY > 0) {
                 currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
             } else if (currentVelocityY < 0) {
@@ -387,20 +414,23 @@ public class Player {
                 currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
                     : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
             }
-
         }
     }
 
     private void drawAnimation(Batch batch, TextureRegion upperBodyFrame, TextureRegion lowerBodyFrame) {
         float posX = isFacingRight ? body.getPosition().x - 26 : body.getPosition().x - 36;
         float posY = body.getPosition().y - 24;
-
-        batch.draw(upperBodyFrame, posX, posY, 64, 64);
-        batch.draw(lowerBodyFrame, posX, posY, 64, 64);
+        if (isSliding) {
+            batch.draw(upperBodyFrame, posX, body.getPosition().y - 36, 64, 64);
+        } else {
+            batch.draw(upperBodyFrame, posX, posY, 64, 64);
+            batch.draw(lowerBodyFrame, posX, posY, 64, 64);
+        }
     }
 
     public void onStartEnemyAttackCollision() {
-        takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
+        if (!isSliding)
+            takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
     }
 
 }

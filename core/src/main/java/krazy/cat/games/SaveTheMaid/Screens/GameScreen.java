@@ -29,6 +29,7 @@ import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class GameScreen implements Screen {
     private boolean jumpPressed = false;
+    private boolean slidePressed = false;
     private boolean debugPressed = false;
 
     private final SaveTheMaidGame game;
@@ -53,6 +54,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
+
         this.hud = new Hud(game.batch);
 
 
@@ -137,6 +139,14 @@ public class GameScreen implements Screen {
         }
         if (hud.getRestartButton().isPressed()) {
             restart();
+        }
+        if (hud.getSlideButton().isPressed()) {
+            if (!slidePressed) { // If the jump button is pressed for the first time
+                player.slide();
+                slidePressed = true; // Mark jump as pressed
+            }
+        } else {
+            slidePressed = false; // Reset when button is released
         }
     }
 

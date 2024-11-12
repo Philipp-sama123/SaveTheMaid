@@ -24,6 +24,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import javax.swing.ButtonModel;
+
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Screens.CustomizeScreen;
 import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
@@ -49,6 +51,7 @@ public class Hud implements Disposable {
     private ImageButton shootUpButton;
     private ImageButton debugButton;
     private ImageButton restartButton;
+    private ImageButton slideButton;
     private Touchpad movementJoystick;
 
     public Hud(SpriteBatch spriteBatch) {
@@ -93,6 +96,8 @@ public class Hud implements Disposable {
         return movementJoystick;
     }
 
+    public ImageButton getSlideButton() {
+        return slideButton;  }
 
     public ImageButton getJumpButton() {
         return jumpButton;
@@ -115,7 +120,6 @@ public class Hud implements Disposable {
     }
 
     private void createButtons() {
-        // Load texture for pause button
         Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
         Texture jumpTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/JumpPressed.png"));
         ImageButton.ImageButtonStyle buttonStyleJump = new ImageButton.ImageButtonStyle();
@@ -124,6 +128,15 @@ public class Hud implements Disposable {
         buttonStyleJump.down = new TextureRegionDrawable(jumpTextureDown);
 
         jumpButton = new ImageButton(buttonStyleJump);
+
+        Texture slideTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/SlideButton.png"));
+        Texture slideTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/SlideButtonPressed.png"));
+        ImageButton.ImageButtonStyle buttonStyleSlide = new ImageButton.ImageButtonStyle();
+
+        buttonStyleSlide.up = new TextureRegionDrawable(slideTextureUp);
+        buttonStyleSlide.down = new TextureRegionDrawable(slideTextureDown);
+
+        slideButton = new ImageButton(buttonStyleSlide);
 
         Texture shootTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"));
         Texture shootTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingPressed.png"));
@@ -159,16 +172,17 @@ public class Hud implements Disposable {
         Table buttonTable = new Table();
         buttonTable.setFillParent(true);
         buttonTable.center().right();
-        buttonTable.add(jumpButton).size(25, 25).pad(10).row();
-        buttonTable.add(shootUpButton).size(25, 25).pad(10).row();
-        buttonTable.add(shootButton).size(25, 25).pad(10);
+        buttonTable.add(slideButton).size(25, 25).pad(5).row();
+        buttonTable.add(jumpButton).size(25, 25).pad(5).row();
+        buttonTable.add(shootUpButton).size(25, 25).pad(5).row();
+        buttonTable.add(shootButton).size(25, 25).pad(5);
         stage.addActor(buttonTable);
 
         Table debugTable = new Table();
         debugTable.setFillParent(true);
         debugTable.top().left();
-        debugTable.add(debugButton).size(25, 25).pad(10).row();
-        debugTable.add(restartButton).size(25, 25).pad(10);
+        debugTable.add(debugButton).size(15, 15).pad(2.5f).row();
+        debugTable.add(restartButton).size(15, 15).pad(2.5f);
         stage.addActor(debugTable);
     }
 
