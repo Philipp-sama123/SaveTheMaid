@@ -2,6 +2,8 @@ package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -18,10 +20,12 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
 public abstract class BaseEnemy {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
-    protected static  float ATTACK_RANGE = 25f;
+    protected static float ATTACK_RANGE = 25f;
     protected static final float MOVEMENT_SPEED = 15f;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-
+    public Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("SFX/swipe.mp3"));
+    public Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
+    public Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("SFX/ZombieAttack.wav"));
 
     public boolean isDestroyed;
     public int health = 100;

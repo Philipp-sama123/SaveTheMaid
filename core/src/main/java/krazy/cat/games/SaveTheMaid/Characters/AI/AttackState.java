@@ -10,6 +10,7 @@ public class AttackState implements State {
     public void enter(BaseEnemy enemy) {
         if (enemy.canAttack()) {
             enemy.attack();
+            enemy.attackSound.play();
         } else {
             enemy.getStateMachine().changeState(new IdleState()); // Switch back if cooldown is active
         }

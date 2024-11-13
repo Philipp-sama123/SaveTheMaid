@@ -22,6 +22,7 @@ public class HitState implements State {
             // Set the enemy's animation to the hit animation
             enemy.hit();
             animationStarted = true;
+            enemy.hitSound.play();
         }
         enemy.startAttackCooldown();
     }

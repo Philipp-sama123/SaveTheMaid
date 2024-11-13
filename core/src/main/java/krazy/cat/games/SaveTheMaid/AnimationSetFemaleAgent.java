@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -74,7 +75,6 @@ public class AnimationSetFemaleAgent {
         }
         return upperBodyAnimations;
     }
-
     private Map<AnimationType, Animation<TextureRegion>> CreateLowerBodyAnimations(Texture spriteSheet) {
         final Map<AnimationType, Animation<TextureRegion>> lowerBodyAnimations;
         TextureRegion[][] textureRegions = TextureRegion.split(spriteSheet, FRAME_WIDTH, FRAME_HEIGHT);

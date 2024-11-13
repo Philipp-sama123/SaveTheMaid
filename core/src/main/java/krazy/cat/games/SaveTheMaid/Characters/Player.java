@@ -4,6 +4,7 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -59,6 +60,9 @@ public class Player {
     private static final float SLIDE_DURATION = 1.f;    // Duration of the slide in seconds
     private boolean isSliding = false;                   // Check if currently sliding
     private float slideTime;                             // Track slide duration
+    private Sound jumpSound;
+    private Sound hitSound;
+    private Sound shootSound;
 
     public Player(World world) {
         this.world = world;
@@ -89,6 +93,7 @@ public class Player {
         bloodEffectAnimation = new Animation<>(0.1f, bloodFrames, Animation.PlayMode.NORMAL);
 
         definePlayer();
+        initializeSounds();
     }
 
     public void update(float delta) {
@@ -150,6 +155,12 @@ public class Player {
         rectShape.dispose();
     }
 
+    private void initializeSounds() {
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("SFX/Jump.wav"));
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("SFX/Shoot.wav"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
+    }
+
     public void draw(Batch batch) {
         setBatchColorForDamage(batch);
         drawAnimation(batch, getCurrentUpperBodyFrame(), getCurrentLowerBodyFrame());
@@ -179,6 +190,7 @@ public class Player {
         return projectiles;
     }
 
+
     public void jump() {
         if (isSliding) return;
         if (jumpCount < MAX_JUMPS) {
@@ -189,6 +201,8 @@ public class Player {
 
             // Start jump effect animation
             jumpEffectTime = 0;
+
+            jumpSound.play();
             showJumpEffect = true;
         }
     }
@@ -267,7 +281,7 @@ public class Player {
             // Spawn above the character and set velocity straight up
             Vector2 position = body.getPosition().add(0, 40); // Adjust height if necessary
             Vector2 velocity = new Vector2(0, 1000);           // Set to move vertically up
-
+            shootSound.play();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
@@ -286,14 +300,14 @@ public class Player {
                 position.y -= 16;
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
-            // Add a new projectile with specified rotation
+            shootSound.play();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
 
     private void takeDamage(float damage) {
         if (isDead) return;  // Ignore damage if already dead
-
+        hitSound.play();
         currentHealth -= damage;
         showBloodEffect = true;  // Trigger blood effect for feedback
         bloodEffectTime = 0;
