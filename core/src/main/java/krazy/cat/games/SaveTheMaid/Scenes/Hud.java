@@ -3,6 +3,7 @@ package krazy.cat.games.SaveTheMaid.Scenes;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
@@ -24,14 +25,11 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import javax.swing.ButtonModel;
-
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
-import krazy.cat.games.SaveTheMaid.Screens.CustomizeScreen;
-import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
 
 public class Hud implements Disposable {
-    private final InputMultiplexer inputMultiplexer;
+    private SaveTheMaidGame game;
+    private InputMultiplexer inputMultiplexer;
     public Stage stage;
     public Viewport viewport;
 
@@ -50,17 +48,17 @@ public class Hud implements Disposable {
     private ImageButton shootButton;
     private ImageButton shootUpButton;
     private ImageButton debugButton;
-    private ImageButton restartButton;
+    private ImageButton pauseButton;
     private ImageButton slideButton;
     private Touchpad movementJoystick;
 
-    public Hud(SpriteBatch spriteBatch) {
+    public Hud(SaveTheMaidGame game) {
         worldTimer = 0;
         timeCount = 0;
         health = 0;
-
+        this.game = game;
         viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, new OrthographicCamera());
-        stage = new Stage(viewport, spriteBatch);
+        stage = new Stage(viewport, game.batch);
         Table table = new Table();
         table.top();
         table.setFillParent(true);
@@ -86,10 +84,19 @@ public class Hud implements Disposable {
         createMovementJoystick();
         createButtons();
 
+    }
+
+    public void enableInput() {
         // Initialize InputMultiplexer
-        inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(stage);
+        if (inputMultiplexer == null) {
+            inputMultiplexer = new InputMultiplexer();
+            inputMultiplexer.addProcessor(stage);
+        }
         Gdx.input.setInputProcessor(inputMultiplexer);
+    }
+
+    public void disableInput() {
+        Gdx.input.setInputProcessor(null);
     }
 
     public Touchpad getMovementJoystick() {
@@ -97,7 +104,8 @@ public class Hud implements Disposable {
     }
 
     public ImageButton getSlideButton() {
-        return slideButton;  }
+        return slideButton;
+    }
 
     public ImageButton getJumpButton() {
         return jumpButton;
@@ -115,8 +123,8 @@ public class Hud implements Disposable {
         return shootButton;
     }
 
-    public Button getRestartButton() {
-        return restartButton;
+    public Button getPauseButton() {
+        return pauseButton;
     }
 
     private void createButtons() {
@@ -166,7 +174,7 @@ public class Hud implements Disposable {
         buttonStyleRestartButton.up = new TextureRegionDrawable(restartTextureUp);
         buttonStyleRestartButton.down = new TextureRegionDrawable(restartTextureDown);
 
-        restartButton = new ImageButton(buttonStyleRestartButton);
+        pauseButton = new ImageButton(buttonStyleRestartButton);
 
         // Arrange main buttons in a right-aligned table
         Table buttonTable = new Table();
@@ -181,9 +189,18 @@ public class Hud implements Disposable {
         Table debugTable = new Table();
         debugTable.setFillParent(true);
         debugTable.top().left();
-        debugTable.add(restartButton).size(15, 15).pad(2.5f);
+        debugTable.add(pauseButton).size(15, 15).pad(2.5f);
         debugTable.add(debugButton).size(15, 15).pad(2.5f);
         stage.addActor(debugTable);
+
+
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("INPUT", "game.setScreen(game.getGameScreen());");
+                game.setScreen(game.getPauseScreen()); // Switch back to GameScreen
+            }
+        });
     }
 
     private void createMovementJoystick() {

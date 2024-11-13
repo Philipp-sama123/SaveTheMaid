@@ -45,7 +45,7 @@ public class StartupScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game));
+                game.setScreen(game.getGameScreen());
             }
         });
 
@@ -65,11 +65,11 @@ public class StartupScreen implements Screen {
         table.add(customizeButton).size(50).pad(20);
 
         stage.addActor(table);
-        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class StartupScreen implements Screen {
         // Draw the background
         game.batch.begin();
         game.batch.draw(backgroundTexture, 0, 0, backgroundTexture.getWidth(), backgroundTexture.getHeight());
-        game.batch.draw(backgroundTexture, GAME_WIDTH-backgroundTexture.getWidth(), 0, backgroundTexture.getWidth(), backgroundTexture.getHeight());
+        game.batch.draw(backgroundTexture, GAME_WIDTH - backgroundTexture.getWidth(), 0, backgroundTexture.getWidth(), backgroundTexture.getHeight());
         game.batch.end();
 
         stage.act(delta);
@@ -99,6 +99,7 @@ public class StartupScreen implements Screen {
 
     @Override
     public void hide() {
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override

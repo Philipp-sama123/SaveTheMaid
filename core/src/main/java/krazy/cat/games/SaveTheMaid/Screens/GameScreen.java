@@ -31,6 +31,7 @@ public class GameScreen implements Screen {
     private boolean jumpPressed = false;
     private boolean slidePressed = false;
     private boolean debugPressed = false;
+    private boolean pausePressed = false;
 
     private final SaveTheMaidGame game;
     private final Player player;
@@ -52,11 +53,14 @@ public class GameScreen implements Screen {
     private Array<BaseEnemy> enemies = new Array<>();
     public boolean isShowBox2dDebug;
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
 
-        this.hud = new Hud(game.batch);
-
+        this.hud = new Hud(game);
 
         this.mapLoader = new TmxMapLoader();
         // fix for map background artifacts
@@ -88,7 +92,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
+        hud.enableInput();
     }
 
     public void update(float dt) {
@@ -139,10 +143,8 @@ public class GameScreen implements Screen {
         } else {
             slidePressed = false; // Reset when button is released
         }
+        Gdx.app.log("Pause Button", "isPressed: " + hud.getPauseButton().isPressed() + ", pausePressed: " + pausePressed);
 
-        if (hud.getRestartButton().isPressed()) {
-            restart();
-        }
         if (hud.getShootButton().isPressed()) {
             player.shoot();
         }
@@ -185,7 +187,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
@@ -195,7 +196,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        hud.disableInput();
     }
 
     @Override
