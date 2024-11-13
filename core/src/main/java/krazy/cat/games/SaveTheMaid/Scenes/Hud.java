@@ -52,6 +52,8 @@ public class Hud implements Disposable {
     private ImageButton slideButton;
     private Touchpad movementJoystick;
 
+    private boolean jumpPressed = false;
+
     public Hud(SaveTheMaidGame game) {
         worldTimer = 0;
         timeCount = 0;
@@ -85,7 +87,6 @@ public class Hud implements Disposable {
         createButtons();
 
     }
-
     public void enableInput() {
         // Initialize InputMultiplexer
         if (inputMultiplexer == null) {
@@ -99,33 +100,6 @@ public class Hud implements Disposable {
         Gdx.input.setInputProcessor(null);
     }
 
-    public Touchpad getMovementJoystick() {
-        return movementJoystick;
-    }
-
-    public ImageButton getSlideButton() {
-        return slideButton;
-    }
-
-    public ImageButton getJumpButton() {
-        return jumpButton;
-    }
-
-    public ImageButton getShootUpButton() {
-        return shootUpButton;
-    }
-
-    public ImageButton getDebugButton() {
-        return debugButton;
-    }
-
-    public ImageButton getShootButton() {
-        return shootButton;
-    }
-
-    public Button getPauseButton() {
-        return pauseButton;
-    }
 
     private void createButtons() {
         Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
@@ -157,7 +131,7 @@ public class Hud implements Disposable {
         shootButton = new ImageButton(buttonStyleShoot);
         shootUpButton = new ImageButton(buttonStyleShoot);
 
-        Texture debugButtonTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Buttons/Notifications.png"));
+        Texture debugButtonTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Notifications.png"));
         Texture debugButtonTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Notifications.png"));
 
         ImageButton.ImageButtonStyle buttonStyleDebugButton = new ImageButton.ImageButtonStyle();
@@ -167,14 +141,14 @@ public class Hud implements Disposable {
 
         debugButton = new ImageButton(buttonStyleDebugButton);
 
-        Texture restartTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Buttons/Repeat.png"));
-        Texture restartTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Repeat.png"));
-        ImageButton.ImageButtonStyle buttonStyleRestartButton = new ImageButton.ImageButtonStyle();
+        Texture pausetTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Pause.png"));
+        Texture pauseTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Pause.png"));
+        ImageButton.ImageButtonStyle buttonStylePauseButton = new ImageButton.ImageButtonStyle();
 
-        buttonStyleRestartButton.up = new TextureRegionDrawable(restartTextureUp);
-        buttonStyleRestartButton.down = new TextureRegionDrawable(restartTextureDown);
+        buttonStylePauseButton.up = new TextureRegionDrawable(pausetTextureUp);
+        buttonStylePauseButton.down = new TextureRegionDrawable(pauseTextureDown);
 
-        pauseButton = new ImageButton(buttonStyleRestartButton);
+        pauseButton = new ImageButton(buttonStylePauseButton);
 
         // Arrange main buttons in a right-aligned table
         Table buttonTable = new Table();
@@ -193,12 +167,17 @@ public class Hud implements Disposable {
         debugTable.add(debugButton).size(15, 15).pad(2.5f);
         stage.addActor(debugTable);
 
-
         pauseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("INPUT", "game.setScreen(game.getGameScreen());");
                 game.setScreen(game.getPauseScreen()); // Switch back to GameScreen
+            }
+        });
+
+        debugButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.getGameScreen().isShowBox2dDebug = !game.getGameScreen().isShowBox2dDebug; // Switch back to GameScreen
             }
         });
     }
@@ -251,11 +230,34 @@ public class Hud implements Disposable {
     // Method to update the timer and display in the HUD
     public void update(float deltaTime) {
         timeCount += deltaTime;
+
         if (timeCount >= 1) {  // Decrement timer every second
             worldTimer++;
             countdownLabel.setText(String.format("%03d", worldTimer));  // Update label
             timeCount = 0;
         }
+
+        if (shootUpButton.isPressed()) {
+            game.getGameScreen().getPlayer().shootUp();
+        }
+        if (shootButton.isPressed()) {
+            game.getGameScreen().getPlayer().shoot();
+        }
+
+        if (jumpButton.isPressed()) {
+            if (!jumpPressed) {
+                game.getGameScreen().getPlayer().jump();
+                jumpPressed = true;
+            }
+        } else {
+            jumpPressed = false; // Reset when button is released
+        }
+        if (slideButton.isPressed()) {
+            game.getGameScreen().getPlayer().slide();
+        }
+        float joystickPercentX = movementJoystick.getKnobPercentX(); // Knob percentage movement on the X-axis
+        game.getGameScreen().getPlayer().move(joystickPercentX);
+        game.getGameScreen().getPlayer().crouch(movementJoystick.getKnobPercentY() < -0.75);
     }
 
     @Override

@@ -21,18 +21,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
-import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class GameScreen implements Screen {
-    private boolean jumpPressed = false;
-    private boolean slidePressed = false;
-    private boolean debugPressed = false;
-    private boolean pausePressed = false;
-
     private final SaveTheMaidGame game;
     private final Player player;
 
@@ -52,6 +47,10 @@ public class GameScreen implements Screen {
     // private Array<ZombieEnemy> enemies = new Array<>();
     private Array<BaseEnemy> enemies = new Array<>();
     public boolean isShowBox2dDebug;
+
+    // map dimensions in pixels
+    public int mapWidthInPixels;
+    public int mapHeightInPixels;
 
     public Player getPlayer() {
         return player;
@@ -88,6 +87,15 @@ public class GameScreen implements Screen {
         world.setContactListener(new WorldContactListener());
 
         player = new Player(world);
+
+        // Calculate map size
+        int mapWidthInTiles = map.getProperties().get("width", Integer.class);       // Number of tiles in width
+        int mapHeightInTiles = map.getProperties().get("height", Integer.class);     // Number of tiles in height
+        int tilePixelWidth = map.getProperties().get("tilewidth", Integer.class);    // Tile width in pixels
+        int tilePixelHeight = map.getProperties().get("tileheight", Integer.class);  // Tile height in pixels
+
+        mapWidthInPixels = mapWidthInTiles * tilePixelWidth;
+        mapHeightInPixels = mapHeightInTiles * tilePixelHeight;
     }
 
     @Override
@@ -96,62 +104,25 @@ public class GameScreen implements Screen {
     }
 
     public void update(float dt) {
-        handleInput(dt);
-
         world.step(1 / 60f, 6, 2);
 
         for (BaseEnemy enemy : enemies) {
             enemy.update(dt, player.body.getPosition());
         }
-        gameCamera.position.x = player.body.getPosition().x;
-        gameCamera.position.y = player.body.getPosition().y + 32;
 
+        // Update Camera
+        gameCamera.position.x = Math.max(player.body.getPosition().x, (float) GAME_WIDTH / 2);
+        gameCamera.position.y = Math.max(player.body.getPosition().y + 32, (float) GAME_HEIGHT / 2);
+
+        gameCamera.position.x = Math.min(gameCamera.position.x, mapWidthInPixels);
+        gameCamera.position.y = Math.min(gameCamera.position.y, mapHeightInPixels);
         gameCamera.update();
+
         // just render what the camera can see
         renderer.setView(gameCamera);
         hud.update(dt);
     }
 
-    private void handleInput(float dt) {
-        // Get the x and y coordinates of the touch
-        float joystickPercentX = hud.getMovementJoystick().getKnobPercentX(); // Knob percentage movement on the X-axis
-        Gdx.app.log("handleInput ", "hud.getMovementJoystick().getKnobPercentY() " + hud.getMovementJoystick().getKnobPercentY());
-        player.move(joystickPercentX);
-        player.crouch(hud.getMovementJoystick().getKnobPercentY() < -0.75);
-
-        if (hud.getJumpButton().isPressed()) {
-            if (!jumpPressed) { // If the jump button is pressed for the first time
-                player.jump();
-                jumpPressed = true; // Mark jump as pressed
-            }
-        } else {
-            jumpPressed = false; // Reset when button is released
-        }
-        if (hud.getDebugButton().isPressed()) {
-            if (!debugPressed) {
-                isShowBox2dDebug = !isShowBox2dDebug;
-                debugPressed = true; // Mark debug as pressed
-            }
-        } else {
-            debugPressed = false; // Reset when button is released
-        }
-        if (hud.getSlideButton().isPressed()) {
-            if (!slidePressed) { // If the jump button is pressed for the first time
-                player.slide();
-                slidePressed = true; // Mark jump as pressed
-            }
-        } else {
-            slidePressed = false; // Reset when button is released
-        }
-        Gdx.app.log("Pause Button", "isPressed: " + hud.getPauseButton().isPressed() + ", pausePressed: " + pausePressed);
-
-        if (hud.getShootButton().isPressed()) {
-            player.shoot();
-        }
-        if (hud.getShootUpButton().isPressed()) {
-            player.shootUp();
-        }
-    }
 
     @Override
     public void render(float dt) {
@@ -210,10 +181,5 @@ public class GameScreen implements Screen {
 
     public void addEnemy(BaseEnemy enemy) {
         enemies.add(enemy);
-    }
-
-    // ToDO.. not sure of all this recreating always ...
-    public void restart() {
-        game.setScreen(new StartupScreen(game));
     }
 }

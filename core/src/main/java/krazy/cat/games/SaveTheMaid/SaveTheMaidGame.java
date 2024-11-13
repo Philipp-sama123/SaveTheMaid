@@ -27,13 +27,19 @@ public class SaveTheMaidGame extends Game {
         setScreen(getStartupScreen());
     }
 
+    public void reinitializeGameScreen() {
+        gameScreen = null;
+        gameScreen = new GameScreen(this);
+    }
 
     public GameScreen getGameScreen() {
         return gameScreen;
     }
+
     public StartupScreen getStartupScreen() {
         return startupScreen;
     }
+
     public PauseScreen getPauseScreen() {
         return pauseScreen;
     }
