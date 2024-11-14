@@ -20,7 +20,7 @@ import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
-public class BatEnemy extends BaseEnemy {
+public class BatEnemy extends BaseEnemy<AnimationSetBat.BatAnimationType> {
     private final AnimationSetBat animationSet;
 
     private AnimationSetBat.BatAnimationType currentState;
@@ -103,11 +103,6 @@ public class BatEnemy extends BaseEnemy {
         body.setGravityScale(0f);
     }
 
-    @Override
-    public void setAnimation(AnimationSetZombie.ZombieAnimationType zombieAnimationType) {
-
-    }
-
     private void createAttackCollider() {
         PolygonShape attackShape = new PolygonShape();
         float xOffset = isFacingLeft ? -12f : 12f;
@@ -176,15 +171,12 @@ public class BatEnemy extends BaseEnemy {
         }
     }
 
+    @Override
     public void setAnimation(AnimationSetBat.BatAnimationType type) {
         currentState = type;
         stateTime = 0;
     }
 
-    @Override
-    public void setAnimation(AnimationSetRat.RatAnimationType type) {
-
-    }
 
     @Override
     public boolean isDeathAnimationComplete() {

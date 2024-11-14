@@ -20,7 +20,7 @@ import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
-public class ZombieEnemy extends BaseEnemy {
+public class ZombieEnemy extends BaseEnemy<AnimationSetZombie.ZombieAnimationType> {
     private final AnimationSetZombie animationSet;
 
     private AnimationSetZombie.ZombieAnimationType currentState;
@@ -141,14 +141,6 @@ public class ZombieEnemy extends BaseEnemy {
     public void setAnimation(AnimationSetZombie.ZombieAnimationType type) {
         currentState = type;
         stateTime = 0;
-    }
-
-    @Override
-    public void setAnimation(AnimationSetBat.BatAnimationType type) {
-    }
-
-    @Override
-    public void setAnimation(AnimationSetRat.RatAnimationType type) {
     }
 
     @Override

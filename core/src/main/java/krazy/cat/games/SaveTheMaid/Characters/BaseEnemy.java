@@ -4,7 +4,9 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -18,7 +20,8 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
-public abstract class BaseEnemy {
+
+public abstract class BaseEnemy<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     protected static float ATTACK_RANGE = 25f;
     protected static final float MOVEMENT_SPEED = 15f;
@@ -97,11 +100,7 @@ public abstract class BaseEnemy {
 
     protected abstract void defineEnemy(Vector2 position);
 
-    public abstract void setAnimation(AnimationSetZombie.ZombieAnimationType type);
-
-    public abstract void setAnimation(AnimationSetBat.BatAnimationType type);
-
-    public abstract void setAnimation(AnimationSetRat.RatAnimationType type);
+    public abstract void setAnimation(T animationType);
 
     public abstract void moveToPlayer(Vector2 playerPosition);
 

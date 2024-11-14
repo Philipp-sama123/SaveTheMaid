@@ -10,10 +10,10 @@
     "fileStates": {
         "Level_1.tmx": {
             "scale": 0.835,
-            "selectedLayer": 6,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 3985.029940119761,
-                "y": 5528.74251497006
+                "x": 949.1017964071857,
+                "y": 5843.7125748503
             }
         },
         "PlatformerAssets.tsx": {

@@ -21,7 +21,7 @@ import krazy.cat.games.SaveTheMaid.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
-public class RatEnemy extends BaseEnemy {
+public class RatEnemy extends BaseEnemy<AnimationSetRat.RatAnimationType> {
     private final AnimationSetRat animationSet;
 
     private AnimationSetRat.RatAnimationType currentState;
@@ -101,16 +101,6 @@ public class RatEnemy extends BaseEnemy {
         shape.dispose();
         // Initialize the attack collider as a sensor initially
         createAttackCollider();
-    }
-
-    @Override
-    public void setAnimation(AnimationSetZombie.ZombieAnimationType zombieAnimationType) {
-
-    }
-
-    @Override
-    public void setAnimation(AnimationSetBat.BatAnimationType type) {
-
     }
 
     private void createAttackCollider() {
