@@ -6,8 +6,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
-import krazy.cat.games.SaveTheMaid.Characters.ZombieEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 
 public class WorldContactListener implements ContactListener {
@@ -26,10 +25,10 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof BaseEnemy) {
-            handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (BaseEnemy) fixtureB.getUserData());
-        } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof BaseEnemy) {
-            handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (BaseEnemy) fixtureA.getUserData());
+        if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof BaseAICharacter) {
+            handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (BaseAICharacter) fixtureB.getUserData());
+        } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof BaseAICharacter) {
+            handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
         } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Player) {
             handleProjectileHitPlayer((Projectile) fixtureA.getUserData(), (Player) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Player) {
@@ -38,10 +37,10 @@ public class WorldContactListener implements ContactListener {
             handleProjectileEnvironmentCollision((Projectile) fixtureA.getUserData());
         } else if (fixtureB.getUserData() instanceof Projectile && "environment".equals(fixtureA.getUserData())) {
             handleProjectileEnvironmentCollision((Projectile) fixtureB.getUserData());
-        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseEnemy) {
-            handleAttackCollision((Player) fixtureA.getUserData(), (BaseEnemy) fixtureB.getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseEnemy) {
-            handleAttackCollision((Player) fixtureB.getUserData(), (BaseEnemy) fixtureA.getUserData());
+        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseAICharacter) {
+            handleAttackCollision((Player) fixtureA.getUserData(), (BaseAICharacter) fixtureB.getUserData());
+        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseAICharacter) {
+            handleAttackCollision((Player) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
         }
     }
 
@@ -54,11 +53,11 @@ public class WorldContactListener implements ContactListener {
         projectile.onCollision(); // Set the projectile for destruction when it hits the environment
     }
 
-    private void handleAttackCollision(Player player, BaseEnemy enemy) {
+    private void handleAttackCollision(Player player, BaseAICharacter enemy) {
         player.onStartEnemyAttackCollision(); // Apply damage to the player
     }
 
-    private void handleProjectileHitEnemy(Projectile projectile, BaseEnemy enemy) {
+    private void handleProjectileHitEnemy(Projectile projectile, BaseAICharacter enemy) {
         // Flag the projectile and enemy for destruction or update their states
         projectile.onCollision();
         enemy.onHit();  // Ensure `onHit` method is in your `Enemy` class for handling hit logic

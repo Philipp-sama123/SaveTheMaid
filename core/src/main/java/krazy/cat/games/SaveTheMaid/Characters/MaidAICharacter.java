@@ -1,0 +1,177 @@
+package krazy.cat.games.SaveTheMaid.Characters;
+
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+
+public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimationType> {
+    private final AnimationSetMaid animationSet;
+
+    private AnimationSetMaid.MaidAnimationType currentState;
+    private AnimationSetMaid.MaidAnimationType previousState;
+
+    public float stateTime;
+    private boolean isFacingLeft = true;
+    public boolean isDestroyed = false;
+
+    public MaidAICharacter(World world, Vector2 position) {
+        super(world, position);
+        this.currentState = AnimationSetMaid.MaidAnimationType.IDLE;
+
+        Texture spriteSheet = new Texture("Characters/GandalfHardcoreMaid/Maid Character black.png");
+        this.animationSet = new AnimationSetMaid(spriteSheet);
+    }
+
+    @Override
+    public boolean canAttack() {
+        return true;
+    }
+
+    @Override
+    public void update(float dt, Vector2 playerPosition) {
+        if (isDestroyed) {
+            disableCollision();
+            return;
+        }
+
+        stateTime += dt;
+        stateMachine.update(dt, playerPosition);
+        adjustFacingDirection();
+    }
+
+    @Override
+    public void draw(Batch batch) {
+        if (isDestroyed && isDeathAnimationComplete()) return;
+
+        boolean looping = currentState != AnimationSetMaid.MaidAnimationType.DIE;
+        TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
+
+        batch.draw(
+            currentFrame,
+            body.getPosition().x - 32,
+            body.getPosition().y - 20,
+            64,
+            64
+        );
+    }
+
+    @Override
+    protected void defineEnemy(Vector2 position) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(position);
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(8f, 20f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+
+        fixtureDef.filter.categoryBits = CATEGORY_ENEMY;
+        fixtureDef.filter.maskBits = MASK_ENEMY;
+        body.createFixture(fixtureDef).setUserData(this);
+        shape.dispose();
+    }
+
+
+    @Override
+    public void moveToPlayer(Vector2 playerPosition) {
+        Vector2 direction = playerPosition.cpy().sub(body.getPosition()).nor();
+        direction.scl(MOVEMENT_SPEED);
+
+        body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
+
+        if (direction.len() > 0) {
+            currentState = AnimationSetMaid.MaidAnimationType.WALK;
+        } else {
+            currentState = AnimationSetMaid.MaidAnimationType.IDLE;
+        }
+    }
+
+    @Override
+    public void attack() {
+        Gdx.app.log("MAID", "NOT USED! attack");
+    }
+
+    @Override
+    public void chase() {
+        setAnimation(AnimationSetMaid.MaidAnimationType.WALK);
+    }
+
+    @Override
+    public void die() {
+        setAnimation(AnimationSetMaid.MaidAnimationType.DIE);
+        disableCollision();
+    }
+
+    @Override
+    public void hit() {
+        Gdx.app.log("MAID", "TODO Implement! hit");
+        // body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop horizontal movement
+
+    }
+
+    @Override
+    public void idle() {
+        setAnimation(AnimationSetMaid.MaidAnimationType.IDLE);
+        body.setLinearVelocity(0, 0);
+    }
+
+    @Override
+    public void dispose() {
+        if (world != null && body != null) {
+            if (attackCollider != null) body.destroyFixture(attackCollider);
+            world.destroyBody(body);
+            body = null;
+        }
+    }
+
+    private void adjustFacingDirection() {
+        float velocityX = body.getLinearVelocity().x;
+
+        if (velocityX < 0 && !isFacingLeft) {
+            animationSet.flipFramesHorizontally();
+            isFacingLeft = true;
+        } else if (velocityX > 0 && isFacingLeft) {
+            animationSet.flipFramesHorizontally();
+            isFacingLeft = false;
+        }
+    }
+
+    @Override
+    public void updateAttackColliderPosition() {
+        Gdx.app.log("MAID", "NOT USED! updateAttackColliderPosition");
+    }
+
+    @Override
+    public void setAnimation(AnimationSetMaid.MaidAnimationType animationType) {
+        currentState = animationType;
+        stateTime = 0;
+    }
+
+
+    @Override
+    public boolean isDeathAnimationComplete() {
+        return animationSet.getAnimation(AnimationSetMaid.MaidAnimationType.DIE).isAnimationFinished(stateTime);
+    }
+
+    @Override
+    public boolean isAttackAnimationFinished() {
+        return true;
+    }
+
+    @Override
+    public boolean isHitAnimationFinished() {
+        return true;
+    }
+}

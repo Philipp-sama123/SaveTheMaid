@@ -20,7 +20,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Scenes.Hud;
@@ -45,7 +46,8 @@ public class GameScreen implements Screen {
     private Box2DDebugRenderer box2DDebugRenderer;
 
     // private Array<ZombieEnemy> enemies = new Array<>();
-    private Array<BaseEnemy> enemies = new Array<>();
+    private Array<BaseAICharacter> enemies = new Array<>();
+    private Array<BaseAICharacter> maids = new Array<>();
     public boolean isShowBox2dDebug;
 
     // map dimensions in pixels
@@ -106,8 +108,11 @@ public class GameScreen implements Screen {
     public void update(float dt) {
         world.step(1 / 60f, 6, 2);
 
-        for (BaseEnemy enemy : enemies) {
+        for (var enemy : enemies) {
             enemy.update(dt, player.body.getPosition());
+        }
+        for (var maid : maids) {
+            maid.update(dt, player.body.getPosition());
         }
 
         // Update Camera
@@ -141,8 +146,11 @@ public class GameScreen implements Screen {
         game.batch.begin();
         //  player.updateAnimationState(game.batch);
         player.draw(game.batch);
-        for (BaseEnemy enemy : enemies) {
+        for (BaseAICharacter enemy : enemies) {
             enemy.draw(game.batch);
+        }
+        for (BaseAICharacter maid : maids) {
+            maid.draw(game.batch);
         }
         hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
         game.batch.end();
@@ -179,7 +187,11 @@ public class GameScreen implements Screen {
         hud.dispose();
     }
 
-    public void addEnemy(BaseEnemy enemy) {
+    public void addEnemy(BaseAICharacter enemy) {
         enemies.add(enemy);
+    }
+
+    public void addMaid(MaidAICharacter maidAICharacter) {
+        maids.add(maidAICharacter);
     }
 }

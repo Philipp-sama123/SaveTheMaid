@@ -17,10 +17,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.AnimationSetBat;
-import krazy.cat.games.SaveTheMaid.AnimationSetRat;
-import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 
-public class BatEnemy extends BaseEnemy<AnimationSetBat.BatAnimationType> {
+public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimationType> {
     private final AnimationSetBat animationSet;
 
     private AnimationSetBat.BatAnimationType currentState;
@@ -31,12 +29,17 @@ public class BatEnemy extends BaseEnemy<AnimationSetBat.BatAnimationType> {
     private boolean isFacingLeft = false;
     public boolean isDestroyed = false;
 
-    public BatEnemy(World world, Vector2 position) {
+    public BatAICharacter(World world, Vector2 position) {
         super(world, position);
         this.currentState = AnimationSetBat.BatAnimationType.MOVE1;
 
         Texture spriteSheet = new Texture("Characters/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png");
         this.animationSet = new AnimationSetBat(spriteSheet);
+    }
+
+    @Override
+    public boolean canAttack() {
+        return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
     }
 
     public void update(float dt, Vector2 playerPosition) {

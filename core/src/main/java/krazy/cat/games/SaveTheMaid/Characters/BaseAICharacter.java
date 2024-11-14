@@ -4,28 +4,24 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.AnimationSetBat;
-import krazy.cat.games.SaveTheMaid.AnimationSetRat;
-import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
 
 
-public abstract class BaseEnemy<T extends Enum<T>> {
+public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     protected static float ATTACK_RANGE = 25f;
     protected static final float MOVEMENT_SPEED = 15f;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
+
     public Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("SFX/swipe.mp3"));
     public Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
     public Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("SFX/ZombieAttack.wav"));
@@ -45,7 +41,7 @@ public abstract class BaseEnemy<T extends Enum<T>> {
     protected Fixture attackCollider;
     protected boolean attackColliderActive;
 
-    public BaseEnemy(World world, Vector2 position) {
+    public BaseAICharacter(World world, Vector2 position) {
         this.world = world;
         this.stateTime = 0f;
 
@@ -72,15 +68,16 @@ public abstract class BaseEnemy<T extends Enum<T>> {
     }
 
     public void deactivateAttackCollider() {
+        if (attackCollider == null) {
+            return;
+        }
         attackColliderActive = false;
         Filter filter = attackCollider.getFilterData();
         filter.maskBits = MASK_GROUND_ONLY; // Set mask to none
         attackCollider.setFilterData(filter);
     }
 
-    public boolean canAttack() {
-        return attackCooldownTimer <= 0; // Can attack only if cooldown has expired
-    }
+    public abstract boolean canAttack();
 
     public StateMachine getStateMachine() {
         return stateMachine;

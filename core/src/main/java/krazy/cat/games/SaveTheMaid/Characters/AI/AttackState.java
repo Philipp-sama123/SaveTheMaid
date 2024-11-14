@@ -2,12 +2,11 @@ package krazy.cat.games.SaveTheMaid.Characters.AI;
 
 import com.badlogic.gdx.math.Vector2;
 
-import krazy.cat.games.SaveTheMaid.AnimationSetZombie;
-import krazy.cat.games.SaveTheMaid.Characters.BaseEnemy;
+import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
 
 public class AttackState implements State {
     @Override
-    public void enter(BaseEnemy enemy) {
+    public void enter(BaseAICharacter enemy) {
         if (enemy.canAttack()) {
             enemy.attack();
             enemy.attackSound.play();
@@ -18,14 +17,14 @@ public class AttackState implements State {
 
 
     @Override
-    public void update(BaseEnemy enemy, float deltaTime, Vector2 playerPosition) {
+    public void update(BaseAICharacter enemy, float deltaTime, Vector2 playerPosition) {
         if (enemy.isAttackAnimationFinished()) {
             enemy.getStateMachine().changeState(new IdleState());
         }
     }
 
     @Override
-    public void exit(BaseEnemy enemy) {
+    public void exit(BaseAICharacter enemy) {
         enemy.deactivateAttackCollider();
     }
 }
