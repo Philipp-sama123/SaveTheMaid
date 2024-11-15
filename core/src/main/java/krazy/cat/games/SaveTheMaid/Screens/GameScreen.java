@@ -20,11 +20,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.MaidAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
-import krazy.cat.games.SaveTheMaid.Scenes.Hud;
+import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 

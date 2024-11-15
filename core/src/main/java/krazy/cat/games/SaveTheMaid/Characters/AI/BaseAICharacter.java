@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.AI;
 
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
@@ -11,9 +11,8 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.AI.HitState;
-import krazy.cat.games.SaveTheMaid.Characters.AI.IdleState;
-import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
 
 
 public abstract class BaseAICharacter<T extends Enum<T>> {
@@ -26,7 +25,6 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
     public Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("SFX/ZombieAttack.wav"));
 
-    public boolean isDestroyed;
     public int health = 100;
     public int currentDamage = 20;
 
@@ -41,6 +39,8 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     protected Fixture attackCollider;
     protected boolean attackColliderActive;
 
+    protected boolean isFacingLeft = false;
+    public boolean isDestroyed = false;
     public BaseAICharacter(World world, Vector2 position) {
         this.world = world;
         this.stateTime = 0f;

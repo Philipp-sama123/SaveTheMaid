@@ -17,8 +17,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
-import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent;
-import krazy.cat.games.SaveTheMaid.AnimationSetFemaleAgent.AnimationType;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
 import krazy.cat.games.SaveTheMaid.Projectile;
 
 public class Player {
@@ -432,7 +432,6 @@ public class Player {
                 currentAnimationState = isCrouching ? (isShooting ? AnimationType.CROUCH_SHOOT : AnimationType.CROUCH_IDLE)
                     : (isShooting ? AnimationType.STAND_SHOOT : AnimationType.IDLE);
             }
-            Gdx.app.log("ANIM", currentAnimationState + " currentanim");
         }
     }
 

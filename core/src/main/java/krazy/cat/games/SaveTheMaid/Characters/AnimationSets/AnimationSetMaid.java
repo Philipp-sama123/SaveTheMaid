@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.AnimationSets;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -26,7 +26,7 @@ public class AnimationSetMaid implements AnimationSet {
         animations.put(MaidAnimationType.WALK, createAnimation(textureRegions, 0, 0, 8));             // Row 0, Frames 0-7
         animations.put(MaidAnimationType.CARRY, createAnimation(textureRegions, 0, 8, 8));          // Row 0, Frame 8 + Row 1, Frames 0-6
         animations.put(MaidAnimationType.CARRY_FULL, createAnimation(textureRegions, 1, 6, 8));          // Row 1, Frames 7-8 + Row 2, Frames 0-5
-        animations.put(MaidAnimationType.RUN, createAnimation(textureRegions, 2, 4, 7));            // Row 2, Frames 6-8 + Row 3, Frame 0
+        animations.put(MaidAnimationType.RUN, createAnimation(textureRegions, 2, 5, 6));            // Row 2, Frames 6-8 + Row 3, Frame 0
         animations.put(MaidAnimationType.IDLE, createAnimation(textureRegions, 3, 2, 5));        // Row 3, Frames 1-8
         animations.put(MaidAnimationType.CARRY_IDLE, createAnimation(textureRegions, 3, 7, 5));        // Row 4, Frames 0-8
         animations.put(MaidAnimationType.SIT, createAnimation(textureRegions, 4, 7, 6));             // Row 5, Frames 0-3

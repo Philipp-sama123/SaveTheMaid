@@ -3,7 +3,7 @@ package krazy.cat.games.SaveTheMaid.Characters.AI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.State;
 
 public class StateMachine {
     private State currentState;

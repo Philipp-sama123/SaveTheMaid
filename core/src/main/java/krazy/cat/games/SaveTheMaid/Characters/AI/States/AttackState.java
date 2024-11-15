@@ -1,15 +1,14 @@
-package krazy.cat.games.SaveTheMaid.Characters.AI;
+package krazy.cat.games.SaveTheMaid.Characters.AI.States;
 
 import com.badlogic.gdx.math.Vector2;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 
 public class AttackState implements State {
     @Override
     public void enter(BaseAICharacter enemy) {
         if (enemy.canAttack()) {
             enemy.attack();
-            enemy.attackSound.play();
         } else {
             enemy.getStateMachine().changeState(new IdleState()); // Switch back if cooldown is active
         }

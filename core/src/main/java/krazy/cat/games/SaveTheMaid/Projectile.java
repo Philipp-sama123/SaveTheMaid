@@ -3,6 +3,7 @@ package krazy.cat.games.SaveTheMaid;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -20,6 +21,7 @@ public class Projectile {
 
     private boolean isFacingRight;
     private boolean isShootingUp; // New flag to indicate upward shooting
+    private boolean isFlipped = false;
 
     public Projectile(World world, Vector2 position, Vector2 velocity, Texture texture) {
         this.world = world;
@@ -73,9 +75,14 @@ public class Projectile {
     public void update(float dt) {
         stateTime += dt;
         if (!isDestroyed) {
-            body.applyForceToCenter(new Vector2(0, 100), true);  // Adjust the force value as needed
+            body.applyForceToCenter(new Vector2(0, 100), true);
+            if (!isFlipped && isShootingUp && body.getLinearVelocity().y < 0) {
+                for (TextureRegion frame : animation.getKeyFrames()) {
+                    frame.flip(true, true);
+                }
+                isFlipped = true;
+            }
         }
-
         if (setToDestroy) { //ToDo: maximum range for bullets
             destroy();
         }

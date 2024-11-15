@@ -16,10 +16,10 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.BatAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.MaidAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.RatAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.ZombieAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Coin;

@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.AI.Enemies;
 
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
@@ -16,18 +16,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.AnimationSetBat;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetBat;
+import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 
 public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimationType> {
     private final AnimationSetBat animationSet;
 
     private AnimationSetBat.BatAnimationType currentState;
     private AnimationSetBat.BatAnimationType previousState;
-
-    public float stateTime;
-
-    private boolean isFacingLeft = false;
-    public boolean isDestroyed = false;
 
     public BatAICharacter(World world, Vector2 position) {
         super(world, position);
@@ -201,6 +197,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         setAnimation(AnimationSetBat.BatAnimationType.GRAB);
         activateAttackCollider();
         updateAttackColliderPosition();
+        attackSound.play();
         startAttackCooldown(); // Start the cooldown after initiating the attack
     }
 

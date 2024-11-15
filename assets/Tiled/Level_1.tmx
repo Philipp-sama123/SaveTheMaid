@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="105">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="107">
  <tileset firstgid="1" source="PlatformerAssets.tsx"/>
  <layer id="1" name="Background" width="200" height="200">
   <data encoding="csv">
@@ -465,6 +465,8 @@
   <object id="103" x="3932.93" y="5535.33" width="37.1257" height="34.7305"/>
  </objectgroup>
  <objectgroup id="9" name="SpawnPointsMaid">
-  <object id="104" x="1053.89" y="6336.53" width="37.1257" height="27.5449"/>
+  <object id="104" x="4328.32" y="5538.9" width="37.1257" height="27.5449"/>
+  <object id="105" x="4436.88" y="5541.31" width="37.1257" height="27.5449"/>
+  <object id="106" x="6214.85" y="6337.61" width="37.1257" height="27.5449"/>
  </objectgroup>
 </map>

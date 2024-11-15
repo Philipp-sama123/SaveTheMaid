@@ -1,8 +1,8 @@
-package krazy.cat.games.SaveTheMaid.Characters.AI;
+package krazy.cat.games.SaveTheMaid.Characters.AI.States;
 
 import com.badlogic.gdx.math.Vector2;
 
-import krazy.cat.games.SaveTheMaid.Characters.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 
 public class ChaseState implements State {
     @Override
@@ -13,7 +13,7 @@ public class ChaseState implements State {
     @Override
     public void update(BaseAICharacter enemy, float deltaTime, Vector2 playerPosition) {
         if (enemy.isPlayerInRange(playerPosition)) {
-            if (enemy.isInAttackRange(playerPosition)) {
+            if (enemy.isInAttackRange(playerPosition) && enemy.canAttack()) {
                 enemy.getStateMachine().changeState(new AttackState());
             } else {
                 enemy.moveToPlayer(playerPosition);

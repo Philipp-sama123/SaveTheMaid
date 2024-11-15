@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.AI;
 
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
@@ -13,22 +13,23 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetMaid;
+
 public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimationType> {
     private final AnimationSetMaid animationSet;
+    protected static final float WALK_SPEED = 5f;
 
     private AnimationSetMaid.MaidAnimationType currentState;
     private AnimationSetMaid.MaidAnimationType previousState;
 
-    public float stateTime;
-    private boolean isFacingLeft = true;
-    public boolean isDestroyed = false;
-
     public MaidAICharacter(World world, Vector2 position) {
+
         super(world, position);
         this.currentState = AnimationSetMaid.MaidAnimationType.IDLE;
-
         Texture spriteSheet = new Texture("Characters/GandalfHardcoreMaid/Maid Character black.png");
         this.animationSet = new AnimationSetMaid(spriteSheet);
+        isFacingLeft = true;
+
     }
 
     @Override
@@ -90,22 +91,18 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         direction.scl(MOVEMENT_SPEED);
 
         body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
-
-        if (direction.len() > 0) {
-            currentState = AnimationSetMaid.MaidAnimationType.WALK;
-        } else {
-            currentState = AnimationSetMaid.MaidAnimationType.IDLE;
-        }
+        currentState = AnimationSetMaid.MaidAnimationType.RUN;
     }
 
     @Override
     public void attack() {
-        Gdx.app.log("MAID", "NOT USED! attack");
+        setAnimation(AnimationSetMaid.MaidAnimationType.IDLE);
+        body.setLinearVelocity(0, 0);
     }
 
     @Override
     public void chase() {
-        setAnimation(AnimationSetMaid.MaidAnimationType.WALK);
+        setAnimation(AnimationSetMaid.MaidAnimationType.RUN);
     }
 
     @Override
@@ -167,7 +164,7 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
 
     @Override
     public boolean isAttackAnimationFinished() {
-        return true;
+        return animationSet.getAnimation(AnimationSetMaid.MaidAnimationType.LAY).isAnimationFinished(stateTime);
     }
 
     @Override
