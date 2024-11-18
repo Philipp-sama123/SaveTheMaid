@@ -2,6 +2,7 @@ package krazy.cat.games.SaveTheMaid.Screens;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -50,6 +51,9 @@ public class GameScreen implements Screen {
     private Array<BaseAICharacter> maids = new Array<>();
     public boolean isShowBox2dDebug;
 
+    private float accumulator = 0;
+    private final float fixedTimeStep = 1 / 60f;
+
     // map dimensions in pixels
     public int mapWidthInPixels;
     public int mapHeightInPixels;
@@ -64,8 +68,9 @@ public class GameScreen implements Screen {
         this.hud = new Hud(game);
 
         this.mapLoader = new TmxMapLoader();
-        // fix for map background artifacts
         this.map = mapLoader.load("Tiled/Level_1.tmx");
+
+        // Fix for map background artifacts
         for (TiledMapTileSet tileSet : map.getTileSets()) {
             for (TiledMapTile tile : tileSet) {
                 if (tile.getTextureRegion() != null) {
@@ -75,15 +80,17 @@ public class GameScreen implements Screen {
                 }
             }
         }
-        this.renderer = new OrthogonalTiledMapRenderer(map, 1);
+
+        this.renderer = new OrthogonalTiledMapRenderer(map, 1 / PPM); // Adjust for PPM
 
         this.gameCamera = new OrthographicCamera();
-        this.gameViewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, gameCamera);
+        this.gameViewport = new FitViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera); // Adjust for PPM
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
-        this.world = new World(new Vector2(0, -125), false);
+        this.world = new World(new Vector2(0, -125 / PPM), false); // Adjust gravity for PPM
         this.box2DDebugRenderer = new Box2DDebugRenderer();
+
         // Initializes also the enemies
         new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
@@ -91,10 +98,10 @@ public class GameScreen implements Screen {
         player = new Player(world);
 
         // Calculate map size
-        int mapWidthInTiles = map.getProperties().get("width", Integer.class);       // Number of tiles in width
-        int mapHeightInTiles = map.getProperties().get("height", Integer.class);     // Number of tiles in height
-        int tilePixelWidth = map.getProperties().get("tilewidth", Integer.class);    // Tile width in pixels
-        int tilePixelHeight = map.getProperties().get("tileheight", Integer.class);  // Tile height in pixels
+        int mapWidthInTiles = map.getProperties().get("width", Integer.class);
+        int mapHeightInTiles = map.getProperties().get("height", Integer.class);
+        int tilePixelWidth = map.getProperties().get("tilewidth", Integer.class);
+        int tilePixelHeight = map.getProperties().get("tileheight", Integer.class);
 
         mapWidthInPixels = mapWidthInTiles * tilePixelWidth;
         mapHeightInPixels = mapHeightInTiles * tilePixelHeight;
@@ -105,29 +112,45 @@ public class GameScreen implements Screen {
         hud.enableInput();
     }
 
-    public void update(float dt) {
-        world.step(1 / 60f, 6, 2);
+    public void update(float deltaTime) {
+       // world.step(1 / 60f, 6, 2);
+        accumulator += deltaTime;
 
+        while (accumulator >= fixedTimeStep) {
+            world.step(fixedTimeStep, 6, 2);
+            accumulator -= fixedTimeStep;
+        }
         for (var enemy : enemies) {
-            enemy.update(dt, player.body.getPosition());
+            enemy.update(deltaTime, player.body.getPosition());
         }
         for (var maid : maids) {
-            maid.update(dt, player.body.getPosition());
+            maid.update(deltaTime, player.body.getPosition());
         }
 
-        // Update Camera
-        gameCamera.position.x = Math.max(player.body.getPosition().x, (float) GAME_WIDTH / 2);
-        gameCamera.position.y = Math.max(player.body.getPosition().y + 32, (float) GAME_HEIGHT / 2);
+        // Update Camera (convert Box2D to pixel coordinates)
+        gameCamera.position.x = Math.max(
+            player.body.getPosition().x * PPM,
+            (float) GAME_WIDTH / 2 / PPM
+        );
+        gameCamera.position.y = Math.max(
+            player.body.getPosition().y * PPM + 32 / PPM,
+            (float) GAME_HEIGHT / 2 / PPM
+        );
 
-        gameCamera.position.x = Math.min(gameCamera.position.x, mapWidthInPixels);
-        gameCamera.position.y = Math.min(gameCamera.position.y, mapHeightInPixels);
+        gameCamera.position.x = Math.max(
+            player.body.getPosition().x,
+            (float) GAME_WIDTH / 2 / PPM
+        );
+        gameCamera.position.y = Math.max(
+            player.body.getPosition().y + 32 / PPM,
+            (float) GAME_HEIGHT / 2 / PPM
+        );
         gameCamera.update();
 
-        // just render what the camera can see
+        // Render only visible part of the map
         renderer.setView(gameCamera);
-        hud.update(dt);
+        hud.update(deltaTime);
     }
-
 
     @Override
     public void render(float dt) {
@@ -136,22 +159,24 @@ public class GameScreen implements Screen {
         update(dt);
         player.update(dt);
 
-        // render game map
+        // Render game map
         renderer.render();
-        // render Box2D Debug
+
+        // Render Box2D Debug
         if (isShowBox2dDebug)
             box2DDebugRenderer.render(world, gameCamera.combined);
 
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
-        //  player.updateAnimationState(game.batch);
         player.draw(game.batch);
+
         for (BaseAICharacter enemy : enemies) {
             enemy.draw(game.batch);
         }
         for (BaseAICharacter maid : maids) {
             maid.draw(game.batch);
         }
+
         hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
         game.batch.end();
 
@@ -163,6 +188,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         gameViewport.update(width, height);
     }
+
 
     @Override
     public void pause() {

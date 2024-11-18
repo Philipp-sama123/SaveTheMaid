@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
@@ -23,11 +24,18 @@ import krazy.cat.games.SaveTheMaid.Projectile;
 
 public class Player {
     private static final int MAX_JUMPS = 3;
+    private static final float SLIDE_IMPULSE = 1.5f;
+    private static final float SLIDE_DURATION = 1.f;
+    private final float PROJECTILE_VELOCITY_X = 2.5f;
+    private final float PROJECTILE_VELOCITY_Y = 1.5f;
+    private int JUMP_EFFECT_Y_OFFSET = 40;
+    private int BLOOD_EFFECT_X_OFFSET = 25;
+
     private int jumpCount = 0;
 
-    float slowSpeed = 25;
-    float walkSpeed = 50;
-    float runSpeed = 100;
+    float slowSpeed = 25 / PPM;
+    float walkSpeed = 50 / PPM;
+    float runSpeed = 100 / PPM;
 
     private final AnimationSetFemaleAgent animationSetAgent;
     public World world;
@@ -52,17 +60,18 @@ public class Player {
     private float bloodEffectTime;
     private boolean showBloodEffect;
 
-    public final int maxHealth = 100;         // Max health value
+    public final int maxHealth = 100;
     public int currentHealth = maxHealth;
-    private boolean isDead = false;
 
-    private static final float SLIDE_IMPULSE = 700;        // Set desired slide speed
-    private static final float SLIDE_DURATION = 1.f;    // Duration of the slide in seconds
-    private boolean isSliding = false;                   // Check if currently sliding
-    private float slideTime;                             // Track slide duration
+    private boolean isDead = false;
+    private boolean isSliding = false;
+
+
+    private float slideTime;
     private Sound jumpSound;
     private Sound hitSound;
     private Sound shootSound;
+
 
     public Player(World world) {
         this.world = world;
@@ -136,7 +145,7 @@ public class Player {
 
     private void definePlayer() {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(100, 100);
+        bodyDef.position.set(100 / PPM, 100 / PPM); // Convert to meters
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
@@ -144,7 +153,7 @@ public class Player {
         projectiles = new Array<>();
 
         PolygonShape rectShape = new PolygonShape();
-        rectShape.setAsBox(8f, 24f);
+        rectShape.setAsBox(8f / PPM, 24f / PPM); // Convert dimensions to meters
 
         FixtureDef playerFixtureDef = new FixtureDef();
         playerFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
@@ -154,6 +163,7 @@ public class Player {
 
         rectShape.dispose();
     }
+
 
     private void initializeSounds() {
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("SFX/Jump.wav"));
@@ -172,16 +182,18 @@ public class Player {
         // Draw the jump effect
         if (showJumpEffect) {
             TextureRegion jumpEffectFrame = jumpEffectAnimation.getKeyFrame(jumpEffectTime);
-            float effectPosX = body.getPosition().x - (float) jumpEffectFrame.getRegionWidth() / 2;
-            float effectPosY = body.getPosition().y - 40;  // Place slightly below the player
-            batch.draw(jumpEffectFrame, effectPosX, effectPosY, jumpEffectFrame.getRegionWidth(), jumpEffectFrame.getRegionHeight());
+            float effectPosX = (body.getPosition().x) - ((float) jumpEffectFrame.getRegionWidth() / 2 / PPM);
+
+            float effectPosY = (body.getPosition().y) - JUMP_EFFECT_Y_OFFSET / PPM; // Position slightly below player
+            batch.draw(jumpEffectFrame, effectPosX, effectPosY, jumpEffectFrame.getRegionWidth() / PPM, jumpEffectFrame.getRegionHeight() / PPM);
         }
+
         // Draw the blood effect
         if (showBloodEffect) {
             TextureRegion bloodEffectFrame = bloodEffectAnimation.getKeyFrame(bloodEffectTime);
-            float effectPosX = body.getPosition().x - (float) bloodEffectFrame.getRegionWidth() / 2 + 25;
+            float effectPosX = body.getPosition().x - ((float) bloodEffectFrame.getRegionWidth() / 2 / PPM) + BLOOD_EFFECT_X_OFFSET / PPM;
             float effectPosY = body.getPosition().y;  // Place slightly below the player
-            batch.draw(bloodEffectFrame, effectPosX, effectPosY, bloodEffectFrame.getRegionWidth(), bloodEffectFrame.getRegionHeight());
+            batch.draw(bloodEffectFrame, effectPosX, effectPosY, bloodEffectFrame.getRegionWidth() / PPM, bloodEffectFrame.getRegionHeight() / PPM);
         }
 
     }
@@ -194,14 +206,13 @@ public class Player {
     public void jump() {
         if (isSliding) return;
         if (jumpCount < MAX_JUMPS) {
-            body.setLinearVelocity(body.getLinearVelocity().x, 500);
+            body.setLinearVelocity(body.getLinearVelocity().x, 100 / PPM); // Scaled jump velocity
             jumpCount++;
             stateTime = 0;
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
 
             // Start jump effect animation
             jumpEffectTime = 0;
-
             jumpSound.play();
             showJumpEffect = true;
         }
@@ -271,16 +282,17 @@ public class Player {
         updateAnimationStateBasedOnMovement();
     }
 
+
     public void shootUp() {
-        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
+        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f / PPM;
 
         if (isGrounded && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
 
             // Spawn above the character and set velocity straight up
-            Vector2 position = body.getPosition().add(0, 40); // Adjust height if necessary
-            Vector2 velocity = new Vector2(0, 1000);           // Set to move vertically up
+            Vector2 position = body.getPosition().add(0, 40 / PPM); // Adjust height if necessary
+            Vector2 velocity = new Vector2(0, PROJECTILE_VELOCITY_Y);           // Set to move vertically up
             shootSound.play();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
@@ -292,12 +304,12 @@ public class Player {
             stateTime = 0f;
 
             // Determine position offset and velocity based on facing direction
-            Vector2 position = body.getPosition().add(isFacingRight ? 20 : -20, isCrouching ? 2 : 10);
-            // TODO: MAYBE WITH AN IMPULSE (!)
-            Vector2 velocity = new Vector2(isFacingRight ? 1000 : -1000, 0);
+            Vector2 position = body.getPosition().add(isFacingRight ? 20 / PPM : -20 / PPM, isCrouching ? 2 / PPM : 10 / PPM);
+
+            Vector2 velocity = new Vector2(isFacingRight ? PROJECTILE_VELOCITY_X : -PROJECTILE_VELOCITY_X, 0);
 
             if (isSliding) {
-                position.y -= 16;
+                position.y -= 16 / PPM;
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
             shootSound.play();
@@ -404,8 +416,9 @@ public class Player {
     }
 
     private void updateAnimationStateBasedOnMovement() {
-        int currentVelocityX = Math.round(body.getLinearVelocity().x);
-        int currentVelocityY = Math.round(body.getLinearVelocity().y);
+        float currentVelocityX = body.getLinearVelocity().x;
+        float currentVelocityY = body.getLinearVelocity().y;
+
         if (isSliding) {
             currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
         } else if (isShootingUp) {
@@ -414,18 +427,18 @@ public class Player {
             } else if (currentVelocityY < 0) {
                 currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
             } else if (currentVelocityX != 0) {
-                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
+                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10 / PPM);
                 currentAnimationState = isRunning ? AnimationType.RUN_SHOOT_UP : AnimationType.WALK_SHOOT_UP;
             } else {
                 currentAnimationState = isCrouching ? AnimationType.CROUCH_SHOOT_UP : AnimationType.STAND_SHOOT_UP;
             }
         } else {
-            if (currentVelocityY > 0) {
+            if (currentVelocityY > 0.f) {
                 currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-            } else if (currentVelocityY < 0) {
+            } else if (currentVelocityY < 0.f) {
                 currentAnimationState = isShooting ? AnimationType.FALL_SHOOT : AnimationType.FALL;
-            } else if (currentVelocityX != 0) {
-                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10);
+            } else if (currentVelocityX != 0.f) {
+                boolean isRunning = Math.abs(currentVelocityX) >= (runSpeed - 10 / PPM);
                 currentAnimationState = isShooting ? (isRunning ? AnimationType.RUN_SHOOT : AnimationType.WALK_SHOOT)
                     : (isRunning ? AnimationType.RUN : AnimationType.WALK);
             } else {
@@ -436,16 +449,17 @@ public class Player {
     }
 
     private void drawAnimation(Batch batch, TextureRegion upperBodyFrame, TextureRegion lowerBodyFrame) {
-        float posX = isFacingRight ? body.getPosition().x - 26 : body.getPosition().x - 36;
-        float posY = body.getPosition().y - 24;
+        float posX = isFacingRight ? body.getPosition().x - 26 / PPM : body.getPosition().x - 36 / PPM;
+        float posY = body.getPosition().y - 24 / PPM;
         if (isSliding) {
-            batch.draw(upperBodyFrame, posX, body.getPosition().y - 36, 64, 64);
-            batch.draw(lowerBodyFrame, posX, body.getPosition().y - 36, 64, 64);
+            batch.draw(upperBodyFrame, posX, body.getPosition().y - 36 / PPM, 64 / PPM, 64 / PPM);
+            batch.draw(lowerBodyFrame, posX, body.getPosition().y - 36 / PPM, 64 / PPM, 64 / PPM);
         } else {
-            batch.draw(upperBodyFrame, posX, posY, 64, 64);
-            batch.draw(lowerBodyFrame, posX, posY, 64, 64);
+            batch.draw(upperBodyFrame, posX, posY, 64 / PPM, 64 / PPM);
+            batch.draw(lowerBodyFrame, posX, posY, 64 / PPM, 64 / PPM);
         }
     }
+
 
     public void onStartEnemyAttackCollision() {
         if (!isSliding)

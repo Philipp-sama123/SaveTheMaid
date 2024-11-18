@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
@@ -56,7 +57,7 @@ public class Projectile {
 
         body = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(8, 6);
+        shape.setAsBox(8 / PPM, 6 / PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -75,7 +76,7 @@ public class Projectile {
     public void update(float dt) {
         stateTime += dt;
         if (!isDestroyed) {
-            body.applyForceToCenter(new Vector2(0, 100), true);
+            // body.applyForceToCenter(new Vector2(0, 100), true);
             if (!isFlipped && isShootingUp && body.getLinearVelocity().y < 0) {
                 for (TextureRegion frame : animation.getKeyFrames()) {
                     frame.flip(true, true);
@@ -94,9 +95,9 @@ public class Projectile {
 
             // Draw rotated frame if shooting upwards
             if (isShootingUp) {
-                batch.draw(frame, body.getPosition().x - 8, body.getPosition().y - 6, 8, 6, 16, 12, 1, 1, -90);
+                batch.draw(frame, body.getPosition().x - 8 / PPM, body.getPosition().y - 6 / PPM, 8 / PPM, 6 / PPM, 16 / PPM, 12 / PPM, 1, 1, -90);
             } else {
-                batch.draw(frame, body.getPosition().x - 8, body.getPosition().y - 6, 16, 12);
+                batch.draw(frame, body.getPosition().x - 8 / PPM, body.getPosition().y - 6 / PPM, 16 / PPM, 12 / PPM);
             }
         }
     }

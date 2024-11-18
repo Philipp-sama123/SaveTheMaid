@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI.Enemies;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
@@ -31,7 +32,7 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
 
         Texture spriteSheet = new Texture("Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png");
         this.animationSet = new AnimationSetRat(spriteSheet);
-        ATTACK_RANGE = 30f;
+        ATTACK_RANGE = 30f / PPM;
     }
 
     @Override
@@ -73,10 +74,10 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
 
         batch.draw(
             currentFrame,
-            body.getPosition().x - (float) AnimationSetRat.FRAME_WIDTH / 2,
-            body.getPosition().y - 12,
-            AnimationSetRat.FRAME_WIDTH,
-            AnimationSetRat.FRAME_HEIGHT
+            body.getPosition().x - (float) AnimationSetRat.FRAME_WIDTH / 2 / PPM,
+            body.getPosition().y - 12 / PPM,
+            AnimationSetRat.FRAME_WIDTH / PPM,
+            AnimationSetRat.FRAME_HEIGHT / PPM
         );
     }
 
@@ -87,7 +88,7 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(14f, 10f);
+        shape.setAsBox(14f / PPM, 10f / PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -102,8 +103,8 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
 
     private void createAttackCollider() {
         PolygonShape attackShape = new PolygonShape();
-        float xOffset = isFacingLeft ? -16f : 16f;
-        attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
+        float xOffset = isFacingLeft ? -16f / PPM : 16f / PPM;
+        attackShape.setAsBox(6f / PPM, 6f / PPM, new Vector2(xOffset, 0), 0);
 
         FixtureDef attackFixtureDef = new FixtureDef();
         attackFixtureDef.shape = attackShape;
@@ -123,12 +124,12 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
         if (attackCollider == null) return;
         if (attackColliderActive) {
             // Calculate the offset based on facing direction
-            float xOffset = isFacingLeft ? -12f : 12f;
+            float xOffset = isFacingLeft ? -12f / PPM : 12f / PPM;
             float yOffset = 0f; // Adjust Y offset if necessary
 
             // Move the collider to the attack position relative to the enemy's body
             PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
-            attackShape.setAsBox(6f, 6f, new Vector2(xOffset, yOffset), 0);
+            attackShape.setAsBox(6f / PPM, 6f / PPM, new Vector2(xOffset, yOffset), 0);
             Filter filter = attackCollider.getFilterData();
             filter.categoryBits = CATEGORY_PROJECTILE;
             filter.maskBits = MASK_PROJECTILE;
@@ -221,13 +222,4 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
         body.setLinearVelocity(0, 0);
     }
 
-    @Override
-    public void dispose() {
-        if (world != null && body != null) {
-            if (attackCollider != null) body.destroyFixture(attackCollider);
-            world.destroyBody(body);
-            body = null;
-        }
-        //animationSet.dispose(); ToDo: OOOOUU this is bad (!) when this is activated all the other rats get a null :O
-    }
 }

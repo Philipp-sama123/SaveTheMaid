@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
 import com.badlogic.gdx.Gdx;
@@ -17,8 +18,8 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
 
 public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
-    protected static float ATTACK_RANGE = 25f;
-    protected static final float MOVEMENT_SPEED = 15f;
+    protected static float ATTACK_RANGE = 25f/PPM;
+    protected static final float MOVEMENT_SPEED = 15f/PPM;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
     public Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("SFX/swipe.mp3"));
@@ -123,5 +124,12 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     public abstract void draw(Batch batch);
 
-    public abstract void dispose();
+    public void dispose() {
+        if (world != null && body != null) {
+            if (attackCollider != null) body.destroyFixture(attackCollider);
+            world.destroyBody(body);
+            body = null;
+        }
+        //animationSet.dispose(); ToDo: OOOOUU this is bad (!) when this is activated all the other rats get a null :O
+    }
 }

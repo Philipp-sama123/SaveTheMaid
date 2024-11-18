@@ -9,10 +9,12 @@ import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
 
 public class SaveTheMaidGame extends Game {
-    public SpriteBatch batch;
-
+    public static final float PPM = 100; // 100 pixels = 1 meter
     public static final int GAME_WIDTH = 384;
     public static final int GAME_HEIGHT = 192;
+
+    public SpriteBatch batch;
+
     private GameScreen gameScreen;
     private PauseScreen pauseScreen;
     private StartupScreen startupScreen;

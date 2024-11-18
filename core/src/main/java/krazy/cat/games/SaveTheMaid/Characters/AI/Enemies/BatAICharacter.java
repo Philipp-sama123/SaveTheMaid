@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI.Enemies;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
@@ -72,10 +73,10 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
 
         batch.draw(
             currentFrame,
-            body.getPosition().x - 21,
-            body.getPosition().y - 20,
-            40,
-            42
+            body.getPosition().x - 21 / PPM,
+            body.getPosition().y - 20 / PPM,
+            40 / PPM,
+            42 / PPM
         );
     }
 
@@ -87,7 +88,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(10f, 10f);
+        shape.setAsBox(10f / PPM, 10f / PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -104,8 +105,8 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
 
     private void createAttackCollider() {
         PolygonShape attackShape = new PolygonShape();
-        float xOffset = isFacingLeft ? -12f : 12f;
-        attackShape.setAsBox(6f, 6f, new Vector2(xOffset, 0), 0);
+        float xOffset = isFacingLeft ? -12f / PPM : 12f / PPM;
+        attackShape.setAsBox(6f / PPM, 6f / PPM, new Vector2(xOffset, 0), 0);
 
         FixtureDef attackFixtureDef = new FixtureDef();
         attackFixtureDef.shape = attackShape;
@@ -125,12 +126,12 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         if (attackCollider == null) return;
         if (attackColliderActive) {
             // Calculate the offset based on facing direction
-            float xOffset = isFacingLeft ? -12f : 12f;
+            float xOffset = isFacingLeft ? -12f / PPM : 12f / PPM;
             float yOffset = 0f; // Adjust Y offset if necessary
 
             // Move the collider to the attack position relative to the enemy's body
             PolygonShape attackShape = (PolygonShape) attackCollider.getShape();
-            attackShape.setAsBox(6f, 6f, new Vector2(xOffset, yOffset), 0);
+            attackShape.setAsBox(6f / PPM, 6f / PPM, new Vector2(xOffset, yOffset), 0);
             Filter filter = attackCollider.getFilterData();
             filter.categoryBits = CATEGORY_PROJECTILE;
             filter.maskBits = MASK_PROJECTILE;
@@ -224,13 +225,4 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         body.setLinearVelocity(0, 0);
     }
 
-    @Override
-    public void dispose() {
-        if (world != null && body != null) {
-            if (attackCollider != null) body.destroyFixture(attackCollider);
-            world.destroyBody(body);
-            body = null;
-        }
-        animationSet.dispose();
-    }
 }

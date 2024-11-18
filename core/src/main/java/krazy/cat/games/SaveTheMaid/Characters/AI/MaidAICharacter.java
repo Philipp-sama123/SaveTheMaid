@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
 
@@ -58,10 +59,10 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
 
         batch.draw(
             currentFrame,
-            body.getPosition().x - 32,
-            body.getPosition().y - 20,
-            64,
-            64
+            body.getPosition().x - 32 / PPM,
+            body.getPosition().y - 20 / PPM,
+            64 / PPM,
+            64 / PPM
         );
     }
 
@@ -73,7 +74,7 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(8f, 20f);
+        shape.setAsBox(8f / PPM, 20f / PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
