@@ -12,8 +12,6 @@ public class HitState implements State {
 
     @Override
     public void enter(BaseAICharacter enemy) {
-        Gdx.app.log("HitState", "Enemy has entered HitState.");
-
         enemy.health -= enemy.currentDamage;
         if (enemy.health <= 0) {
             enemy.health = 0;
@@ -22,7 +20,7 @@ public class HitState implements State {
             // Set the enemy's animation to the hit animation
             enemy.hit();
             animationStarted = true;
-            enemy.hitSound.play();
+            enemy.HIT_SOUND.play();
         }
         enemy.startAttackCooldown();
     }

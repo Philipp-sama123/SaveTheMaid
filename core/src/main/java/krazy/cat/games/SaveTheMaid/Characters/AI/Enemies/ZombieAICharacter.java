@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.GameAssetManager;
 
 public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.ZombieAnimationType> {
     private final AnimationSetZombie animationSet;
@@ -30,7 +31,7 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
         super(world, position);
         this.currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
 
-        Texture spriteSheet = new Texture("Characters/Zombie/Colors/Grey.png");
+        Texture spriteSheet = GameAssetManager.getInstance().get("Characters/Zombie/Colors/Grey.png", Texture.class);
         this.animationSet = new AnimationSetZombie(spriteSheet);
         isFacingLeft = true;
 
@@ -170,7 +171,7 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
         setAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK);
         activateAttackCollider();
         updateAttackColliderPosition();
-        attackSound.play();
+        ATTACK_SOUND.play();
         startAttackCooldown(); // Start the cooldown after initiating the attack
     }
 

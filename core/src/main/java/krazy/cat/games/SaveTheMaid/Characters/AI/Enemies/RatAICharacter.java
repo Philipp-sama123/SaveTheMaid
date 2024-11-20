@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.GameAssetManager;
 
 public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimationType> {
     private final AnimationSetRat animationSet;
@@ -30,7 +31,10 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
         super(world, position);
         this.currentState = AnimationSetRat.RatAnimationType.IDLE;
 
-        Texture spriteSheet = new Texture("Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png");
+        Texture spriteSheet = GameAssetManager.getInstance().get(
+            "Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png",
+            Texture.class
+        );
         this.animationSet = new AnimationSetRat(spriteSheet);
         ATTACK_RANGE = 30f / PPM;
     }
@@ -193,7 +197,7 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
     @Override
     public void attack() {
         setAnimation(AnimationSetRat.RatAnimationType.ATTACK_1);
-        attackSound.play();
+        ATTACK_SOUND.play();
         activateAttackCollider();
         updateAttackColliderPosition();
         startAttackCooldown(); // Start the cooldown after initiating the attack

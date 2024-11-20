@@ -5,6 +5,7 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -20,13 +21,14 @@ import com.badlogic.gdx.utils.Array;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
+import krazy.cat.games.SaveTheMaid.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
 
 public class Player {
     private static final int MAX_JUMPS = 3;
     private static final float SLIDE_IMPULSE = 1.5f;
     private static final float SLIDE_DURATION = 1.f;
-    private final float PROJECTILE_VELOCITY_X = 2.5f;
+    private final float PROJECTILE_VELOCITY_X = 2.f;
     private final float PROJECTILE_VELOCITY_Y = 1.5f;
     private int JUMP_EFFECT_Y_OFFSET = 40;
     private int BLOOD_EFFECT_X_OFFSET = 25;
@@ -75,24 +77,22 @@ public class Player {
 
     public Player(World world) {
         this.world = world;
-        animationSetAgent = new AnimationSetFemaleAgent(
-            new Texture("Characters/FemaleAgent/Body/Black.png"),
-            new Texture("Characters/FemaleAgent/Feet/Red.png")
-        );
-        // Load jump sprite sheet and split into frames
-        Texture jumpSpriteSheet = new Texture("JumpEffect.png");
-        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
 
-        // Convert the 2D array to a 1D array of TextureRegion for Animation
+        animationSetAgent = new AnimationSetFemaleAgent(
+            GameAssetManager.getInstance().get("Characters/FemaleAgent/Body/Black.png", Texture.class),
+            GameAssetManager.getInstance().get("Characters/FemaleAgent/Feet/Red.png", Texture.class)
+        );
+
+        Texture jumpSpriteSheet = GameAssetManager.getInstance().get("JumpEffect.png", Texture.class);
+        Texture bloodSpriteSheet = GameAssetManager.getInstance().get("PlayerBloodEffect.png", Texture.class);
+
+        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
         Array<TextureRegion> jumpFrames = new Array<>();
         for (int i = 0; i < 4; i++) {
             jumpFrames.add(tmpFrames[0][i]);  // Assuming there's only one row with four frames
         }
-
-        // Create the jump animation with a frame duration (adjust duration as needed)
         jumpEffectAnimation = new Animation<>(0.1f, jumpFrames, Animation.PlayMode.NORMAL);
-        // Load jump sprite sheet and split into frames
-        Texture bloodSpriteSheet = new Texture("PlayerBloodEffect.png");
+
         TextureRegion[][] tmpFramesBlood = TextureRegion.split(bloodSpriteSheet, 110, 86);
 
         Array<TextureRegion> bloodFrames = new Array<>();
@@ -149,7 +149,7 @@ public class Player {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        projectileTexture = new Texture("Characters/FemaleAgent/PixelBullet16x16.png");
+        projectileTexture = GameAssetManager.getInstance().get("Characters/FemaleAgent/PixelBullet16x16.png", Texture.class);
         projectiles = new Array<>();
 
         PolygonShape rectShape = new PolygonShape();
@@ -206,7 +206,9 @@ public class Player {
     public void jump() {
         if (isSliding) return;
         if (jumpCount < MAX_JUMPS) {
-            body.setLinearVelocity(body.getLinearVelocity().x, 100 / PPM); // Scaled jump velocity
+            body.setLinearVelocity(body.getLinearVelocity().x, 1.5f); // Scaled jump velocity
+            // Apply the impulse to the body's center
+            //  body.applyLinearImpulse(new Vector2(0, 1.5f), body.getWorldCenter(), true);
             jumpCount++;
             stateTime = 0;
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;

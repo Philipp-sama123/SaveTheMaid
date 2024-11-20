@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.GameAssetManager;
 
 public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimationType> {
     private final AnimationSetBat animationSet;
@@ -30,7 +31,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         super(world, position);
         this.currentState = AnimationSetBat.BatAnimationType.MOVE1;
 
-        Texture spriteSheet = new Texture("Characters/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png");
+        Texture spriteSheet = GameAssetManager.getInstance().get("Characters/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png", Texture.class);
         this.animationSet = new AnimationSetBat(spriteSheet);
     }
 
@@ -71,13 +72,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         boolean looping = currentState != AnimationSetBat.BatAnimationType.DEATH2;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
-        batch.draw(
-            currentFrame,
-            body.getPosition().x - 21 / PPM,
-            body.getPosition().y - 20 / PPM,
-            40 / PPM,
-            42 / PPM
-        );
+        batch.draw(currentFrame, body.getPosition().x - 21 / PPM, body.getPosition().y - 20 / PPM, 40 / PPM, 42 / PPM);
     }
 
 
@@ -198,7 +193,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         setAnimation(AnimationSetBat.BatAnimationType.GRAB);
         activateAttackCollider();
         updateAttackColliderPosition();
-        attackSound.play();
+        ATTACK_SOUND.play();
         startAttackCooldown(); // Start the cooldown after initiating the attack
     }
 

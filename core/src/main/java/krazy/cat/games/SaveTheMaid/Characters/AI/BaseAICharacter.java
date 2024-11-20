@@ -14,17 +14,18 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
+import krazy.cat.games.SaveTheMaid.GameAssetManager;
 
 
 public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
-    protected static float ATTACK_RANGE = 25f/PPM;
-    protected static final float MOVEMENT_SPEED = 15f/PPM;
+    protected static float ATTACK_RANGE = 25f / PPM;
+    protected static final float MOVEMENT_SPEED = 15f / PPM;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
-    public Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("SFX/swipe.mp3"));
-    public Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
-    public Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("SFX/ZombieAttack.wav"));
+    public Sound ATTACK_SOUND = GameAssetManager.getInstance().get("SFX/swipe.mp3", Sound.class);
+    public Sound HIT_SOUND = GameAssetManager.getInstance().get("SFX/PlayerHit.wav", Sound.class);
+    public Sound DEATH_SOUND = GameAssetManager.getInstance().get("SFX/ZombieAttack.wav", Sound.class);
 
     public int health = 100;
     public int currentDamage = 20;
@@ -42,6 +43,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     protected boolean isFacingLeft = false;
     public boolean isDestroyed = false;
+
     public BaseAICharacter(World world, Vector2 position) {
         this.world = world;
         this.stateTime = 0f;

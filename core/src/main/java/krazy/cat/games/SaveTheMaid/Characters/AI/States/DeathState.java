@@ -7,7 +7,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 public class DeathState implements State {
     @Override
     public void enter(BaseAICharacter enemy) {
-        enemy.deathSound.play();
+        enemy.DEATH_SOUND.play();
         enemy.die();
     }
 

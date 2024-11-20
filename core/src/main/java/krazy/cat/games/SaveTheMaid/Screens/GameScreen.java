@@ -113,7 +113,7 @@ public class GameScreen implements Screen {
     }
 
     public void update(float deltaTime) {
-       // world.step(1 / 60f, 6, 2);
+        // world.step(1 / 60f, 6, 2);
         accumulator += deltaTime;
 
         while (accumulator >= fixedTimeStep) {
@@ -126,16 +126,6 @@ public class GameScreen implements Screen {
         for (var maid : maids) {
             maid.update(deltaTime, player.body.getPosition());
         }
-
-        // Update Camera (convert Box2D to pixel coordinates)
-        gameCamera.position.x = Math.max(
-            player.body.getPosition().x * PPM,
-            (float) GAME_WIDTH / 2 / PPM
-        );
-        gameCamera.position.y = Math.max(
-            player.body.getPosition().y * PPM + 32 / PPM,
-            (float) GAME_HEIGHT / 2 / PPM
-        );
 
         gameCamera.position.x = Math.max(
             player.body.getPosition().x,
@@ -156,7 +146,9 @@ public class GameScreen implements Screen {
     public void render(float dt) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         update(dt);
+
         player.update(dt);
 
         // Render game map
@@ -166,22 +158,20 @@ public class GameScreen implements Screen {
         if (isShowBox2dDebug)
             box2DDebugRenderer.render(world, gameCamera.combined);
 
+        drawEntities();
+
+        hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
+        hud.stage.act();
+        hud.stage.draw();
+    }
+
+    private void drawEntities() {
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
         player.draw(game.batch);
-
-        for (BaseAICharacter enemy : enemies) {
-            enemy.draw(game.batch);
-        }
-        for (BaseAICharacter maid : maids) {
-            maid.draw(game.batch);
-        }
-
-        hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
+        for (BaseAICharacter enemy : enemies) enemy.draw(game.batch);
+        for (BaseAICharacter maid : maids) maid.draw(game.batch);
         game.batch.end();
-
-        hud.stage.act();
-        hud.stage.draw();
     }
 
     @Override

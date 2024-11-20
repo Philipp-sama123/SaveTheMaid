@@ -1,7 +1,17 @@
 package krazy.cat.games.SaveTheMaid.Screens;
 
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_GROUND;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -13,83 +23,124 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import krazy.cat.games.SaveTheMaid.Characters.Player; // Import Player class
+import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class CustomizeScreen implements Screen {
     private final SaveTheMaidGame game;
+    private final Player player;
+    private final SpriteBatch batch;
     private final Stage stage;
-    private final Player player; // Player instance
-    private final SpriteBatch batch; // SpriteBatch for rendering
-    private final World world; // World instance for physics
-    private Body groundBody; // Ground body
+    private final World world;
+    private final OrthographicCamera camera;
+    private final FitViewport viewport;
+
+    private Body groundBody;
 
     public CustomizeScreen(SaveTheMaidGame game) {
         this.game = game;
-        stage = new Stage(new ScreenViewport());
-        batch = game.batch; // Use the game's batch
-        world = new World(new Vector2(0, -9.8f), true); // Create a dummy world with gravity
-        player = new Player(world); // Create player instance with the dummy world
-        createGround(); // Create ground for the player to stand on
+        this.batch = game.batch;
+
+        // Set up the camera and viewport
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(
+            (float) GAME_WIDTH / 2 / PPM,
+            (float) GAME_HEIGHT / 2 / PPM, camera
+        );
+        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
+        camera.update();
+
+        // Create stage
+        stage = new Stage(viewport, batch);
+
+        // Create the Box2D world
+        world = new World(new Vector2(0, -9.8f), true);
+
+        // Create player instance
+        player = new Player(world);
+
+        // Create ground for physics
+        createGround();
+
+        // Set up the UI
+        setupUI();
     }
 
     private void createGround() {
         BodyDef groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(400, 50); // Set position of the ground
-        groundBodyDef.type = BodyDef.BodyType.StaticBody; // Set body type as static
+        groundBodyDef.position.set(camera.viewportWidth / 2, 10 / PPM); // Adjusted for PPM
+        groundBodyDef.type = BodyDef.BodyType.StaticBody;
+
         groundBody = world.createBody(groundBodyDef);
 
-        // Create a box shape for the ground
-        FixtureDef groundFixtureDef = new FixtureDef();
-        groundFixtureDef.shape = new PolygonShape();
-        ((PolygonShape) groundFixtureDef.shape).setAsBox(800, 10); // Width, Height
-        groundBody.createFixture(groundFixtureDef);
-        groundFixtureDef.shape.dispose(); // Dispose shape to free memory
-    }
+        PolygonShape groundShape = new PolygonShape();
+        groundShape.setAsBox(camera.viewportWidth, 10 / PPM); // Adjusted width and height for PPM
 
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-        setupUI();
+        FixtureDef groundFixtureDef = new FixtureDef();
+        groundFixtureDef.shape = groundShape;
+        groundFixtureDef.filter.categoryBits = CATEGORY_GROUND;
+        groundFixtureDef.filter.maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_PROJECTILE;
+        groundBody.createFixture(groundFixtureDef);
+
+        groundShape.dispose();
     }
 
     private void setupUI() {
-        // Back button with a visual style
+        // Load the back button texture
         Texture backTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"));
         ImageButton backButton = new ImageButton(new TextureRegionDrawable(backTexture));
-        backButton.getImage().setScaling(Scaling.fit);
-        backButton.setSize(100, 100); // Set preferred size
-        backButton.setPosition(50, 50);
+
+        backButton.setSize(1, 1); // Set the button size
+        backButton.setPosition(0, 0); // Adjust position for visibility
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new StartupScreen(game));
             }
         });
+
+        // Add the button to the stage
         stage.addActor(backButton);
+    }
+
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        world.step(delta, 6, 2); // Update the world
-        stage.act(delta); // Update the stage
-        stage.draw(); // Draw the stage
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Render the player in idle animation
+        // Update physics world
+        world.step(delta, 6, 2);
+
+        // Update camera and stage
+        camera.update();
+        stage.act(delta);
+
+        // Render the player and the ground
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        player.update(delta); // Update player animations
-        player.draw(batch); // Draw the player with original scale
+        player.update(delta);
+        player.draw(batch);
         batch.end();
+
+        // Render the UI
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+        viewport.update(width, height);
     }
 
     @Override
@@ -107,7 +158,6 @@ public class CustomizeScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-       // player.dispose(); // Dispose player resources if necessary
-        world.dispose(); // Dispose the dummy world
+        world.dispose();
     }
 }

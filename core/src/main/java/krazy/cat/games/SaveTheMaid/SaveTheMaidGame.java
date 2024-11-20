@@ -2,6 +2,9 @@ package krazy.cat.games.SaveTheMaid;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
@@ -14,6 +17,7 @@ public class SaveTheMaidGame extends Game {
     public static final int GAME_HEIGHT = 192;
 
     public SpriteBatch batch;
+    private AssetManager assetManager;
 
     private GameScreen gameScreen;
     private PauseScreen pauseScreen;
@@ -21,7 +25,12 @@ public class SaveTheMaidGame extends Game {
 
     @Override
     public void create() {
+        GameAssetManager.getInstance(); // Initializes and loads assets
         batch = new SpriteBatch();
+        assetManager = new AssetManager();
+
+        assetManager.finishLoading(); // Wait until all assets are loaded
+
         startupScreen = new StartupScreen(this);
         gameScreen = new GameScreen(this);
         pauseScreen = new PauseScreen(this);
@@ -44,5 +53,14 @@ public class SaveTheMaidGame extends Game {
 
     public PauseScreen getPauseScreen() {
         return pauseScreen;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+
+    @Override
+    public void dispose() {
+        GameAssetManager.getInstance().dispose(); // Dispose assets when the game ends
     }
 }
