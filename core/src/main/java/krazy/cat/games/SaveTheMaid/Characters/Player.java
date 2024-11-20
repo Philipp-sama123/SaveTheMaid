@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -30,8 +31,9 @@ public class Player {
     private static final float SLIDE_DURATION = 1.f;
     private final float PROJECTILE_VELOCITY_X = 2.f;
     private final float PROJECTILE_VELOCITY_Y = 1.5f;
-    private int JUMP_EFFECT_Y_OFFSET = 40;
-    private int BLOOD_EFFECT_X_OFFSET = 25;
+    private final int JUMP_EFFECT_Y_OFFSET = 40;
+    private final int BLOOD_EFFECT_X_OFFSET = 25;
+    private final float SLIDE_COLLIDER_VERTICAL_OFFSET = -32 / PPM;
 
     private int jumpCount = 0;
 
@@ -139,6 +141,7 @@ public class Player {
 
             if (slideTime >= SLIDE_DURATION) {
                 isSliding = false;
+                restoreCollider();
             }
         }
     }
@@ -221,15 +224,70 @@ public class Player {
     }
 
     public void slide() {
-        if (isSliding || isDead) return;  // Do not slide if already sliding or dead
+        if (isSliding || isDead) return; // Do not slide if already sliding or dead
+
+        // Rotate collider
+        rotateColliderForSlide();
 
         isSliding = true;
         slideTime = 0;
 
         float slideImpulseX = isFacingRight ? SLIDE_IMPULSE : -SLIDE_IMPULSE;
-        body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);        // Set animation state to slide or slide+shoot
+        body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);
+
+        // Set animation state to slide or slide+shoot
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
+
     }
+
+    // Method to rotate the collider for sliding
+    private void rotateColliderForSlide() {
+        // Remove the original fixture
+        Array<Fixture> fixturesToDestroy = new Array<>();
+        for (Fixture fixture : body.getFixtureList()) {
+            fixturesToDestroy.add(fixture);
+        }
+        for (Fixture fixture : fixturesToDestroy) {
+            body.destroyFixture(fixture);
+        }
+        // Create a new rotated fixture
+        PolygonShape rotatedShape = new PolygonShape();
+
+        rotatedShape.setAsBox(24f / PPM, 8f / PPM, new Vector2(0, SLIDE_COLLIDER_VERTICAL_OFFSET / 2), 0); // Dimensions flipped for a 90-degree rotation
+
+        FixtureDef slideFixtureDef = new FixtureDef();
+        slideFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        slideFixtureDef.filter.maskBits = MASK_PLAYER;
+        slideFixtureDef.shape = rotatedShape;
+
+        body.createFixture(slideFixtureDef).setUserData(this);
+        rotatedShape.dispose();
+    }
+
+    // Restore the original collider
+    private void restoreCollider() {
+        // Remove the sliding fixture
+        Array<Fixture> fixturesToDestroy = new Array<>();
+        for (Fixture fixture : body.getFixtureList()) {
+            fixturesToDestroy.add(fixture);
+        }
+        for (Fixture fixture : fixturesToDestroy) {
+            body.destroyFixture(fixture);
+        }
+
+        // Create the original fixture
+        PolygonShape originalShape = new PolygonShape();
+        originalShape.setAsBox(8f / PPM, 24f / PPM);
+
+        FixtureDef originalFixtureDef = new FixtureDef();
+        originalFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        originalFixtureDef.filter.maskBits = MASK_PLAYER;
+        originalFixtureDef.shape = originalShape;
+
+        body.createFixture(originalFixtureDef).setUserData(this);
+        originalShape.dispose();
+    }
+
 
     private void onDeath() {
         // Reset jump, movement, or shooting states
@@ -467,5 +525,4 @@ public class Player {
         if (!isSliding)
             takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
     }
-
 }
