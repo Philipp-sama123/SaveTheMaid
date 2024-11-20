@@ -5,7 +5,6 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -21,7 +20,8 @@ import com.badlogic.gdx.utils.Array;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
-import krazy.cat.games.SaveTheMaid.GameAssetManager;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
 
 public class Player {
@@ -79,12 +79,12 @@ public class Player {
         this.world = world;
 
         animationSetAgent = new AnimationSetFemaleAgent(
-            GameAssetManager.getInstance().get("Characters/FemaleAgent/Body/Black.png", Texture.class),
-            GameAssetManager.getInstance().get("Characters/FemaleAgent/Feet/Red.png", Texture.class)
+            GameAssetManager.getInstance().get(AssetPaths.PLAYER_BODY_TEXTURE, Texture.class),
+            GameAssetManager.getInstance().get(AssetPaths.PLAYER_FEET_TEXTURE, Texture.class)
         );
 
-        Texture jumpSpriteSheet = GameAssetManager.getInstance().get("JumpEffect.png", Texture.class);
-        Texture bloodSpriteSheet = GameAssetManager.getInstance().get("PlayerBloodEffect.png", Texture.class);
+        Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
+        Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
 
         TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
         Array<TextureRegion> jumpFrames = new Array<>();
@@ -149,7 +149,7 @@ public class Player {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        projectileTexture = GameAssetManager.getInstance().get("Characters/FemaleAgent/PixelBullet16x16.png", Texture.class);
+        projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         projectiles = new Array<>();
 
         PolygonShape rectShape = new PolygonShape();

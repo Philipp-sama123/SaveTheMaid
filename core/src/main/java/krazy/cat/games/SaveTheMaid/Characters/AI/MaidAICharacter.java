@@ -15,6 +15,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetMaid;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimationType> {
     private final AnimationSetMaid animationSet;
@@ -27,7 +29,7 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
 
         super(world, position);
         this.currentState = AnimationSetMaid.MaidAnimationType.IDLE;
-        Texture spriteSheet = new Texture("Characters/GandalfHardcoreMaid/Maid Character black.png");
+        Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.MAID_CHARACTER_BLACK, Texture.class);
         this.animationSet = new AnimationSetMaid(spriteSheet);
         isFacingLeft = true;
 

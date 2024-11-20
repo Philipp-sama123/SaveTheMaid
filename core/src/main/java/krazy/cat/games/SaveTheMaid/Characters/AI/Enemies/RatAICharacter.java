@@ -19,7 +19,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetRat;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.GameAssetManager;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimationType> {
     private final AnimationSetRat animationSet;
@@ -32,7 +33,7 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
         this.currentState = AnimationSetRat.RatAnimationType.IDLE;
 
         Texture spriteSheet = GameAssetManager.getInstance().get(
-            "Characters/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png",
+            AssetPaths.RAT_TEXTURE,
             Texture.class
         );
         this.animationSet = new AnimationSetRat(spriteSheet);

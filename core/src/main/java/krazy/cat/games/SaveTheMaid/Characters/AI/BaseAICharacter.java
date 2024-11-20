@@ -3,7 +3,6 @@ package krazy.cat.games.SaveTheMaid.Characters.AI;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -14,7 +13,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
-import krazy.cat.games.SaveTheMaid.GameAssetManager;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 
 public abstract class BaseAICharacter<T extends Enum<T>> {
@@ -23,9 +23,9 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static final float MOVEMENT_SPEED = 15f / PPM;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
-    public Sound ATTACK_SOUND = GameAssetManager.getInstance().get("SFX/swipe.mp3", Sound.class);
-    public Sound HIT_SOUND = GameAssetManager.getInstance().get("SFX/PlayerHit.wav", Sound.class);
-    public Sound DEATH_SOUND = GameAssetManager.getInstance().get("SFX/ZombieAttack.wav", Sound.class);
+    public Sound ATTACK_SOUND = GameAssetManager.getInstance().get(AssetPaths.SWIPE_SOUND, Sound.class);
+    public Sound HIT_SOUND = GameAssetManager.getInstance().get(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
+    public Sound DEATH_SOUND = GameAssetManager.getInstance().get(AssetPaths.ZOMBIE_ATTACK_SOUND, Sound.class);
 
     public int health = 100;
     public int currentDamage = 20;

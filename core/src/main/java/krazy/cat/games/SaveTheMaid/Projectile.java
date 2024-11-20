@@ -4,7 +4,6 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -23,6 +22,8 @@ public class Projectile {
     private boolean isFacingRight;
     private boolean isShootingUp; // New flag to indicate upward shooting
     private boolean isFlipped = false;
+
+    private final float X_OFFSET_BULLET = 2 / PPM;
 
     public Projectile(World world, Vector2 position, Vector2 velocity, Texture texture) {
         this.world = world;
@@ -56,8 +57,10 @@ public class Projectile {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
 
         body = world.createBody(bodyDef);
+
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(8 / PPM, 6 / PPM);
+
+        shape.setAsBox(6 / PPM, 3 / PPM, new Vector2(X_OFFSET_BULLET,0 ), 0);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -84,6 +87,15 @@ public class Projectile {
                 isFlipped = true;
             }
         }
+
+        // Rotate the body if shooting upwards
+        if (isShootingUp) {
+            float rotation = (float) Math.toRadians(-90); // Convert degrees to radians
+            body.setTransform(body.getPosition(), rotation);
+        } else {
+            body.setTransform(body.getPosition(), 0); // No rotation for horizontal shooting
+        }
+
         if (setToDestroy) { //ToDo: maximum range for bullets
             destroy();
         }

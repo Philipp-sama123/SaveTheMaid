@@ -1,15 +1,13 @@
 package krazy.cat.games.SaveTheMaid;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class SaveTheMaidGame extends Game {
     public static final float PPM = 100; // 100 pixels = 1 meter

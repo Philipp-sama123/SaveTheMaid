@@ -19,7 +19,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.GameAssetManager;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.ZombieAnimationType> {
     private final AnimationSetZombie animationSet;
@@ -31,7 +32,7 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
         super(world, position);
         this.currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
 
-        Texture spriteSheet = GameAssetManager.getInstance().get("Characters/Zombie/Colors/Grey.png", Texture.class);
+        Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.ZOMBIE_GREY_TEXTURE, Texture.class);
         this.animationSet = new AnimationSetZombie(spriteSheet);
         isFacingLeft = true;
 
