@@ -12,8 +12,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -92,12 +94,21 @@ public class CustomizeScreen implements Screen {
     }
 
     private void setupUI() {
-        // Load the back button texture
-        Texture backTexture = new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"));
-        ImageButton backButton = new ImageButton(new TextureRegionDrawable(backTexture));
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = new TextureRegionDrawable(new Texture(Gdx.files.internal("UiSprites/Buttons/Shooting.png"))); // Default button state
+        style.down = new TextureRegionDrawable(new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingPressed.png"))); // Pressed button state
 
-        backButton.setSize(1, 1); // Set the button size
-        backButton.setPosition(0, 0); // Adjust position for visibility
+        ImageButton backButton = new ImageButton(style);
+
+        // Set button size (adjust based on your PPM)
+        backButton.setSize(.25f, .25f); // 1 world unit, adjust as necessary
+
+        // Position the button at the top-left corner
+        float buttonX = 10 / PPM; // Small margin from the left
+        float buttonY = viewport.getWorldHeight() - backButton.getHeight() - 10 / PPM; // Adjust for height and margin
+        backButton.setPosition(buttonX, buttonY);
+
+        // Add a click listener to the button
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -140,7 +151,7 @@ public class CustomizeScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
+        viewport.update(width, height, true);
     }
 
     @Override

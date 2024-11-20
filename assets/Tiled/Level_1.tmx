@@ -410,7 +410,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="Ground">
-  <object id="29" x="0" y="6367" width="6400" height="32"/>
+  <object id="29" x="0" y="6369" width="6400" height="32"/>
   <object id="38" x="1058.46" y="6080" width="1627" height="62"/>
   <object id="68" x="959.957" y="6208.22" width="190.069" height="61.9327"/>
   <object id="69" x="1248.26" y="6207.15" width="189.002" height="63.0005"/>
