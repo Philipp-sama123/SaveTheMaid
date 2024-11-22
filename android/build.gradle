@@ -1,6 +1,7 @@
-apply plugin: 'com.android.application'
-
-
+plugins {
+  id 'com.android.application'
+  id 'com.google.gms.google-services'
+}
 android {
   namespace "krazy.cat.games"
   compileSdk 34
@@ -16,16 +17,16 @@ android {
     }
   }
   packagingOptions {
-		resources {
-			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
+    resources {
+      excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
                    'META-INF/dependencies.txt', '**/*.gwt.xml']
-			pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1',
+      pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1',
                      'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
-		}
+    }
   }
   defaultConfig {
     applicationId 'krazy.cat.games'
-    minSdkVersion 19
+    minSdkVersion 23
     targetSdkVersion 34
     versionCode 1
     versionName "1.0"
@@ -65,7 +66,12 @@ dependencies {
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-
+  implementation 'com.google.firebase:firebase-core:21.1.1' // This may be required for Firebase setup
+  implementation platform('com.google.firebase:firebase-bom:33.6.0') // Firebase BOM
+  implementation 'com.google.firebase:firebase-auth'                // Firebase Authentication
+  implementation 'com.google.firebase:firebase-database'            // Firebase Realtime Database
+  implementation 'com.google.android.gms:play-services-auth:21.2.0'  // Authentication for Google Play Games
+  implementation 'com.google.android.gms:play-services-games:23.2.0' // Google Play Games services
 }
 
 // Called every time gradle gets executed, takes the native dependencies of
@@ -80,11 +86,11 @@ tasks.register('copyAndroidNatives') {
 
     configurations.natives.copy().files.each { jar ->
       def outputDir = null
-      if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-      if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-      if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-      if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-      if(outputDir != null) {
+      if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+      if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+      if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+      if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+      if (outputDir != null) {
         copy {
           from zipTree(jar)
           into outputDir

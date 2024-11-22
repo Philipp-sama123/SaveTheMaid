@@ -7,9 +7,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -26,6 +28,8 @@ public class StartupScreen implements Screen {
     private final Viewport viewport;
     Texture backgroundTexture;
 
+    private Label greetingLabel;
+
     public StartupScreen(SaveTheMaidGame game) {
         this.game = game;
         backgroundTexture = new Texture("Characters/FemaleAgent/Portrait/Red.png");
@@ -38,7 +42,16 @@ public class StartupScreen implements Screen {
         Texture playPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Simple right.png")); // Add pressed texture
         Texture customizeTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Settings.png"));
         Texture customizePressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Settings.png")); // Add pressed texture
-
+        Texture logoutTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Exit.png"));
+        Texture logoutPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Exit.png")); // Add pressed texture
+        // Set up Logout button
+        ImageButton logoutButton = new ImageButton(new TextureRegionDrawable(logoutTexture), new TextureRegionDrawable(logoutPressedTexture));
+        logoutButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.firebaseInterface.logout();
+            }
+        });
 
         // Set up Play button
         ImageButton playButton = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
@@ -57,18 +70,44 @@ public class StartupScreen implements Screen {
                 game.setScreen(new CustomizeScreen(game));
             }
         });
+
+        // Load button textures
+        Texture loginTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Shop.png"));
+        Texture loginPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Shop.png")); // Add pressed texture
+
+        // Set up Login button
+        ImageButton loginButton = new ImageButton(new TextureRegionDrawable(loginTexture), new TextureRegionDrawable(loginPressedTexture));
+        loginButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new LoginScreen(game));
+            }
+        });
+        BitmapFont font = new BitmapFont(); // Use your own font if you have one
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = font;
+
+        greetingLabel = new Label("", labelStyle);
+        updateGreetingText();
+
         // Layout buttons in a table
         Table table = new Table();
         table.center();
         table.setFillParent(true);
-        table.add(playButton).size(50).pad(20);
-        table.add(customizeButton).size(50).pad(20);
+        table.add(greetingLabel).padBottom(20).row();  // Add greeting label
+
+        table.add(playButton).size(50).pad(10);
+        table.add(customizeButton).size(50).pad(10);
+        table.add(logoutButton).size(50).pad(10);
+        table.add(loginButton).size(50).pad(10);
 
         stage.addActor(table);
     }
 
     @Override
     public void show() {
+
+        updateGreetingText();
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -105,5 +144,14 @@ public class StartupScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    private void updateGreetingText() {
+        String userEmail = game.firebaseInterface.getUserDisplayName();
+        if (userEmail != null) {
+            greetingLabel.setText("Hello, " + userEmail);
+        } else {
+            greetingLabel.setText("Hello, Guest");
+        }
     }
 }

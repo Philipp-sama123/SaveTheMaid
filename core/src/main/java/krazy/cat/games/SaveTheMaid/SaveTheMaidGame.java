@@ -1,8 +1,10 @@
 package krazy.cat.games.SaveTheMaid;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
@@ -21,6 +23,12 @@ public class SaveTheMaidGame extends Game {
     private PauseScreen pauseScreen;
     private StartupScreen startupScreen;
 
+    public FirebaseInterface firebaseInterface;
+
+    public SaveTheMaidGame(FirebaseInterface firebaseInterface) {
+        this.firebaseInterface = firebaseInterface;
+    }
+
     @Override
     public void create() {
         GameAssetManager.getInstance(); // Initializes and loads assets
@@ -34,6 +42,10 @@ public class SaveTheMaidGame extends Game {
         pauseScreen = new PauseScreen(this);
 
         setScreen(getStartupScreen());
+
+        // Example Firebase usage
+        firebaseInterface.writeData("examplePath", "Hello Firebase!");
+        Gdx.app.log("firebaseInterface", firebaseInterface + " ");
     }
 
     public void reinitializeGameScreen() {
@@ -56,6 +68,13 @@ public class SaveTheMaidGame extends Game {
     public AssetManager getAssetManager() {
         return assetManager;
     }
+
+//    public boolean isUserSignedIn() {
+//        FirebaseUser user = firebaseInterface.getCurrentUser(); // Assuming getCurrentUser() returns the current Firebase user if signed in
+//        Gdx.app.log("USER", "firebaseInterface.getUserEmail()" + firebaseInterface.getUserEmail());
+//        Gdx.app.log("USER", "firebaseInterface.getUserDisplayName()" + firebaseInterface.getUserDisplayName());
+//        return user != null;
+//    }
 
     @Override
     public void dispose() {
