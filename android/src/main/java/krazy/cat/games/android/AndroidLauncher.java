@@ -26,18 +26,6 @@ public class AndroidLauncher extends AndroidApplication implements FirebaseInter
         AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
         configuration.useImmersiveMode = true; // Recommended, but not required.
 
-        // Check if FirebaseApp is already initialized
-        if (FirebaseApp.getApps(this).isEmpty()) {
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                .setApplicationId(ApiKeys.FIREBASE_APP_ID) // From google-services.json
-                .setApiKey(ApiKeys.FIREBASE_API_KEY) // From google-services.json
-                .setDatabaseUrl(ApiKeys.FIREBASE_DATABASE_URL) // From Firebase Console (Realtime Database URL)
-                .setProjectId(ApiKeys.FIREBASE_PROJECT_ID) // From google-services.json
-                .build();
-
-            FirebaseApp.initializeApp(this, options);
-        }
-
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -63,17 +51,23 @@ public class AndroidLauncher extends AndroidApplication implements FirebaseInter
 
 
     @Override
-    public void writeData(String path, Object data) {
-        System.out.println("Trying to write: " + data);
+    public void writeData(String path, Object data, FirebaseCallback callback) {
+        System.out.println("TRY TO ! " + data);
         databaseReference.child(path).setValue(data)
             .addOnCompleteListener(this, task -> {
+                System.out.println("TRY TO this, task! " + data);
+
                 if (task.isSuccessful()) {
-                    System.out.println("Data written to: " + path);
+                    System.out.println("Data successfully written to: " + path);
+                    callback.onSuccess(); // Notify success
                 } else {
-                    System.err.println("Failed to write data: " + task.getException().getMessage());
+                    String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                    System.err.println("Failed to write data: " + errorMessage);
+                    callback.onFailure(errorMessage); // Notify failure
                 }
             });
     }
+
 
     @Override
     public void createUser(String email, String password, FirebaseCallback callback) {
@@ -109,6 +103,7 @@ public class AndroidLauncher extends AndroidApplication implements FirebaseInter
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return user != null ? user.getDisplayName() : null;  // Return user's display name or null if not signed in
     }
+
     @Override
     public void setUserDisplayName(String name, FirebaseCallback callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -143,6 +138,7 @@ public class AndroidLauncher extends AndroidApplication implements FirebaseInter
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return user != null && user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;  // Return user's photo URL or null if not signed in
     }
+
     @Override
     public void logout() {
         FirebaseAuth.getInstance().signOut();

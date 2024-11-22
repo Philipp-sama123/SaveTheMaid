@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.FirebaseCallback;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
@@ -192,6 +193,18 @@ public class GameScreen implements Screen {
     @Override
     public void hide() {
         hud.disableInput();
+        // Example Firebase usage
+        game.firebaseInterface.writeData("/ollaa/aja", "Hello Firebase!", new FirebaseCallback() {
+            @Override
+            public void onSuccess() {
+                Gdx.app.log("WRITE DATA !!","Data written successfully to Firebase!");
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                Gdx.app.log("WRITE DATA !!","Failed to write data: " + errorMessage);
+            }
+        });
     }
 
     @Override

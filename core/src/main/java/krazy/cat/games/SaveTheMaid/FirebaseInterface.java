@@ -4,7 +4,7 @@ package krazy.cat.games.SaveTheMaid;
 public interface FirebaseInterface {
     void signIn(String email, String password, FirebaseCallback callback);
 
-    void writeData(String path, Object data);
+    void writeData(String path, Object data, FirebaseCallback callback);
 
     void createUser(String email, String password, FirebaseCallback callback);
     // New methods to fetch user data

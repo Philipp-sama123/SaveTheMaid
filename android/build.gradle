@@ -70,8 +70,6 @@ dependencies {
   implementation platform('com.google.firebase:firebase-bom:33.6.0') // Firebase BOM
   implementation 'com.google.firebase:firebase-auth'                // Firebase Authentication
   implementation 'com.google.firebase:firebase-database'            // Firebase Realtime Database
-  implementation 'com.google.android.gms:play-services-auth:21.2.0'  // Authentication for Google Play Games
-  implementation 'com.google.android.gms:play-services-games:23.2.0' // Google Play Games services
 }
 
 // Called every time gradle gets executed, takes the native dependencies of

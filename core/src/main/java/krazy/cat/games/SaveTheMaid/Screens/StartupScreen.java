@@ -96,10 +96,10 @@ public class StartupScreen implements Screen {
         table.setFillParent(true);
         table.add(greetingLabel).padBottom(20).row();  // Add greeting label
 
-        table.add(playButton).size(50).pad(10);
-        table.add(customizeButton).size(50).pad(10);
-        table.add(logoutButton).size(50).pad(10);
-        table.add(loginButton).size(50).pad(10);
+        table.add(playButton).size(50).pad(5);
+        table.add(customizeButton).size(50).pad(5);
+        table.add(logoutButton).size(50).pad(5);
+        table.add(loginButton).size(50).pad(5);
 
         stage.addActor(table);
     }

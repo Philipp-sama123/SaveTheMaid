@@ -42,10 +42,6 @@ public class SaveTheMaidGame extends Game {
         pauseScreen = new PauseScreen(this);
 
         setScreen(getStartupScreen());
-
-        // Example Firebase usage
-        firebaseInterface.writeData("examplePath", "Hello Firebase!");
-        Gdx.app.log("firebaseInterface", firebaseInterface + " ");
     }
 
     public void reinitializeGameScreen() {
