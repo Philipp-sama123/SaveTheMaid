@@ -20,7 +20,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import javax.swing.text.View;
 
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
@@ -51,18 +54,23 @@ public class Hud implements Disposable {
 
     private boolean jumpPressed = false;
 
-    public Hud(SaveTheMaidGame game) {
+    public Hud(SaveTheMaidGame game, Viewport viewport) {
         worldTimer = 0;
         timeCount = 0;
         health = 0;
         this.game = game;
-        viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, new OrthographicCamera());
+
+        // Use StretchViewport for the HUD
+        this.viewport = viewport;
         stage = new Stage(viewport, game.batch);
+
         Table table = new Table();
         table.top();
         table.setFillParent(true);
+
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(0.5f);  // Scale down the font size to 50%
+        font.getData().setScale(0.5f); // Adjust font scaling for StretchViewport
+
         countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
         healthLabel = new Label(String.format("%06d", health), new Label.LabelStyle(font, Color.WHITE));
         timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
@@ -80,10 +88,11 @@ public class Hud implements Disposable {
 
         stage.addActor(table);
 
+        // Initialize other UI components
         createMovementJoystick();
         createButtons();
-
     }
+
     public void enableInput() {
         // Initialize InputMultiplexer
         if (inputMultiplexer == null) {

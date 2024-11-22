@@ -18,7 +18,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
@@ -34,8 +36,8 @@ public class GameScreen implements Screen {
     private final SaveTheMaidGame game;
     private final Player player;
 
-    private Viewport gameViewport;
-    private OrthographicCamera gameCamera;
+    private Viewport gameViewport, uiViewport;
+    private OrthographicCamera gameCamera, uiCamera;
     private Hud hud;
 
     // Tiled Map Variables
@@ -47,7 +49,6 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
 
-    // private Array<ZombieEnemy> enemies = new Array<>();
     private Array<BaseAICharacter> enemies = new Array<>();
     private Array<BaseAICharacter> maids = new Array<>();
     public boolean isShowBox2dDebug;
@@ -55,7 +56,7 @@ public class GameScreen implements Screen {
     private float accumulator = 0;
     private final float fixedTimeStep = 1 / 60f;
 
-    // map dimensions in pixels
+    // Map dimensions in pixels
     public int mapWidthInPixels;
     public int mapHeightInPixels;
 
@@ -66,8 +67,12 @@ public class GameScreen implements Screen {
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
 
-        this.hud = new Hud(game);
+        // Initialize HUD with a separate camera and viewport
+        this.uiCamera = new OrthographicCamera();
+        this.uiViewport = new ExtendViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
+        this.hud = new Hud(game, uiViewport);
 
+        // Load map and setup tiled renderer
         this.mapLoader = new TmxMapLoader();
         this.map = mapLoader.load("Tiled/Level_1.tmx");
 
@@ -84,15 +89,22 @@ public class GameScreen implements Screen {
 
         this.renderer = new OrthogonalTiledMapRenderer(map, 1 / PPM); // Adjust for PPM
 
+        // Game camera and viewport
         this.gameCamera = new OrthographicCamera();
-        this.gameViewport = new FitViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera); // Adjust for PPM
+        float aspectRatio = (float) Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
+        if (aspectRatio > 1) { // Portrait mode
+            this.gameViewport = new ExtendViewport(GAME_WIDTH / PPM, (GAME_HEIGHT * 1.2f) / PPM, gameCamera);
+        } else { // Landscape or square
+            this.gameViewport = new ExtendViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
+        }
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
+        // Box2D world setup
         this.world = new World(new Vector2(0, -125 / PPM), false); // Adjust gravity for PPM
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
-        // Initializes also the enemies
+        // Initialize map and entities
         new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
 
@@ -114,13 +126,13 @@ public class GameScreen implements Screen {
     }
 
     public void update(float deltaTime) {
-        // world.step(1 / 60f, 6, 2);
         accumulator += deltaTime;
 
         while (accumulator >= fixedTimeStep) {
             world.step(fixedTimeStep, 6, 2);
             accumulator -= fixedTimeStep;
         }
+
         for (var enemy : enemies) {
             enemy.update(deltaTime, player.body.getPosition());
         }
@@ -128,17 +140,19 @@ public class GameScreen implements Screen {
             maid.update(deltaTime, player.body.getPosition());
         }
 
+        // Center camera on player while clamping within map bounds
         gameCamera.position.x = Math.max(
-            player.body.getPosition().x,
-            (float) GAME_WIDTH / 2 / PPM
+            gameCamera.viewportWidth / 2,
+            Math.min(player.body.getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2)
         );
+
         gameCamera.position.y = Math.max(
-            player.body.getPosition().y + 32 / PPM,
-            (float) GAME_HEIGHT / 2 / PPM
+            gameCamera.viewportHeight / 2,
+            Math.min(player.body.getPosition().y, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2)
         );
         gameCamera.update();
 
-        // Render only visible part of the map
+        // Update renderer view and HUD
         renderer.setView(gameCamera);
         hud.update(deltaTime);
     }
@@ -152,7 +166,7 @@ public class GameScreen implements Screen {
 
         player.update(dt);
 
-        // Render game map
+        // Render map
         renderer.render();
 
         // Render Box2D Debug
@@ -161,6 +175,7 @@ public class GameScreen implements Screen {
 
         drawEntities();
 
+        // Draw HUD/UI
         hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
         hud.stage.act();
         hud.stage.draw();
@@ -177,9 +192,21 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        gameViewport.update(width, height);
-    }
+        float aspectRatio = (float) height / width;
 
+        // Recreate the game viewport for portrait and landscape adjustments
+        if (aspectRatio > 1) { // Portrait mode
+            gameViewport = new ExtendViewport((GAME_WIDTH-250) / PPM, (GAME_HEIGHT -100) / PPM, gameCamera);
+        } else { // Landscape or square
+            gameViewport = new ExtendViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
+        }
+
+        // Apply and update the new viewport
+        gameViewport.update(width, height, true);
+
+        // Update the UI viewport
+        uiViewport.update(width, height, true);
+    }
 
     @Override
     public void pause() {
@@ -187,7 +214,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -197,12 +223,12 @@ public class GameScreen implements Screen {
         game.firebaseInterface.writeData("/ollaa/aja", "Hello Firebase!", new FirebaseCallback() {
             @Override
             public void onSuccess() {
-                Gdx.app.log("WRITE DATA !!","Data written successfully to Firebase!");
+                Gdx.app.log("WRITE DATA !!", "Data written successfully to Firebase!");
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                Gdx.app.log("WRITE DATA !!","Failed to write data: " + errorMessage);
+                Gdx.app.log("WRITE DATA !!", "Failed to write data: " + errorMessage);
             }
         });
     }
