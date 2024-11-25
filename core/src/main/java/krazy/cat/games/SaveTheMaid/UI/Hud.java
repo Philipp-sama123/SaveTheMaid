@@ -12,8 +12,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -26,6 +28,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import javax.swing.text.View;
 
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
+import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
+import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class Hud implements Disposable {
     private SaveTheMaidGame game;
@@ -36,9 +40,10 @@ public class Hud implements Disposable {
     private Integer worldTimer;
     private float timeCount;
     private Integer health;
-
+    private Image healthBar;
+    private Image healthBarBackground;
     Label countdownLabel;
-    public Label healthLabel;
+
     Label timeLabel;
     Label levelLabel;
     Label worldLabel;
@@ -59,7 +64,6 @@ public class Hud implements Disposable {
         timeCount = 0;
         health = 0;
         this.game = game;
-
         // Use StretchViewport for the HUD
         this.viewport = viewport;
         stage = new Stage(viewport, game.batch);
@@ -72,18 +76,27 @@ public class Hud implements Disposable {
         font.getData().setScale(0.5f); // Adjust font scaling for StretchViewport
 
         countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
-        healthLabel = new Label(String.format("%06d", health), new Label.LabelStyle(font, Color.WHITE));
+
         timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
         levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
         worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
         playerLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
+        // Add the health bar to a new Table
+        Texture healthBarTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
+        Texture healthBarBackgroundTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_CONTAINER, Texture.class);
 
-        table.add(playerLabel).expandX();
-        table.add(worldLabel).expandX();
+        healthBar = new Image(new TextureRegionDrawable(new TextureRegion(healthBarTexture)));
+        healthBarBackground = new Image(new TextureRegionDrawable(new TextureRegion(healthBarBackgroundTexture)));
+
+        Stack healthStack = new Stack();
+        healthStack.add(healthBar); // Add the health bar first
+        healthStack.add(healthBarBackground); // Add the health label over the health bar
+        table.add(healthStack).expandX();
+        table.add().expandX();
         table.add(timeLabel).expandX();
         table.row();
-        table.add(healthLabel).expandX();
-        table.add(levelLabel).expandX();
+        table.add().expandX();
+        table.add().expandX();
         table.add(countdownLabel).expandX();
 
         stage.addActor(table);
@@ -168,7 +181,7 @@ public class Hud implements Disposable {
 
         Table debugTable = new Table();
         debugTable.setFillParent(true);
-        debugTable.top().left();
+        debugTable.bottom().left();
         debugTable.add(pauseButton).size(15, 15).pad(2.5f);
         debugTable.add(debugButton).size(15, 15).pad(2.5f);
         stage.addActor(debugTable);
@@ -266,6 +279,23 @@ public class Hud implements Disposable {
         game.getGameScreen().getPlayer().crouch(movementJoystick.getKnobPercentY() < -0.75);
     }
 
+    public void updateHealth(int currentHealth, int maxHealth) {
+        if (currentHealth < 0) currentHealth = 0;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+
+        // Calculate the new width of the health bar based on the health percentage
+        float healthPercentage = (float) currentHealth / maxHealth;
+        float originalWidth = healthBar.getPrefWidth(); // Assuming this gives the original texture width
+        float newWidth = originalWidth * healthPercentage;
+
+        // Update the width of the health bar
+        healthBar.setWidth(newWidth);
+
+        // Optionally reposition the health bar to keep it aligned correctly within the background
+        float healthBarX = healthBarBackground.getX();
+        healthBar.setPosition(healthBarX, healthBar.getY());
+
+    }
     @Override
     public void dispose() {
         stage.dispose();

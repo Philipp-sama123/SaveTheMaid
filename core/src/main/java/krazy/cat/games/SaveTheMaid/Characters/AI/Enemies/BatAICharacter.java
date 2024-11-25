@@ -69,6 +69,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
     @Override
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
+
         drawHealthBar(batch);
         boolean looping = currentState != AnimationSetBat.BatAnimationType.DEATH2;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);

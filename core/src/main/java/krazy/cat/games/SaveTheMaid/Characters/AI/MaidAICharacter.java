@@ -59,6 +59,8 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         boolean looping = currentState != AnimationSetMaid.MaidAnimationType.DIE;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
+        drawHealthBar(batch);
+
         batch.draw(
             currentFrame,
             body.getPosition().x - 32 / PPM,

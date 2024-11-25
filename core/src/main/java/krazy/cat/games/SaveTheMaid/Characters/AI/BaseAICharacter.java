@@ -46,11 +46,13 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public boolean isDestroyed = false;
 
     protected Texture healthBar;
+    protected float healthBarYOffset = 15;
 
 
     public BaseAICharacter(World world, Vector2 position) {
         this.world = world;
         this.stateTime = 0f;
+
         healthBar = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
 
         defineEnemy(position);
@@ -132,9 +134,9 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public abstract void draw(Batch batch);
 
     public void drawHealthBar(Batch batch) {
-        batch.setColor(1,1,1,.35f);
-        batch.draw(healthBar, body.getPosition().x - (healthBar.getWidth() / PPM) / 2, body.getPosition().y + 15 / PPM, healthBar.getWidth() / PPM * ((float) health / 100), healthBar.getHeight() / PPM);
-        batch.setColor(1,1,1,1);
+        batch.setColor(1, 1, 1, .5f);
+        batch.draw(healthBar, body.getPosition().x - (healthBar.getWidth() / PPM) / 2, body.getPosition().y + healthBarYOffset / PPM, healthBar.getWidth() / PPM * ((float) health / 100), healthBar.getHeight() / PPM);
+        batch.setColor(1, 1, 1, 1);
 
     }
 

@@ -23,6 +23,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
@@ -169,7 +172,7 @@ public class GameScreen implements Screen {
         drawEntities();
 
         // Draw HUD/UI
-        hud.healthLabel.setText(player.currentHealth + "/" + player.maxHealth);
+        hud.updateHealth(player.currentHealth, player.maxHealth);
         hud.stage.act();
         hud.stage.draw();
     }
@@ -204,17 +207,21 @@ public class GameScreen implements Screen {
     public void hide() {
         hud.disableInput();
         // Example Firebase usage
-        game.firebaseInterface.writeData("/ollaa/aja", "Hello Firebase!", new FirebaseCallback() {
-            @Override
-            public void onSuccess() {
-                Gdx.app.log("WRITE DATA !!", "Data written successfully to Firebase!");
-            }
+        try {
+            game.firebaseInterface.writeData("/data", "Hello Firebase from: " + game.firebaseInterface.getUserEmail(), new FirebaseCallback() {
+                @Override
+                public void onSuccess() {
+                    Gdx.app.log("WRITE DATA !!", "Data written successfully to Firebase!");
+                }
 
-            @Override
-            public void onFailure(String errorMessage) {
-                Gdx.app.log("WRITE DATA !!", "Failed to write data: " + errorMessage);
-            }
-        });
+                @Override
+                public void onFailure(String errorMessage) {
+                    Gdx.app.log("WRITE DATA !!", "Failed to write data: " + errorMessage);
+                }
+            });
+        } catch (Exception exception) {
+            Gdx.app.error("ERROR CAUGHT game.firebaseInterface.writeData", exception.getMessage());
+        }
     }
 
     @Override
