@@ -9,6 +9,10 @@ public class AssetPaths {
     public static final String BAT_TEXTURE = "Characters/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png";
     public static final String ZOMBIE_GREY_TEXTURE = "Characters/Zombie/Colors/Grey.png";
 
+    public static final String HEALTH_BAR_ANIMATIONS = "UiSprites/HealthBars/HealthBar_Animations.png";
+    public static final String HEALTH_BAR_CONTAINER = "UiSprites/HealthBars/HealthBar_Container.png";
+    public static final String HEALTH_BAR_SIMPLE= "UiSprites/HealthBars/HealthBar_Simple.png";
+
     // Player Assets
     public static final String PLAYER_BODY_TEXTURE = "Characters/FemaleAgent/Body/Black.png";
     public static final String PLAYER_FEET_TEXTURE = "Characters/FemaleAgent/Feet/Red.png";

@@ -4,6 +4,7 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -44,9 +45,13 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     protected boolean isFacingLeft = false;
     public boolean isDestroyed = false;
 
+    protected Texture healthBar;
+
+
     public BaseAICharacter(World world, Vector2 position) {
         this.world = world;
         this.stateTime = 0f;
+        healthBar = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
 
         defineEnemy(position);
         deactivateAttackCollider();
@@ -125,6 +130,13 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public abstract void update(float dt, Vector2 position);
 
     public abstract void draw(Batch batch);
+
+    public void drawHealthBar(Batch batch) {
+        batch.setColor(1,1,1,.35f);
+        batch.draw(healthBar, body.getPosition().x - (healthBar.getWidth() / PPM) / 2, body.getPosition().y + 15 / PPM, healthBar.getWidth() / PPM * ((float) health / 100), healthBar.getHeight() / PPM);
+        batch.setColor(1,1,1,1);
+
+    }
 
     public void dispose() {
         if (world != null && body != null) {

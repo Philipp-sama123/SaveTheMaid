@@ -77,6 +77,8 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
         boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
+        drawHealthBar(batch);
+
         batch.draw(
             currentFrame,
             body.getPosition().x - 32 / PPM,
@@ -84,6 +86,7 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
             64 / PPM,
             64 / PPM
         );
+
     }
 
     @Override

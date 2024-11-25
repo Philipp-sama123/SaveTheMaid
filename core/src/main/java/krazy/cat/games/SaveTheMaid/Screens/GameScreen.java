@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -45,10 +45,8 @@ public class GameScreen implements Screen {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
 
-    // Box2D Variables
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
-
     private Array<BaseAICharacter> enemies = new Array<>();
     private Array<BaseAICharacter> maids = new Array<>();
     public boolean isShowBox2dDebug;
@@ -69,7 +67,7 @@ public class GameScreen implements Screen {
 
         // Initialize HUD with a separate camera and viewport
         this.uiCamera = new OrthographicCamera();
-        this.uiViewport = new ExtendViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
+        this.uiViewport = new StretchViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
         this.hud = new Hud(game, uiViewport);
 
         // Load map and setup tiled renderer
@@ -91,12 +89,7 @@ public class GameScreen implements Screen {
 
         // Game camera and viewport
         this.gameCamera = new OrthographicCamera();
-        float aspectRatio = (float) Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
-        if (aspectRatio > 1) { // Portrait mode
-            this.gameViewport = new ExtendViewport(GAME_WIDTH / PPM, (GAME_HEIGHT * 1.2f) / PPM, gameCamera);
-        } else { // Landscape or square
-            this.gameViewport = new ExtendViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
-        }
+        this.gameViewport = new StretchViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
         this.gameViewport.apply();
         this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
 
@@ -192,15 +185,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        float aspectRatio = (float) height / width;
-
-        // Recreate the game viewport for portrait and landscape adjustments
-        if (aspectRatio > 1) { // Portrait mode
-            gameViewport = new ExtendViewport((GAME_WIDTH-250) / PPM, (GAME_HEIGHT -100) / PPM, gameCamera);
-        } else { // Landscape or square
-            gameViewport = new ExtendViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
-        }
-
         // Apply and update the new viewport
         gameViewport.update(width, height, true);
 

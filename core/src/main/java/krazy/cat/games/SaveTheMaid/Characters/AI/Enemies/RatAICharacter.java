@@ -84,6 +84,7 @@ public class RatAICharacter extends BaseAICharacter<AnimationSetRat.RatAnimation
             AnimationSetRat.FRAME_WIDTH / PPM,
             AnimationSetRat.FRAME_HEIGHT / PPM
         );
+        drawHealthBar(batch);
     }
 
     protected void defineEnemy(Vector2 position) {

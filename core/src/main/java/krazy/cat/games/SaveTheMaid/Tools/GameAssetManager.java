@@ -41,6 +41,10 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.JUMP_SOUND, Sound.class);
         assetManager.load(AssetPaths.SHOOT_SOUND, Sound.class);
+
+        assetManager.load(AssetPaths.HEALTH_BAR_CONTAINER, Texture.class);
+        assetManager.load(AssetPaths.HEALTH_BAR_ANIMATIONS, Texture.class);
+        assetManager.load(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
     }
 
     public <T> T get(String assetPath, Class<T> type) {
