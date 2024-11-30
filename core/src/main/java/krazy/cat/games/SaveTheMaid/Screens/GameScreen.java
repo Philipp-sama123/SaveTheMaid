@@ -68,7 +68,7 @@ public class GameScreen implements Screen {
 
         // Load map and setup tiled renderer
         this.mapLoader = new TmxMapLoader();
-        this.map = mapLoader.load("Tiled/Level_1.tmx");
+        this.map = mapLoader.load("Tiled/Level_2.tmx");
 
         // Fix for map background artifacts
         for (TiledMapTileSet tileSet : map.getTileSets()) {

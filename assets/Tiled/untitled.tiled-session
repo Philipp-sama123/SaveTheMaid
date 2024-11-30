@@ -8,12 +8,33 @@
         "."
     ],
     "fileStates": {
-        "Level_1.tmx": {
-            "scale": 1.239,
-            "selectedLayer": 1,
+        "FirstLevel.tmx": {
+            "expandedObjectLayers": [
+                9,
+                8,
+                3
+            ],
+            "scale": 0.5424,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 741.3236481033091,
-                "y": 5483.857949959645
+                "x": 1626.1061946902655,
+                "y": 6746.865781710914
+            }
+        },
+        "Level_1.tmx": {
+            "scale": 0.4634,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 736.9443245576176,
+                "y": 6228.959861890376
+            }
+        },
+        "Level_2.tmx": {
+            "scale": 0.3353,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 350.4324485535341,
+                "y": 3031.6134804652547
             }
         },
         "PlatformerAssets.tsx": {
@@ -22,16 +43,17 @@
         }
     },
     "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/PlatformerAssets",
-    "map.height": 200,
+    "map.height": 100,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "3",
-    "map.width": 200,
+    "map.width": 100,
     "openFiles": [
         "PlatformerAssets.tsx",
         "Level_1.tmx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "FirstLevel.tmx",
         "PlatformerAssets.tsx",
         "Level_1.tmx"
     ],
