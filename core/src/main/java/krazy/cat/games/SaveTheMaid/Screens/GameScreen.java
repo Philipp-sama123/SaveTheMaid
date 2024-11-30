@@ -21,7 +21,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.List;
+
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
@@ -44,7 +48,7 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer box2DDebugRenderer;
     private Array<BaseAICharacter> enemies = new Array<>();
-    private Array<BaseAICharacter> maids = new Array<>();
+    private Array<BaseFriendAICharacter> friends = new Array<>();
     public boolean isShowBox2dDebug;
 
     private float accumulator = 0;
@@ -125,8 +129,8 @@ public class GameScreen implements Screen {
         for (var enemy : enemies) {
             enemy.update(deltaTime, player.body.getPosition());
         }
-        for (var maid : maids) {
-            maid.update(deltaTime, player.body.getPosition());
+        for (var friend : friends) {
+            friend.update(deltaTime, player.body.getPosition());
         }
 
         // Center camera on player while clamping within map bounds
@@ -175,7 +179,7 @@ public class GameScreen implements Screen {
         game.batch.begin();
         player.draw(game.batch);
         for (BaseAICharacter enemy : enemies) enemy.draw(game.batch);
-        for (BaseAICharacter maid : maids) maid.draw(game.batch);
+        for (BaseFriendAICharacter friend : friends) friend.draw(game.batch);
         game.batch.end();
     }
 
@@ -215,4 +219,7 @@ public class GameScreen implements Screen {
         enemies.add(enemy);
     }
 
+    public void addCat(BaseFriendAICharacter cat) {
+        friends.add(cat);
+    }
 }

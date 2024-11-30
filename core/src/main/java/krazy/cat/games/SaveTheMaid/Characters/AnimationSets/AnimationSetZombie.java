@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class AnimationSetZombie {
+public class AnimationSetZombie implements AnimationSet<AnimationSetZombie.ZombieAnimationType> {
     private static final float FRAME_DURATION = 0.1f;
     private static final int FRAME_WIDTH = 64;
     private static final int FRAME_HEIGHT = 64;

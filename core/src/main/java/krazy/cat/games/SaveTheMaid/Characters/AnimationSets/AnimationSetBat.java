@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class AnimationSetBat {
+public class AnimationSetBat implements AnimationSet<AnimationSetBat.BatAnimationType> {
     private static final float FRAME_DURATION = 0.1f;
     private static final int FRAME_WIDTH = 40;
     private static final int FRAME_HEIGHT = 42;

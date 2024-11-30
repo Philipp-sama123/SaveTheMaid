@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level_1.tmx",
+    "activeFile": "Level_2.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -30,15 +30,15 @@
             }
         },
         "Level_2.tmx": {
-            "scale": 0.3353,
-            "selectedLayer": 2,
+            "scale": 1.0893,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 350.4324485535341,
-                "y": 3031.6134804652547
+                "x": 382.355641237492,
+                "y": 2978.5183145139085
             }
         },
         "PlatformerAssets.tsx": {
-            "scaleInDock": 0.8933,
+            "scaleInDock": 1.2877,
             "scaleInEditor": 1
         }
     },
@@ -49,13 +49,15 @@
     "map.width": 100,
     "openFiles": [
         "PlatformerAssets.tsx",
-        "Level_1.tmx"
+        "Level_1.tmx",
+        "Level_2.tmx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
-        "FirstLevel.tmx",
         "PlatformerAssets.tsx",
-        "Level_1.tmx"
+        "Level_1.tmx",
+        "Level_2.tmx",
+        "FirstLevel.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }

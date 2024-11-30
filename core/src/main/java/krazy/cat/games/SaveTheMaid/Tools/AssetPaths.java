@@ -11,7 +11,7 @@ public class AssetPaths {
 
     public static final String HEALTH_BAR_ANIMATIONS = "UiSprites/HealthBars/HealthBar_Animations.png";
     public static final String HEALTH_BAR_CONTAINER = "UiSprites/HealthBars/HealthBar_Container.png";
-    public static final String HEALTH_BAR_SIMPLE= "UiSprites/HealthBars/HealthBar_Simple.png";
+    public static final String HEALTH_BAR_SIMPLE = "UiSprites/HealthBars/HealthBar_Simple.png";
 
     // Player Assets
     public static final String PLAYER_BODY_TEXTURE = "Characters/FemaleAgent/Body/Black.png";
@@ -22,4 +22,5 @@ public class AssetPaths {
     public static final String JUMP_SOUND = "SFX/Jump.wav";
     public static final String SHOOT_SOUND = "SFX/Shoot.wav";
     public static final String MAID_CHARACTER_BLACK = "Characters/Friends/GandalfHardcoreMaid/Maid Character black.png";
+    public static final String CAT_TEXTURE_2 = "Characters/Friends/PixelCatsPack/PixelCat3.png";
 }

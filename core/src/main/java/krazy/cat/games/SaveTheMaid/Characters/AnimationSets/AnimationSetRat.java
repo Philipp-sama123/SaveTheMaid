@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class AnimationSetRat {
+public class AnimationSetRat implements AnimationSet<AnimationSetRat.RatAnimationType>{
     private static final float FRAME_DURATION = 0.1f;
     public static final int FRAME_WIDTH = 62;
     public static final int FRAME_HEIGHT = 44;

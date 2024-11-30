@@ -74,6 +74,7 @@ public class AnimationSetFemaleAgent {
         }
         return upperBodyAnimations;
     }
+
     private Map<AnimationType, Animation<TextureRegion>> CreateLowerBodyAnimations(Texture spriteSheet) {
         final Map<AnimationType, Animation<TextureRegion>> lowerBodyAnimations;
         TextureRegion[][] textureRegions = TextureRegion.split(spriteSheet, FRAME_WIDTH, FRAME_HEIGHT);
