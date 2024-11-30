@@ -20,7 +20,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Coin;
@@ -95,8 +94,8 @@ public class Box2dWorldCreator {
         // Create Maid objects for "SpawnPointsMaid" layer
         for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            gameScreen.addMaid(new MaidAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM))); // Adjusted for PPM
+//            gameScreen.addMaid(new MaidAICharacter(world, new Vector2(rectangle.x / PPM,
+//                rectangle.y / PPM))); // Adjusted for PPM
         }
 
         shape.dispose();

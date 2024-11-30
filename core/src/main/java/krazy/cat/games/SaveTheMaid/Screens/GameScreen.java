@@ -22,7 +22,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
@@ -216,7 +215,4 @@ public class GameScreen implements Screen {
         enemies.add(enemy);
     }
 
-    public void addMaid(MaidAICharacter maidAICharacter) {
-        maids.add(maidAICharacter);
-    }
 }
