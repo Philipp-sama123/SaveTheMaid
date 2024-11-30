@@ -1,6 +1,5 @@
 plugins {
   id 'com.android.application'
-  id 'com.google.gms.google-services'
 }
 android {
   namespace "krazy.cat.games"
@@ -66,10 +65,6 @@ dependencies {
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-  implementation 'com.google.firebase:firebase-core:21.1.1' // This may be required for Firebase setup
-  implementation platform('com.google.firebase:firebase-bom:33.6.0') // Firebase BOM
-  implementation 'com.google.firebase:firebase-auth'                // Firebase Authentication
-  implementation 'com.google.firebase:firebase-database'            // Firebase Realtime Database
 }
 
 // Called every time gradle gets executed, takes the native dependencies of

@@ -4,23 +4,21 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import krazy.cat.games.SaveTheMaid.FirebaseCallback;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class LoginScreen implements Screen {
@@ -42,6 +40,7 @@ public class LoginScreen implements Screen {
     private Label errorLabel;
     private Label loadingLabel;
 
+    private final Preferences preferences;
 
     public LoginScreen(SaveTheMaidGame game) {
         this.game = game;
@@ -50,6 +49,10 @@ public class LoginScreen implements Screen {
 
         viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT);
         stage = new Stage(viewport, game.batch);
+
+        // Initialize preferences for local storage
+        preferences = Gdx.app.getPreferences("SaveTheMaidPrefs");
+
         // Initialize the loading label
         loadingLabel = new Label("Loading...", skin);
         loadingLabel.setVisible(false); // Hidden by default
@@ -57,6 +60,7 @@ public class LoginScreen implements Screen {
 
         // Background texture
         backgroundTexture = new Texture("PlatformerAssets/BackgroundLayers/Normal BG/BG_1.png");
+
         // Create buttons
         createUserButton = new TextButton("Create User", skin);
         createUserButton.addListener(new ClickListener() {
@@ -65,39 +69,19 @@ public class LoginScreen implements Screen {
                 String email = emailField.getText();
                 String password = passwordField.getText();
                 String username = usernameField.getText();
+
                 showLoading();
-                // Call createUser with the callback
-                game.firebaseInterface.createUser(email, password, new FirebaseCallback() {
-                    // Show loading indicator
-                    @Override
-                    public void onSuccess() {
-                        // Update the user's display name after creating the user
-                        game.firebaseInterface.setUserDisplayName(username, new FirebaseCallback() {
-                            @Override
-                            public void onSuccess() {
-                                hideLoading();
-                                game.setScreen(game.getStartupScreen()); // Switch screen on success
-                            }
-
-                            @Override
-                            public void onFailure(String errorMessage) {
-                                hideLoading();
-                                errorLabel.setText("Failed to set username: " + errorMessage);
-                                errorLabel.setVisible(true);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        hideLoading();
-                        errorLabel.setText(errorMessage);  // Display error message
-                        errorLabel.setVisible(true);  // Show the error label
-                    }
-                });
+                if (preferences.contains(email)) {
+                    showError("User already exists!");
+                } else {
+                    preferences.putString(email + "_password", password);
+                    preferences.putString(email + "_username", username);
+                    preferences.flush();
+                    hideLoading();
+                    game.setScreen(game.getStartupScreen()); // Switch screen on success
+                }
             }
         });
-
 
         backButton = new TextButton("Back", skin);
         backButton.addListener(new ClickListener() {
@@ -114,22 +98,16 @@ public class LoginScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 String email = emailField.getText();
                 String password = passwordField.getText();
-                showLoading();
-                // Call signIn with the callback
-                game.firebaseInterface.signIn(email, password, new FirebaseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        hideLoading();
-                        game.setScreen(game.getStartupScreen());  // Switch screen on success
-                    }
 
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        hideLoading();
-                        errorLabel.setText(errorMessage);  // Display error message
-                        errorLabel.setVisible(true);  // Show the error label
-                    }
-                });
+                showLoading();
+                if (!preferences.contains(email)) {
+                    showError("User does not exist!");
+                } else if (!preferences.getString(email + "_password").equals(password)) {
+                    showError("Incorrect password!");
+                } else {
+                    hideLoading();
+                    game.setScreen(game.getStartupScreen()); // Switch screen on success
+                }
             }
         });
 
@@ -162,7 +140,7 @@ public class LoginScreen implements Screen {
         // Add the loading indicator to the table
         table.add(loadingLabel).colspan(3).padTop(10).row(); // Position it below the buttons
         table.add(errorLabel).colspan(3);
-        //  table.setDebug(true);
+
         stage.addActor(table);
     }
 
@@ -178,6 +156,7 @@ public class LoginScreen implements Screen {
 
     private void showLoading() {
         loadingLabel.setVisible(true);
+        errorLabel.setVisible(false);
 
         backButton.setVisible(false);
         createUserButton.setVisible(false);
@@ -194,6 +173,12 @@ public class LoginScreen implements Screen {
         logInButton.setVisible(true);
 
         Gdx.graphics.setContinuousRendering(true); // Re-enable continuous rendering
+    }
+
+    private void showError(String message) {
+        hideLoading();
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
     }
 
     @Override

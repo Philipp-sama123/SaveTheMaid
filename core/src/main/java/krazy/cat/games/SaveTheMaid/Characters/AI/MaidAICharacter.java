@@ -20,24 +20,34 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimationType> {
     private final AnimationSetMaid animationSet;
-    protected static final float WALK_SPEED = 5f;
+    private static final float WALK_SPEED = 5f;
 
     private AnimationSetMaid.MaidAnimationType currentState;
     private AnimationSetMaid.MaidAnimationType previousState;
 
-    public MaidAICharacter(World world, Vector2 position) {
+    private Texture attackBarTexture;
+    private float saveProgress = 0f; // Ranges from 0 to 1
+    private final float attackBarYOffset = 30f; // Adjust to position the bar above the character
+    private final float attackCooldownTime = 3f; // Time to refill attack bar (seconds)
+    private float attackCooldownTimer = 0f;
 
+    public MaidAICharacter(World world, Vector2 position) {
         super(world, position);
         this.currentState = AnimationSetMaid.MaidAnimationType.IDLE;
+
+        // Load Maid sprite and animations
         Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.MAID_CHARACTER_BLACK, Texture.class);
         this.animationSet = new AnimationSetMaid(spriteSheet);
-        isFacingLeft = true;
 
+        // Load the attack bar texture
+        attackBarTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
+
+        isFacingLeft = true;
     }
 
     @Override
     public boolean canAttack() {
-        return true;
+        return true;// attackProgress >= 1f; // Maid can attack when progress is full
     }
 
     @Override
@@ -60,6 +70,7 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
         drawHealthBar(batch);
+        drawSaveBar(batch); // Draw the attack progress bar
 
         batch.draw(
             currentFrame,
@@ -89,6 +100,19 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         shape.dispose();
     }
 
+    private void drawSaveBar(Batch batch) {
+        float barWidth = attackBarTexture.getWidth() / PPM * saveProgress; // Scale width by progress
+        batch.setColor(1, 1, 1, 0.75f); // Add transparency to the bar
+        batch.draw(
+            attackBarTexture,
+            body.getPosition().x - (attackBarTexture.getWidth() / (2 * PPM)),
+            body.getPosition().y + attackBarYOffset / PPM,
+            barWidth,
+            attackBarTexture.getHeight() / PPM
+        );
+        batch.setColor(1, 1, 1, 1); // Reset color
+    }
+
 
     @Override
     public void moveToPlayer(Vector2 playerPosition) {
@@ -101,8 +125,13 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
 
     @Override
     public void attack() {
-        setAnimation(AnimationSetMaid.MaidAnimationType.IDLE);
+        if (!canAttack()) return;
+
+        setAnimation(AnimationSetMaid.MaidAnimationType.LAY);
         body.setLinearVelocity(0, 0);
+
+        // Reset attack progress and start cooldown
+        saveProgress += .10f;
     }
 
     @Override
@@ -118,24 +147,13 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
 
     @Override
     public void hit() {
-        Gdx.app.log("MAID", "TODO Implement! hit");
-        // body.setLinearVelocity(0, body.getLinearVelocity().y); // Stop horizontal movement
-
+        Gdx.app.log("MAID", "TODO Implement hit behavior");
     }
 
     @Override
     public void idle() {
         setAnimation(AnimationSetMaid.MaidAnimationType.IDLE);
         body.setLinearVelocity(0, 0);
-    }
-
-    @Override
-    public void dispose() {
-        if (world != null && body != null) {
-            if (attackCollider != null) body.destroyFixture(attackCollider);
-            world.destroyBody(body);
-            body = null;
-        }
     }
 
     private void adjustFacingDirection() {
@@ -160,7 +178,6 @@ public class MaidAICharacter extends BaseAICharacter<AnimationSetMaid.MaidAnimat
         currentState = animationType;
         stateTime = 0;
     }
-
 
     @Override
     public boolean isDeathAnimationComplete() {

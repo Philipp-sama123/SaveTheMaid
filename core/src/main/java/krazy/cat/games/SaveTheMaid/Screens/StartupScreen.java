@@ -27,7 +27,7 @@ public class StartupScreen implements Screen {
     private final Stage stage;
     private final Viewport viewport;
     Texture backgroundTexture;
-
+    private String userEmail;
     private Label greetingLabel;
 
     public StartupScreen(SaveTheMaidGame game) {
@@ -46,12 +46,6 @@ public class StartupScreen implements Screen {
         Texture logoutPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Exit.png")); // Add pressed texture
         // Set up Logout button
         ImageButton logoutButton = new ImageButton(new TextureRegionDrawable(logoutTexture), new TextureRegionDrawable(logoutPressedTexture));
-        logoutButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.firebaseInterface.logout();
-            }
-        });
 
         // Set up Play button
         ImageButton playButton = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
@@ -147,7 +141,6 @@ public class StartupScreen implements Screen {
     }
 
     private void updateGreetingText() {
-        String userEmail = game.firebaseInterface.getUserDisplayName();
         if (userEmail != null) {
             greetingLabel.setText("Hello, " + userEmail);
         } else {

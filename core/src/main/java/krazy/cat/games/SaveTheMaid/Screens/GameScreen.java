@@ -19,17 +19,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-import java.sql.Time;
-import java.sql.Timestamp;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.MaidAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
-import krazy.cat.games.SaveTheMaid.FirebaseCallback;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
@@ -207,21 +201,6 @@ public class GameScreen implements Screen {
     public void hide() {
         hud.disableInput();
         // Example Firebase usage
-        try {
-            game.firebaseInterface.writeData("/data", "Hello Firebase from: " + game.firebaseInterface.getUserEmail(), new FirebaseCallback() {
-                @Override
-                public void onSuccess() {
-                    Gdx.app.log("WRITE DATA !!", "Data written successfully to Firebase!");
-                }
-
-                @Override
-                public void onFailure(String errorMessage) {
-                    Gdx.app.log("WRITE DATA !!", "Failed to write data: " + errorMessage);
-                }
-            });
-        } catch (Exception exception) {
-            Gdx.app.error("ERROR CAUGHT game.firebaseInterface.writeData", exception.getMessage());
-        }
     }
 
     @Override

@@ -23,11 +23,8 @@ public class SaveTheMaidGame extends Game {
     private PauseScreen pauseScreen;
     private StartupScreen startupScreen;
 
-    public FirebaseInterface firebaseInterface;
 
-    public SaveTheMaidGame(FirebaseInterface firebaseInterface) {
-        this.firebaseInterface = firebaseInterface;
-    }
+    public SaveTheMaidGame() {}
 
     @Override
     public void create() {
