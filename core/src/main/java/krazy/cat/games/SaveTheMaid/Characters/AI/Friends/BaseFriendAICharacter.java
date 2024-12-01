@@ -10,15 +10,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.AI.StateMachine;
-import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 
 public abstract class BaseFriendAICharacter<T extends Enum<T>> {
     protected static final float MOVEMENT_SPEED = 15f / PPM;
-    protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
     public Sound ATTACK_SOUND = GameAssetManager.getInstance().get(AssetPaths.SWIPE_SOUND, Sound.class);
     public Sound HIT_SOUND = GameAssetManager.getInstance().get(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
@@ -34,6 +31,7 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
 
     protected boolean isFacingLeft = false;
     public boolean isDestroyed = false;
+    protected boolean isActive = false;
 
     public BaseFriendAICharacter(World world, Vector2 position) {
         this.world = world;
@@ -57,6 +55,7 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
     protected abstract void defineFriend(Vector2 position);
 
     public abstract void setAnimation(T animationType);
+    public abstract void jump();
 
     public abstract void moveToPlayer(Vector2 playerPosition);
 
@@ -72,4 +71,9 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
             body = null;
         }
     }
+
+    public void activate() {
+        isActive = true;
+    }
+
 }

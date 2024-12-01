@@ -25,20 +25,20 @@
             "scale": 0.4634,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 736.9443245576176,
-                "y": 6228.959861890376
+                "x": 3199.179974104445,
+                "y": 3199.179974104445
             }
         },
         "Level_2.tmx": {
-            "scale": 1.0893,
+            "scale": 3.3539,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 382.355641237492,
-                "y": 2978.5183145139085
+                "x": 1404.1861713229375,
+                "y": 2904.8272160768065
             }
         },
         "PlatformerAssets.tsx": {
-            "scaleInDock": 1.2877,
+            "scaleInDock": 0.7613,
             "scaleInEditor": 1
         }
     },

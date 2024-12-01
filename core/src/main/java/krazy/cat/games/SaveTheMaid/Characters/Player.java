@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
@@ -76,6 +77,7 @@ public class Player {
     private Sound hitSound;
     private Sound shootSound;
 
+    private BaseFriendAICharacter friendAICharacter;
 
     public Player(World world) {
         this.world = world;
@@ -220,6 +222,9 @@ public class Player {
             jumpEffectTime = 0;
             jumpSound.play();
             showJumpEffect = true;
+
+            if (friendAICharacter != null)
+                friendAICharacter.jump();
         }
     }
 
@@ -524,5 +529,9 @@ public class Player {
     public void onStartEnemyAttackCollision() {
         if (!isSliding)
             takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
+    }
+
+    public void setFriendReference(BaseFriendAICharacter friend) {
+        friendAICharacter = friend;
     }
 }

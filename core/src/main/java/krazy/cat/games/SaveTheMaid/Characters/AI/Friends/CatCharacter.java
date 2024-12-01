@@ -1,10 +1,13 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI.Friends;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_CAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_CAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -12,15 +15,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetCat;
-import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetCat;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -57,6 +57,11 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
         moveToPlayer(playerPosition);
     }
 
+    public void jump() {
+        body.setLinearVelocity(body.getLinearVelocity().x, 1.5f); // Scaled jump velocity
+        stateTime = 0;
+    }
+
     @Override
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
@@ -71,8 +76,6 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
             currentFrame.getRegionHeight() / PPM);
     }
 
-    private void adjustFacingDirection() {
-    }
 
     @Override
     protected void defineFriend(Vector2 position) {
@@ -91,6 +94,18 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
         fixtureDef.filter.maskBits = MASK_ENEMY;
         body.createFixture(fixtureDef).setUserData(this);
         shape.dispose();
+
+        // Sensor fixture for interactions
+        PolygonShape sensorShape = new PolygonShape();
+        sensorShape.setAsBox(8 / PPM, 10f / PPM); // Same size as the main fixture
+
+        FixtureDef sensorFixtureDef = new FixtureDef();
+        sensorFixtureDef.shape = sensorShape;
+        sensorFixtureDef.isSensor = true; // This makes it a sensor
+        sensorFixtureDef.filter.categoryBits = CATEGORY_CAT; // Same category as the main fixture
+        sensorFixtureDef.filter.maskBits = MASK_CAT;      // Only interacts with the player
+        body.createFixture(sensorFixtureDef).setUserData(this); // Unique userData for the sensor
+        sensorShape.dispose();
     }
 
     @Override
@@ -103,28 +118,29 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
 
     @Override
     public void moveToPlayer(Vector2 playerPosition) {
-        // Calculate the direction vector to the player
-        Vector2 direction = playerPosition.cpy().sub(body.getPosition());
+        if (isActive) {
+            // Calculate the direction vector to the player
+            Vector2 direction = playerPosition.cpy().sub(body.getPosition());
 
-        // If the cat is close to the player, stop movement and pause the animation
-        if (direction.len() < 0.1f) { // Adjust the threshold as needed
-            body.setLinearVelocity(0, 0);
-            setAnimation(AnimationSetCat.CatAnimationType.APPEAR); // Idle or appear animation
-            return;
-        }
+            // If the cat is close to the player, stop movement and pause the animation
+            if (direction.len() < 0.1f) { // Adjust the threshold as needed
+                body.setLinearVelocity(0, 0);
+                setAnimation(AnimationSetCat.CatAnimationType.APPEAR); // Idle or appear animation
+                return;
+            }
 
-        // Normalize the direction and apply movement speed
-        direction.nor().scl(MOVEMENT_SPEED);
+            // Normalize the direction and apply movement speed
+            direction.nor().scl(MOVEMENT_SPEED);
 
-        body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
+            body.setLinearVelocity(direction.x, body.getLinearVelocity().y);
 
-        // Adjust animation and facing direction based on movement
-        if (direction.x > 0) {
-            // Moving right
-            setAnimation(AnimationSetCat.CatAnimationType.WALK_RIGHT);
+            if (direction.x > 0) {
+                setAnimation(AnimationSetCat.CatAnimationType.WALK_RIGHT);
+            } else {
+                setAnimation(AnimationSetCat.CatAnimationType.WALK_LEFT);
+            }
         } else {
-            // Moving left
-            setAnimation(AnimationSetCat.CatAnimationType.WALK_LEFT);
+            setAnimation(AnimationSetCat.CatAnimationType.APPEAR);
         }
     }
 

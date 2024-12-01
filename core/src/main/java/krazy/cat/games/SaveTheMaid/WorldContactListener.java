@@ -1,5 +1,6 @@
 package krazy.cat.games.SaveTheMaid;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 
 public class WorldContactListener implements ContactListener {
@@ -14,11 +16,13 @@ public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_ENEMY = 0x0002;
     public static final short CATEGORY_PROJECTILE = 0x0004;
     public static final short CATEGORY_GROUND = 0x0008;
+    public static final short CATEGORY_CAT = 0x0010;
 
     public static final short MASK_GROUND_ONLY = CATEGORY_GROUND;
-    public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE;
+    public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_CAT;
     public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
-    public static final short MASK_PROJECTILE = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_GROUND;
+    public static final short MASK_PROJECTILE = CATEGORY_GROUND | CATEGORY_PLAYER | CATEGORY_ENEMY;
+    public static final short MASK_CAT = CATEGORY_GROUND | CATEGORY_PLAYER;
 
     @Override
     public void beginContact(Contact contact) {
@@ -41,6 +45,14 @@ public class WorldContactListener implements ContactListener {
             handleAttackCollision((Player) fixtureA.getUserData(), (BaseAICharacter) fixtureB.getUserData());
         } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseAICharacter) {
             handleAttackCollision((Player) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
+        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseFriendAICharacter) {
+            Gdx.app.log("AAAAA", "collision cat and player!!!");
+            ((BaseFriendAICharacter) fixtureA.getUserData()).activate();
+            ((Player) fixtureB.getUserData()).setFriendReference(((BaseFriendAICharacter) fixtureA.getUserData()));
+        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseFriendAICharacter) {
+            Gdx.app.log("AAAAA", "collision cat and player!!!");
+            ((BaseFriendAICharacter) fixtureA.getUserData()).activate();
+
         }
     }
 
