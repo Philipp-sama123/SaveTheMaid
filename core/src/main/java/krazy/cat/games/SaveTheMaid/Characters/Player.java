@@ -111,6 +111,7 @@ public class Player {
     public void update(float delta) {
         if (isDead) {
             handleDeath();
+            // ToDo: fix the end of the animation somehow (!)
         }
 
         stateTime += delta;
@@ -201,11 +202,6 @@ public class Player {
         }
 
     }
-
-    public Array<Projectile> getProjectiles() {
-        return projectiles;
-    }
-
 
     public void jump() {
         if (isSliding) return;
@@ -314,7 +310,7 @@ public class Player {
     private void handleDeath() {
         if (animationSetAgent.getCurrentFrame(currentAnimationState).isAnimationFinished(stateTime)) {
             stateTime = animationSetAgent.getCurrentFrame(currentAnimationState).getAnimationDuration();
-            // Additional logic here, like setting the player's speed to zero or triggering game over
+            return;
         }
         Gdx.app.log("handleDeath", "ToDo: Handle Death!!");
     }
@@ -523,7 +519,6 @@ public class Player {
         }
     }
 
-
     public void onStartEnemyAttackCollision() {
         if (!isSliding)
             takeDamage(5);  // Perform actual hit logic here, e.g., reducing health
@@ -535,5 +530,9 @@ public class Player {
 
     public void appleHeal() {
         currentHealth = maxHealth;
+    }
+
+    public Array<Projectile> getProjectiles() {
+        return projectiles;
     }
 }

@@ -192,6 +192,15 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
 
     @Override
     public boolean isDeathAnimationComplete() {
+        // - ToDo: fix the end Game (!)
+        //      -- ToDo: add Game Over Screen
+        //          -- ToDo: next Level
+        //          -- ToDo: showStats
+        //                  -- ToDo: Enemies Killed
+        //                  -- ToDo: Time
+        //                  -- ToDo: Time with Cat
+        //                  -- ToDo: Hits with Cat
+
         return animationSet.getAnimation(AnimationSetCat.CatAnimationType.DISAPPEAR).isAnimationFinished(stateTime);
     }
 }

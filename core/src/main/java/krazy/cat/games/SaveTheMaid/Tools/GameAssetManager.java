@@ -45,7 +45,6 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.HEALTH_BAR_ANIMATIONS, Texture.class);
         assetManager.load(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
 
-
         assetManager.load(AssetPaths.CAT_TEXTURE_2, Texture.class);
     }
 
