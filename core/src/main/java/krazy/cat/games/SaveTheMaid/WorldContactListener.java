@@ -11,6 +11,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Sprites.Apple;
 import krazy.cat.games.SaveTheMaid.Sprites.Goal;
 
 public class WorldContactListener implements ContactListener {
@@ -23,8 +24,10 @@ public class WorldContactListener implements ContactListener {
     public static final short MASK_GROUND_ONLY = CATEGORY_GROUND;
     public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_CAT;
     public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
+    public static final short MASK_ENEMY_BAT = CATEGORY_PROJECTILE;
     public static final short MASK_PROJECTILE = CATEGORY_GROUND | CATEGORY_PLAYER | CATEGORY_ENEMY;
     public static final short MASK_CAT = CATEGORY_GROUND | CATEGORY_PLAYER;
+
     @Override
     public void beginContact(Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
@@ -47,26 +50,20 @@ public class WorldContactListener implements ContactListener {
         } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseAICharacter) {
             handleAttackCollision((Player) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
         } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseFriendAICharacter) {
-            Gdx.app.log("AAAAA", "collision cat and player!!!");
-            ((BaseFriendAICharacter) fixtureA.getUserData()).activate( ((Player) fixtureB.getUserData()));
+            ((BaseFriendAICharacter) fixtureA.getUserData()).activate(((Player) fixtureB.getUserData()));
             ((Player) fixtureB.getUserData()).setFriendReference(((BaseFriendAICharacter) fixtureA.getUserData()));
         } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseFriendAICharacter) {
-            Gdx.app.log("AAAAA", "collision cat and player!!!");
             ((BaseFriendAICharacter) fixtureA.getUserData()).activate(((Player) fixtureB.getUserData()));
-        }
-
-
-        Object userDataA = fixtureA.getUserData();
-        Object userDataB = fixtureB.getUserData();
-        if (userDataA instanceof Goal && userDataB instanceof CatCharacter) {
-            ((Goal) userDataA).onCatCollision();
-            ((CatCharacter) userDataB).disappear();
-            Gdx.app.log("AAAAA", "collision cat and Goal!!!");
-
-        } else if (userDataB instanceof Goal && userDataA instanceof CatCharacter) {
-            ((Goal) userDataB).onCatCollision();
-            ((CatCharacter) userDataA).disappear();
-            Gdx.app.log("AAAAA", "collision cat and Goal!!!");
+        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Apple) {
+            ((Apple) fixtureB.getUserData()).onPlayerCollision((Player) fixtureA.getUserData());
+        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof Apple) {
+            ((Apple) fixtureA.getUserData()).onPlayerCollision((Player) fixtureB.getUserData());
+        } else if (fixtureA.getUserData() instanceof Goal && fixtureB.getUserData() instanceof CatCharacter) {
+            ((Goal) fixtureA.getUserData()).onCatCollision();
+            ((CatCharacter) fixtureB.getUserData()).disappear();
+        } else if (fixtureB.getUserData() instanceof Goal && fixtureA.getUserData() instanceof CatCharacter) {
+            ((Goal) fixtureB.getUserData()).onCatCollision();
+            ((CatCharacter) fixtureA.getUserData()).disappear();
         }
     }
 

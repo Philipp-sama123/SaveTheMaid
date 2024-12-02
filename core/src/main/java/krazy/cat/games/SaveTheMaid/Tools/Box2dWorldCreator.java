@@ -22,6 +22,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+import krazy.cat.games.SaveTheMaid.Sprites.Apple;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Goal;
 
@@ -55,8 +56,10 @@ public class Box2dWorldCreator {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             new Goal(world, map, rectangle); // Coins are using raw LibGDX coordinates, adjust internally if needed
         }
-        // Create Goal objects for "Coins" layer
+        // Create Goal objects for "Apple" layer
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
+            new Apple(world, rectangle);
         }
         // Create Brick objects for "Bricks" layer
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {

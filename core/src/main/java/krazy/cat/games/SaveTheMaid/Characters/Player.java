@@ -540,4 +540,8 @@ public class Player {
     public void setFriendReference(BaseFriendAICharacter friend) {
         friendAICharacter = friend;
     }
+
+    public void appleHeal() {
+        currentHealth = maxHealth;
+    }
 }

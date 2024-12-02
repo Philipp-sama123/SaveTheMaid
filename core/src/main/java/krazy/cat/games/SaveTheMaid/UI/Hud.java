@@ -148,7 +148,16 @@ public class Hud implements Disposable {
         buttonStyleShoot.down = new TextureRegionDrawable(shootTextureDown);
 
         shootButton = new ImageButton(buttonStyleShoot);
-        shootUpButton = new ImageButton(buttonStyleShoot);
+
+        Texture shootUpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingUp.png"));
+        Texture shootUpTextureDown = new Texture(Gdx.files.internal("UiSprites/Buttons/ShootingUpPressed.png"));
+
+        ImageButton.ImageButtonStyle buttonStyleShootUp = new ImageButton.ImageButtonStyle();
+
+        buttonStyleShootUp.up = new TextureRegionDrawable(shootUpTextureUp);
+        buttonStyleShootUp.down = new TextureRegionDrawable(shootUpTextureDown);
+
+        shootUpButton = new ImageButton(buttonStyleShootUp);
 
         Texture debugButtonTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Notifications.png"));
         Texture debugButtonTextureDown = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Notifications.png"));
@@ -173,10 +182,11 @@ public class Hud implements Disposable {
         Table buttonTable = new Table();
         buttonTable.setFillParent(true);
         buttonTable.center().right();
-        buttonTable.add(slideButton).size(25, 25).pad(5).row();
+
+        buttonTable.add(shootUpButton).size(25, 25).pad(5);
         buttonTable.add(jumpButton).size(25, 25).pad(5).row();
-        buttonTable.add(shootUpButton).size(25, 25).pad(5).row();
         buttonTable.add(shootButton).size(25, 25).pad(5);
+        buttonTable.add(slideButton).size(25, 25).pad(5);
         stage.addActor(buttonTable);
 
         Table debugTable = new Table();

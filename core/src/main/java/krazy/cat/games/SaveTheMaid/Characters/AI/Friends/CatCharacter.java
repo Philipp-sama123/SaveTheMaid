@@ -41,7 +41,7 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     public CatCharacter(World world, Vector2 position) {
         super(world, position);
 
-        this.currentState = AnimationSetCat.CatAnimationType.WALK_LEFT;
+        this.currentState = AnimationSetCat.CatAnimationType.APPEAR;
 
         Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.CAT_TEXTURE_2, Texture.class);
         this.animationSet = new AnimationSetCat(spriteSheet);

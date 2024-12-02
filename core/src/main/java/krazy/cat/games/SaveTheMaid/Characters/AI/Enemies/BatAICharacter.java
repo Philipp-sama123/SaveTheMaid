@@ -4,6 +4,7 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY_BAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
@@ -91,7 +92,7 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
         fixtureDef.shape = shape;
 
         fixtureDef.filter.categoryBits = CATEGORY_ENEMY;
-        fixtureDef.filter.maskBits = MASK_ENEMY;
+        fixtureDef.filter.maskBits = MASK_ENEMY_BAT;
         body.createFixture(fixtureDef).setUserData(this);
         shape.dispose();
         // Initialize the attack collider as a sensor initially
