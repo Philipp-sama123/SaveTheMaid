@@ -9,7 +9,9 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Sprites.Goal;
 
 public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_PLAYER = 0x0001;
@@ -23,7 +25,6 @@ public class WorldContactListener implements ContactListener {
     public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
     public static final short MASK_PROJECTILE = CATEGORY_GROUND | CATEGORY_PLAYER | CATEGORY_ENEMY;
     public static final short MASK_CAT = CATEGORY_GROUND | CATEGORY_PLAYER;
-
     @Override
     public void beginContact(Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
@@ -47,12 +48,25 @@ public class WorldContactListener implements ContactListener {
             handleAttackCollision((Player) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
         } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseFriendAICharacter) {
             Gdx.app.log("AAAAA", "collision cat and player!!!");
-            ((BaseFriendAICharacter) fixtureA.getUserData()).activate();
+            ((BaseFriendAICharacter) fixtureA.getUserData()).activate( ((Player) fixtureB.getUserData()));
             ((Player) fixtureB.getUserData()).setFriendReference(((BaseFriendAICharacter) fixtureA.getUserData()));
         } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseFriendAICharacter) {
             Gdx.app.log("AAAAA", "collision cat and player!!!");
-            ((BaseFriendAICharacter) fixtureA.getUserData()).activate();
+            ((BaseFriendAICharacter) fixtureA.getUserData()).activate(((Player) fixtureB.getUserData()));
+        }
 
+
+        Object userDataA = fixtureA.getUserData();
+        Object userDataB = fixtureB.getUserData();
+        if (userDataA instanceof Goal && userDataB instanceof CatCharacter) {
+            ((Goal) userDataA).onCatCollision();
+            ((CatCharacter) userDataB).disappear();
+            Gdx.app.log("AAAAA", "collision cat and Goal!!!");
+
+        } else if (userDataB instanceof Goal && userDataA instanceof CatCharacter) {
+            ((Goal) userDataB).onCatCollision();
+            ((CatCharacter) userDataA).disappear();
+            Gdx.app.log("AAAAA", "collision cat and Goal!!!");
         }
     }
 
@@ -89,6 +103,4 @@ public class WorldContactListener implements ContactListener {
     public void postSolve(Contact contact, ContactImpulse impulse) {
 
     }
-
-
 }

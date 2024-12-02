@@ -23,7 +23,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
-import krazy.cat.games.SaveTheMaid.Sprites.Coin;
+import krazy.cat.games.SaveTheMaid.Sprites.Goal;
 
 public class Box2dWorldCreator {
     public Box2dWorldCreator(World world, TiledMap map, GameScreen gameScreen) {
@@ -50,36 +50,19 @@ public class Box2dWorldCreator {
             body.createFixture(fixtureDef).setUserData("environment");
         }
 
-        // Create bodies for "Pipes" layer
+        // Create bodies for "Goal" layer
         for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2) / PPM,
-                (rectangle.getY() + rectangle.getHeight() / 2) / PPM); // Adjusted for PPM
-            body = world.createBody(bodyDef);
-
-            shape.setAsBox((rectangle.getWidth() / 2) / PPM,
-                (rectangle.getHeight() / 2) / PPM); // Adjusted for PPM
-            fixtureDef.shape = shape;
-            fixtureDef.filter.categoryBits = CATEGORY_GROUND;
-            fixtureDef.filter.maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_PROJECTILE;
-
-            body.createFixture(fixtureDef).setUserData("environment");
+            new Goal(world, map, rectangle); // Coins are using raw LibGDX coordinates, adjust internally if needed
         }
-
-        // Create Coin objects for "Coins" layer
+        // Create Goal objects for "Coins" layer
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            new Coin(world, map, rectangle); // Coins are using raw LibGDX coordinates, adjust internally if needed
         }
-
         // Create Brick objects for "Bricks" layer
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             new Brick(world, map, rectangle); // Bricks are using raw LibGDX coordinates, adjust internally if needed
         }
-
         // Create enemies for "SpawnPoints" layer
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
@@ -92,7 +75,7 @@ public class Box2dWorldCreator {
                 rectangle.y / PPM))); // Adjusted for PPM
         }
 
-        // Create Maid objects for "SpawnPointsMaid" layer
+        // Create Friend objects for "SpawnPointsFriend" layer
         for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             gameScreen.addCat(new CatCharacter(world, new Vector2(rectangle.x / PPM,

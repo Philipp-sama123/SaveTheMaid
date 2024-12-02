@@ -439,7 +439,7 @@
   <object id="122" x="896.691" y="5506.86" width="93.6239" height="57.3043"/>
   <object id="123" x="896.691" y="5344.63" width="93.6239" height="92.0097"/>
  </objectgroup>
- <objectgroup id="4" name="Pipes"/>
+ <objectgroup id="4" name="Goal"/>
  <objectgroup id="5" name="Coins"/>
  <objectgroup id="6" name="Bricks"/>
  <objectgroup id="8" name="SpawnPoints">
@@ -476,7 +476,7 @@
   <object id="102" x="5557.28" y="6333.49" width="39.9269" height="33.8364"/>
   <object id="103" x="3932.93" y="5535.33" width="37.1257" height="34.7305"/>
  </objectgroup>
- <objectgroup id="9" name="SpawnPointsMaid">
+ <objectgroup id="9" name="SpawnPointsFriend">
   <object id="104" x="4328.32" y="5538.9" width="37.1257" height="27.5449"/>
   <object id="105" x="4436.88" y="5541.31" width="37.1257" height="27.5449"/>
   <object id="106" x="6214.85" y="6337.61" width="37.1257" height="27.5449"/>

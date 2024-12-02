@@ -243,6 +243,8 @@ public class Player {
         // Set animation state to slide or slide+shoot
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
 
+        if (friendAICharacter != null)
+            friendAICharacter.slide();
     }
 
     // Method to rotate the collider for sliding
@@ -267,6 +269,10 @@ public class Player {
 
         body.createFixture(slideFixtureDef).setUserData(this);
         rotatedShape.dispose();
+    }
+
+    public void removeFriend() {
+        friendAICharacter = null;
     }
 
     // Restore the original collider
@@ -349,7 +355,7 @@ public class Player {
 
 
     public void shootUp() {
-        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f / PPM;
+        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f; // ToDo: Make this ground check general
 
         if (isGrounded && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;

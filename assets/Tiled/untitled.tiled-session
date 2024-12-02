@@ -23,18 +23,22 @@
         },
         "Level_1.tmx": {
             "scale": 0.4634,
-            "selectedLayer": 0,
+            "selectedLayer": 7,
             "viewCenter": {
                 "x": 3199.179974104445,
                 "y": 3199.179974104445
             }
         },
         "Level_2.tmx": {
-            "scale": 3.3539,
-            "selectedLayer": 7,
+            "expandedObjectLayers": [
+                5,
+                8
+            ],
+            "scale": 4.5533,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 1404.1861713229375,
-                "y": 2904.8272160768065
+                "x": 174.269211341225,
+                "y": 2995.7393538752112
             }
         },
         "PlatformerAssets.tsx": {
