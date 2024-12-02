@@ -14,8 +14,7 @@ public class AssetPaths {
     public static final String HEALTH_BAR_SIMPLE = "UiSprites/HealthBars/HealthBar_Simple.png";
 
     // Player Assets
-    public static final String PLAYER_BODY_TEXTURE = "Characters/FemaleAgent/Body/Black.png";
-    public static final String PLAYER_FEET_TEXTURE = "Characters/FemaleAgent/Feet/Red.png";
+    public static final String PLAYER_TEXTURE = "Characters/FemaleAgent/Full/Red.png";
     public static final String PLAYER_JUMP_EFFECT_TEXTURE = "JumpEffect.png";
     public static final String PLAYER_BLOOD_EFFECT_TEXTURE = "PlayerBloodEffect.png";
     public static final String AGENT_PIXEL_BULLET_TEXTURE = "Characters/FemaleAgent/PixelBullet16x16.png";

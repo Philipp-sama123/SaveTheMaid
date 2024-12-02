@@ -83,8 +83,7 @@ public class Player {
         this.world = world;
 
         animationSetAgent = new AnimationSetFemaleAgent(
-            GameAssetManager.getInstance().get(AssetPaths.PLAYER_BODY_TEXTURE, Texture.class),
-            GameAssetManager.getInstance().get(AssetPaths.PLAYER_FEET_TEXTURE, Texture.class)
+            GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
         );
 
         Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
@@ -178,7 +177,7 @@ public class Player {
 
     public void draw(Batch batch) {
         setBatchColorForDamage(batch);
-        drawAnimation(batch, getCurrentUpperBodyFrame(), getCurrentLowerBodyFrame());
+        drawAnimation(batch, getCurrentUpperBodyFrame());
         batch.setColor(1, 1, 1, 1);
 
         for (Projectile projectile : projectiles) {
@@ -313,8 +312,8 @@ public class Player {
     }
 
     private void handleDeath() {
-        if (animationSetAgent.getUpperBodyAnimation(currentAnimationState).isAnimationFinished(stateTime)) {
-            stateTime = animationSetAgent.getUpperBodyAnimation(currentAnimationState).getAnimationDuration();
+        if (animationSetAgent.getCurrentFrame(currentAnimationState).isAnimationFinished(stateTime)) {
+            stateTime = animationSetAgent.getCurrentFrame(currentAnimationState).getAnimationDuration();
             // Additional logic here, like setting the player's speed to zero or triggering game over
         }
         Gdx.app.log("handleDeath", "ToDo: Handle Death!!");
@@ -405,12 +404,9 @@ public class Player {
     }
 
     private TextureRegion getCurrentUpperBodyFrame() {
-        return animationSetAgent.getUpperBodyFrame(currentAnimationState, stateTime, true);
+        return animationSetAgent.getCurrentFrame(currentAnimationState, stateTime, true);
     }
 
-    private TextureRegion getCurrentLowerBodyFrame() {
-        return animationSetAgent.getLowerBodyFrame(currentAnimationState, stateTime, true);
-    }
 
     private void updateProjectiles(float delta) {
         for (int i = projectiles.size - 1; i >= 0; i--) {
@@ -430,8 +426,7 @@ public class Player {
     }
 
     private void handleShootingAnimation() {
-
-        Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
+        Animation<TextureRegion> shootAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
         if (shootAnimation.isAnimationFinished(stateTime)) {
             isShooting = false;
             stateTime = 0f;
@@ -440,7 +435,7 @@ public class Player {
     }
 
     private void handleShootingUpAnimation() {
-        Animation<TextureRegion> shootAnimation = animationSetAgent.getUpperBodyAnimation(currentAnimationState);
+        Animation<TextureRegion> shootAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
         if (shootAnimation.isAnimationFinished(stateTime)) {
             isShootingUp = false;
             stateTime = 0f;
@@ -480,9 +475,8 @@ public class Player {
     }
 
     private void adjustFrameOrientation() {
-        if (isFacingRight != animationSetAgent.isUpperBodyFramesFlipped()) {
-            animationSetAgent.flipUpperBodyFramesHorizontally();
-            animationSetAgent.flipLowerBodyFramesHorizontally();
+        if (isFacingRight != animationSetAgent.isFlipped()) {
+            animationSetAgent.flipFramesHorizontally();
         }
     }
 
@@ -519,15 +513,13 @@ public class Player {
         }
     }
 
-    private void drawAnimation(Batch batch, TextureRegion upperBodyFrame, TextureRegion lowerBodyFrame) {
+    private void drawAnimation(Batch batch, TextureRegion currentFrame) {
         float posX = isFacingRight ? body.getPosition().x - 26 / PPM : body.getPosition().x - 36 / PPM;
         float posY = body.getPosition().y - 24 / PPM;
         if (isSliding) {
-            batch.draw(upperBodyFrame, posX, body.getPosition().y - 36 / PPM, 64 / PPM, 64 / PPM);
-            batch.draw(lowerBodyFrame, posX, body.getPosition().y - 36 / PPM, 64 / PPM, 64 / PPM);
+            batch.draw(currentFrame, posX, body.getPosition().y - 36 / PPM, 64 / PPM, 64 / PPM);
         } else {
-            batch.draw(upperBodyFrame, posX, posY, 64 / PPM, 64 / PPM);
-            batch.draw(lowerBodyFrame, posX, posY, 64 / PPM, 64 / PPM);
+            batch.draw(currentFrame, posX, posY, 64 / PPM, 64 / PPM);
         }
     }
 

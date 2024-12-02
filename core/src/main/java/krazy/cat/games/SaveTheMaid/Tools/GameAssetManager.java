@@ -34,8 +34,7 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.MAID_CHARACTER_BLACK, Texture.class);
 
         // Player Assets
-        assetManager.load(AssetPaths.PLAYER_BODY_TEXTURE, Texture.class);
-        assetManager.load(AssetPaths.PLAYER_FEET_TEXTURE, Texture.class);
+        assetManager.load(AssetPaths.PLAYER_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
