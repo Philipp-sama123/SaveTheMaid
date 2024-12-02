@@ -57,6 +57,7 @@ public class GameScreen implements Screen {
     // Map dimensions in pixels
     public int mapWidthInPixels;
     public int mapHeightInPixels;
+    public int enemiesKilled;
 
     public Player getPlayer() {
         return player;
@@ -64,7 +65,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
-
+        enemiesKilled = 0;
         // Initialize HUD with a separate camera and viewport
         this.uiCamera = new OrthographicCamera();
         this.uiViewport = new StretchViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
@@ -101,7 +102,7 @@ public class GameScreen implements Screen {
         new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
 
-        player = new Player(world);
+        player = new Player(world, this);
 
         // Calculate map size
         int mapWidthInTiles = map.getProperties().get("width", Integer.class);
@@ -221,5 +222,13 @@ public class GameScreen implements Screen {
 
     public void addCat(BaseFriendAICharacter cat) {
         friends.add(cat);
+    }
+
+    public void showGameOverScreen() {
+        game.setScreen(new GameOverScreen(game, hud.worldTimer, enemiesKilled));
+    }
+
+    public void addEnemyKill() {
+        enemiesKilled += 1;
     }
 }

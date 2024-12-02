@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
@@ -35,6 +36,7 @@ public class Player {
     private final int JUMP_EFFECT_Y_OFFSET = 40;
     private final int BLOOD_EFFECT_X_OFFSET = 25;
     private final float SLIDE_COLLIDER_VERTICAL_OFFSET = -32 / PPM;
+    private GameScreen gameScreen = null;
 
     private int jumpCount = 0;
 
@@ -82,6 +84,35 @@ public class Player {
     public Player(World world) {
         this.world = world;
 
+        animationSetAgent = new AnimationSetFemaleAgent(
+            GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
+        );
+
+        Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
+        Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
+
+        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
+        Array<TextureRegion> jumpFrames = new Array<>();
+        for (int i = 0; i < 4; i++) {
+            jumpFrames.add(tmpFrames[0][i]);  // Assuming there's only one row with four frames
+        }
+        jumpEffectAnimation = new Animation<>(0.1f, jumpFrames, Animation.PlayMode.NORMAL);
+
+        TextureRegion[][] tmpFramesBlood = TextureRegion.split(bloodSpriteSheet, 110, 86);
+
+        Array<TextureRegion> bloodFrames = new Array<>();
+        for (int i = 0; i < 4; i++) {
+            bloodFrames.add(tmpFramesBlood[0][i]);  // Assuming there's only one row with four frames
+        }
+        bloodEffectAnimation = new Animation<>(0.1f, bloodFrames, Animation.PlayMode.NORMAL);
+
+        definePlayer();
+        initializeSounds();
+    }
+
+    public Player(World world, GameScreen gameScreen) {
+        this.world = world;
+        this.gameScreen = gameScreen;
         animationSetAgent = new AnimationSetFemaleAgent(
             GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
         );
@@ -310,6 +341,9 @@ public class Player {
     private void handleDeath() {
         if (animationSetAgent.getCurrentFrame(currentAnimationState).isAnimationFinished(stateTime)) {
             stateTime = animationSetAgent.getCurrentFrame(currentAnimationState).getAnimationDuration();
+            if(gameScreen!=null) {
+                gameScreen.showGameOverScreen();
+            }
             return;
         }
         Gdx.app.log("handleDeath", "ToDo: Handle Death!!");

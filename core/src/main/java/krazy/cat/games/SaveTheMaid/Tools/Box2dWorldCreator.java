@@ -71,11 +71,11 @@ public class Box2dWorldCreator {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
 
             gameScreen.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                (rectangle.y + 100) / PPM))); // Adjusted for PPM
+                (rectangle.y + 100) / PPM), gameScreen)); // Adjusted for PPM
             gameScreen.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM))); // Adjusted for PPM
+                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
             gameScreen.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                rectangle.y / PPM))); // Adjusted for PPM
+                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
         }
 
         // Create Friend objects for "SpawnPointsFriend" layer

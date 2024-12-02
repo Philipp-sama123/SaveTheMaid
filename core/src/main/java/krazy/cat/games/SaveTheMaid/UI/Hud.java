@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import javax.swing.text.View;
 
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
+import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -37,7 +38,7 @@ public class Hud implements Disposable {
     public Stage stage;
     public Viewport viewport;
 
-    private Integer worldTimer;
+    public Integer worldTimer;
     private float timeCount;
     private Integer health;
     private Image healthBar;

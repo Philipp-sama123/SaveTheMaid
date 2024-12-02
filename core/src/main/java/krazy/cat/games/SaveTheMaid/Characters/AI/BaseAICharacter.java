@@ -14,6 +14,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
+import krazy.cat.games.SaveTheMaid.Screens.GameOverScreen;
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -47,10 +49,11 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     protected Texture healthBar;
     protected float healthBarYOffset = 15;
+    protected GameScreen gameScreen = null;
 
-
-    public BaseAICharacter(World world, Vector2 position) {
+    public BaseAICharacter(World world, Vector2 position, GameScreen gameScreen) {
         this.world = world;
+        this.gameScreen = gameScreen;
         this.stateTime = 0f;
 
         healthBar = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
@@ -139,7 +142,11 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
         batch.setColor(1, 1, 1, 1);
 
     }
-
+public void addKillToGameScreen() {
+        if(gameScreen!= null) {
+            gameScreen.addEnemyKill();
+        }
+ }
     public void dispose() {
         if (world != null && body != null) {
             if (attackCollider != null) body.destroyFixture(attackCollider);

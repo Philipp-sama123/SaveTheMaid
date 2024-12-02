@@ -20,6 +20,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -29,8 +31,8 @@ public class BatAICharacter extends BaseAICharacter<AnimationSetBat.BatAnimation
     private AnimationSetBat.BatAnimationType currentState;
     private AnimationSetBat.BatAnimationType previousState;
 
-    public BatAICharacter(World world, Vector2 position) {
-        super(world, position);
+    public BatAICharacter(World world, Vector2 position, GameScreen gameScreen) {
+        super(world, position, gameScreen);
         this.currentState = AnimationSetBat.BatAnimationType.MOVE1;
 
         Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.BAT_TEXTURE, Texture.class);
