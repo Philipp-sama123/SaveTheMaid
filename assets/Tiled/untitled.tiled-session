@@ -34,15 +34,15 @@
                 5,
                 8
             ],
-            "scale": 4.5533,
-            "selectedLayer": 3,
+            "scale": 3.0692,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 174.269211341225,
-                "y": 2995.7393538752112
+                "x": 764.5314739997393,
+                "y": 1515.8673269907467
             }
         },
         "PlatformerAssets.tsx": {
-            "scaleInDock": 0.7613,
+            "scaleInDock": 1.1961,
             "scaleInEditor": 1
         }
     },
