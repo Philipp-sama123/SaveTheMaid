@@ -31,14 +31,14 @@
         },
         "Level_2.tmx": {
             "expandedObjectLayers": [
-                5,
-                8
+                8,
+                5
             ],
-            "scale": 3.0692,
+            "scale": 1.3385,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 764.5314739997393,
-                "y": 1515.8673269907467
+                "x": 1221.8901755696675,
+                "y": 2140.829286514755
             }
         },
         "PlatformerAssets.tsx": {

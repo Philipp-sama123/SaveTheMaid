@@ -9,7 +9,7 @@ public class DeathState implements State {
     public void enter(BaseAICharacter enemy) {
         enemy.DEATH_SOUND.play();
         enemy.die();
-        enemy.addKillToGameScreen();
+        enemy.registerKillOnGameScreen(); // ToDo: remove and improve as soon as possible (!)
     }
 
     @Override

@@ -18,6 +18,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.*;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
+import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
@@ -57,10 +58,12 @@ public class GameScreen implements Screen {
     public final int mapWidthInPixels;
     public final int mapHeightInPixels;
     private int enemiesKilled;
+    private int catsSaved;
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
         this.enemiesKilled = 0;
+        this.catsSaved = 0;
 
         // Initialize Cameras and Viewports
         this.uiCamera = new OrthographicCamera();
@@ -119,10 +122,12 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
     public void hide() {
@@ -253,9 +258,17 @@ public class GameScreen implements Screen {
 
     public void addEnemyKill() {
         enemiesKilled++;
+        ScoreSystemManager.getInstance().addScore(10);
+        hud.updateScore();
+    }
+
+    public void addCatSaved() {
+        catsSaved++;
+        ScoreSystemManager.getInstance().addScore(100);
+        hud.updateScore();
     }
 
     public void showGameOverScreen() {
-        game.setScreen(new GameOverScreen(game, hud.getWorldTimer(), enemiesKilled));
+        game.setScreen(new GameOverScreen(game, hud.getWorldTimer(), enemiesKilled, catsSaved));
     }
 }

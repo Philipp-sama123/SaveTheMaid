@@ -14,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
-import krazy.cat.games.SaveTheMaid.Screens.GameOverScreen;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
@@ -23,6 +22,7 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     protected static float ATTACK_RANGE = 25f / PPM;
+    protected static float PLAYER_SEARCH_DISTANCE = 300 / PPM;
     protected static final float MOVEMENT_SPEED = 15f / PPM;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
 
@@ -105,7 +105,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     }
 
     public boolean isPlayerInRange(Vector2 playerPosition) {
-        return body.getPosition().dst(playerPosition) < 500;
+        return body.getPosition().dst(playerPosition) < PLAYER_SEARCH_DISTANCE;
     }
 
     protected abstract void defineEnemy(Vector2 position);
@@ -142,11 +142,13 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
         batch.setColor(1, 1, 1, 1);
 
     }
-public void addKillToGameScreen() {
-        if(gameScreen!= null) {
+
+    public void registerKillOnGameScreen() {
+        if (gameScreen != null) {
             gameScreen.addEnemyKill();
         }
- }
+    }
+
     public void dispose() {
         if (world != null && body != null) {
             if (attackCollider != null) body.destroyFixture(attackCollider);

@@ -1,12 +1,8 @@
 package krazy.cat.games.SaveTheMaid.UI;
 
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,16 +17,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import javax.swing.text.View;
-
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
-import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
+import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
 
 public class Hud implements Disposable {
     private SaveTheMaidGame game;
@@ -38,18 +30,19 @@ public class Hud implements Disposable {
     public Stage stage;
     public Viewport viewport;
 
-    public Integer worldTimer;
+    private Integer worldTimer;
     private float timeCount;
     private Integer health;
+
+    private Label countdownLabel;
+    private Label timeLabel;
+    private Label levelLabel;
+    private Label worldLabel;
+    private Label playerLabel;
+    private Label scoreLabel; // NEW: Label to display the score
+    private Label highScoreLabel; // NEW: Label for the high score
+
     private Image healthBar;
-    private Image healthBarBackground;
-    Label countdownLabel;
-
-    Label timeLabel;
-    Label levelLabel;
-    Label worldLabel;
-    Label playerLabel;
-
     private ImageButton jumpButton;
     private ImageButton shootButton;
     private ImageButton shootUpButton;
@@ -60,55 +53,62 @@ public class Hud implements Disposable {
 
     private boolean jumpPressed = false;
 
+
     public Hud(SaveTheMaidGame game, Viewport viewport) {
-        worldTimer = 0;
-        timeCount = 0;
-        health = 0;
         this.game = game;
-        // Use StretchViewport for the HUD
         this.viewport = viewport;
+        this.worldTimer = 0;
+        this.timeCount = 0;
+        this.health = 100; // Default health value
+
+        // Set up stage and viewport
         stage = new Stage(viewport, game.batch);
 
+        // Initialize the table layout
         Table table = new Table();
         table.top();
         table.setFillParent(true);
 
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(0.5f); // Adjust font scaling for StretchViewport
+        font.getData().setScale(0.5f);
 
+        // Labels
         countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
-
         timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
         levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
         worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
         playerLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
-        // Add the health bar to a new Table
+        scoreLabel = new Label("Score: " + ScoreSystemManager.getInstance().getScore(), new Label.LabelStyle(font, Color.YELLOW)); // Initial score display
+        highScoreLabel = new Label(("High Score: " + ScoreSystemManager.getInstance().getHighScore()), new Label.LabelStyle(font, Color.GREEN)); // Initial high score
+
+        // Health Bar
         Texture healthBarTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
         Texture healthBarBackgroundTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_CONTAINER, Texture.class);
 
         healthBar = new Image(new TextureRegionDrawable(new TextureRegion(healthBarTexture)));
-        healthBarBackground = new Image(new TextureRegionDrawable(new TextureRegion(healthBarBackgroundTexture)));
 
         Stack healthStack = new Stack();
-        healthStack.add(healthBar); // Add the health bar first
-        healthStack.add(healthBarBackground); // Add the health label over the health bar
+        healthStack.add(healthBar);
+
+        // Arrange UI elements in the table
         table.add(healthStack).expandX();
         table.add().expandX();
         table.add(timeLabel).expandX();
+        table.add(scoreLabel).expandX(); // Add score to the HUD
         table.row();
-        table.add().expandX();
+        table.add(playerLabel).expandX();
         table.add().expandX();
         table.add(countdownLabel).expandX();
+        table.add(highScoreLabel).expandX(); // Add high score to the HUD
 
         stage.addActor(table);
 
-        // Initialize other UI components
+        // Initialize controls
         createMovementJoystick();
         createButtons();
     }
 
     public void enableInput() {
-        // Initialize InputMultiplexer
         if (inputMultiplexer == null) {
             inputMultiplexer = new InputMultiplexer();
             inputMultiplexer.addProcessor(stage);
@@ -119,7 +119,6 @@ public class Hud implements Disposable {
     public void disableInput() {
         Gdx.input.setInputProcessor(null);
     }
-
 
     private void createButtons() {
         Texture jumpTextureUp = new Texture(Gdx.files.internal("UiSprites/Buttons/Jump.png"));
@@ -257,13 +256,17 @@ public class Hud implements Disposable {
         stage.addActor(table);
     }
 
-    // Method to update the timer and display in the HUD
+    public void updateScore() {
+        scoreLabel.setText("Score: " + ScoreSystemManager.getInstance().getScore());
+        highScoreLabel.setText("High Score: " + ScoreSystemManager.getInstance().getHighScore());
+    }
+
     public void update(float deltaTime) {
         timeCount += deltaTime;
 
-        if (timeCount >= 1) {  // Decrement timer every second
+        if (timeCount >= 1) {
             worldTimer++;
-            countdownLabel.setText(String.format("%03d", worldTimer));  // Update label
+            countdownLabel.setText(String.format("%03d", worldTimer));
             timeCount = 0;
         }
 
@@ -291,21 +294,8 @@ public class Hud implements Disposable {
     }
 
     public void updateHealth(int currentHealth, int maxHealth) {
-        if (currentHealth < 0) currentHealth = 0;
-        if (currentHealth > maxHealth) currentHealth = maxHealth;
-
-        // Calculate the new width of the health bar based on the health percentage
-        float healthPercentage = (float) currentHealth / maxHealth;
-        float originalWidth = healthBar.getPrefWidth(); // Assuming this gives the original texture width
-        float newWidth = originalWidth * healthPercentage;
-
-        // Update the width of the health bar
-        healthBar.setWidth(newWidth);
-
-        // Optionally reposition the health bar to keep it aligned correctly within the background
-        float healthBarX = healthBarBackground.getX();
-        healthBar.setPosition(healthBarX, healthBar.getY());
-
+        currentHealth = Math.max(0, Math.min(currentHealth, maxHealth));
+        healthBar.setWidth(healthBar.getPrefWidth() * (float) currentHealth / maxHealth);
     }
 
     @Override

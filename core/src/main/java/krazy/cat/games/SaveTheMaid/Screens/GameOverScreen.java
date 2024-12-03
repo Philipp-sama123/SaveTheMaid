@@ -21,15 +21,11 @@ import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class GameOverScreen implements Screen {
     private final SaveTheMaidGame game;
-    private final float timePlayed; // Time played in seconds
-    private final int enemiesKilled; // Time played in seconds
     private Stage stage;
     private Texture backgroundTexture;
 
-    public GameOverScreen(SaveTheMaidGame game, float timePlayed, int enemiesKilled) {
+    public GameOverScreen(SaveTheMaidGame game, float timePlayed, int enemiesKilled,int catsSaved) {
         this.game = game;
-        this.timePlayed = timePlayed;
-        this.enemiesKilled = enemiesKilled;
 
         stage = new Stage(new FitViewport(GAME_WIDTH, GAME_HEIGHT));
 
@@ -53,6 +49,9 @@ public class GameOverScreen implements Screen {
 
         // Enemies Killed label
         Label enemiesKilledLabel = new Label("Enemies killed: " + enemiesKilled, skin);
+
+        // Cats Saved label
+        Label catsSavedLabel = new Label("Cats Saved: " + catsSaved, skin);
 
         // Buttons
         TextButton mainMenuButton = new TextButton("Main Menu", skin);
@@ -85,8 +84,9 @@ public class GameOverScreen implements Screen {
         uiTable.setFillParent(true);
         uiTable.center();
         uiTable.add(gameOverLabel).padBottom(10).row();
-        uiTable.add(timeLabel).padBottom(10).row();
-        uiTable.add(enemiesKilledLabel).padBottom(10).row();
+        uiTable.add(timeLabel).padBottom(5).row();
+        uiTable.add(enemiesKilledLabel).padBottom(5).row();
+        uiTable.add(catsSavedLabel).padBottom(5).row();
         uiTable.add(mainMenuButton).size(100, 25).padBottom(5).row();
         uiTable.add(replayButton).size(100, 25);
 

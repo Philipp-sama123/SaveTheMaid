@@ -48,6 +48,10 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.CAT_TEXTURE_2, Texture.class);
     }
 
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+
     public <T> T get(String assetPath, Class<T> type) {
         return assetManager.get(assetPath, type);
     }

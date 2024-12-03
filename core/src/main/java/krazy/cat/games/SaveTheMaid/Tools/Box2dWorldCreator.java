@@ -82,7 +82,7 @@ public class Box2dWorldCreator {
         for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             gameScreen.addCat(new CatCharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM))); // Adjusted for PPM
+                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
         }
 
         shape.dispose();

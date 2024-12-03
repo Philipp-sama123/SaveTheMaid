@@ -3,12 +3,8 @@ package krazy.cat.games.SaveTheMaid.Characters.AI.Friends;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_CAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_CAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,9 +15,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSet;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetCat;
-import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
+import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -38,8 +33,8 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
 
     private static final float MOVEMENT_SPEED = .25f; // Adjust speed as necessary
 
-    public CatCharacter(World world, Vector2 position) {
-        super(world, position);
+    public CatCharacter(World world, Vector2 position, GameScreen gameScreen) {
+        super(world, position,gameScreen);
 
         this.currentState = AnimationSetCat.CatAnimationType.APPEAR;
 
@@ -48,16 +43,16 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     }
 
     public void update(float dt, Vector2 playerPosition) {
-        if (isDestroyed && !isDeathAnimationComplete()) {
+        if (isDestroyed && !isDisappearAnimationComplete()) {
             disableCollision();
             return;
         }
-        if (isDestroyed && isDeathAnimationComplete()) {
+        if (isDestroyed && isDisappearAnimationComplete()) {
             dispose();
             return;
         }
 
-        if (markedForDisposal && isDeathAnimationComplete()) {
+        if (markedForDisposal && isDisappearAnimationComplete()) {
             dispose();
             return;
         }
@@ -81,13 +76,14 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
             setAnimation(AnimationSetCat.CatAnimationType.DISAPPEAR);
             markedForDisposal = true;
             disableCollision();
+            registerSavedFriend();// ToDo: clean up as soon as possible
         }
         playerReference.removeFriend();
     }
 
     @Override
     public void draw(Batch batch) {
-        if ((isDestroyed || markedForDisposal) && isDeathAnimationComplete()) return;
+        if ((isDestroyed || markedForDisposal) && isDisappearAnimationComplete()) return;
 
         boolean looping = currentState != AnimationSetCat.CatAnimationType.DISAPPEAR;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
@@ -191,7 +187,7 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     }
 
     @Override
-    public boolean isDeathAnimationComplete() {
+    public boolean isDisappearAnimationComplete() {
         // - ToDo: fix the end Game (!)
         //      -- ToDo: add Game Over Screen
         //          -- ToDo: next Level
@@ -200,7 +196,7 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
         //                  -- ToDo: Time
         //                  -- ToDo: Time with Cat
         //                  -- ToDo: Hits with Cat
-
+        // ToDo:  I really don't like this approach also in Enemies!!!
         return animationSet.getAnimation(AnimationSetCat.CatAnimationType.DISAPPEAR).isAnimationFinished(stateTime);
     }
 }
