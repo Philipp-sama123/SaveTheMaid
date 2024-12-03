@@ -307,9 +307,13 @@ public class Hud implements Disposable {
         healthBar.setPosition(healthBarX, healthBar.getY());
 
     }
+
     @Override
     public void dispose() {
         stage.dispose();
     }
 
+    public float getWorldTimer() {
+        return worldTimer;
+    }
 }

@@ -1,210 +1,132 @@
 package krazy.cat.games.SaveTheMaid.Screens;
 
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.*;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.*;
 
-import java.util.List;
-
-import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
+import krazy.cat.games.SaveTheMaid.*;
+import krazy.cat.games.SaveTheMaid.Characters.AI.*;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
-import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
-import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
+import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class GameScreen implements Screen {
+    // Core game and player references
     private final SaveTheMaidGame game;
     private final Player player;
 
-    private Viewport gameViewport, uiViewport;
-    private OrthographicCamera gameCamera, uiCamera;
-    private Hud hud;
+    // Cameras and Viewports
+    private final OrthographicCamera gameCamera;
+    private final Viewport gameViewport;
+    private final OrthographicCamera uiCamera;
+    private final Viewport uiViewport;
+
+    // HUD/UI
+    private final Hud hud;
 
     // Tiled Map Variables
-    private TmxMapLoader mapLoader;
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer renderer;
+    private final TmxMapLoader mapLoader;
+    private final TiledMap map;
+    private final OrthogonalTiledMapRenderer renderer;
 
-    private World world;
-    private Box2DDebugRenderer box2DDebugRenderer;
-    private Array<BaseAICharacter> enemies = new Array<>();
-    private Array<BaseFriendAICharacter> friends = new Array<>();
+    // Box2D Physics
+    private final World world;
+    private final Box2DDebugRenderer box2DDebugRenderer;
+
+    // Game Entities
+    private final Array<BaseAICharacter> enemies = new Array<>();
+    private final Array<BaseFriendAICharacter> friends = new Array<>();
+
+    // Debug and Gameplay State
     public boolean isShowBox2dDebug;
-
-    private float accumulator = 0;
+    private float accumulator = 0f;
     private final float fixedTimeStep = 1 / 60f;
 
-    // Map dimensions in pixels
-    public int mapWidthInPixels;
-    public int mapHeightInPixels;
-    public int enemiesKilled;
-
-    public Player getPlayer() {
-        return player;
-    }
+    // Map Dimensions
+    public final int mapWidthInPixels;
+    public final int mapHeightInPixels;
+    private int enemiesKilled;
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
-        enemiesKilled = 0;
-        // Initialize HUD with a separate camera and viewport
+        this.enemiesKilled = 0;
+
+        // Initialize Cameras and Viewports
         this.uiCamera = new OrthographicCamera();
         this.uiViewport = new StretchViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
         this.hud = new Hud(game, uiViewport);
 
-        // Load map and setup tiled renderer
-        this.mapLoader = new TmxMapLoader();
-        this.map = mapLoader.load("Tiled/Level_2.tmx");
-
-        // Fix for map background artifacts
-        for (TiledMapTileSet tileSet : map.getTileSets()) {
-            for (TiledMapTile tile : tileSet) {
-                if (tile.getTextureRegion() != null) {
-                    tile.getTextureRegion().getTexture().setFilter(
-                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
-                    );
-                }
-            }
-        }
-
-        this.renderer = new OrthogonalTiledMapRenderer(map, 1 / PPM); // Adjust for PPM
-
-        // Game camera and viewport
         this.gameCamera = new OrthographicCamera();
         this.gameViewport = new StretchViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
-        this.gameViewport.apply();
-        this.gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0.f);
+        gameViewport.apply();
 
-        // Box2D world setup
-        this.world = new World(new Vector2(0, -125 / PPM), false); // Adjust gravity for PPM
+        // Load and Configure Map
+        this.mapLoader = new TmxMapLoader();
+        this.map = mapLoader.load("Tiled/Level_2.tmx");
+        configureMapTextures();
+
+        this.renderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
+
+        // Initialize Box2D World and Debug Renderer
+        this.world = new World(new Vector2(0, -125 / PPM), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
 
-        // Initialize map and entities
+        // Initialize World Entities
         new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
+        this.player = new Player(world, this);
 
-        player = new Player(world, this);
+        // Calculate Map Dimensions
+        this.mapWidthInPixels = calculateMapDimension("width") * calculateMapDimension("tilewidth");
+        this.mapHeightInPixels = calculateMapDimension("height") * calculateMapDimension("tileheight");
 
-        // Calculate map size
-        int mapWidthInTiles = map.getProperties().get("width", Integer.class);
-        int mapHeightInTiles = map.getProperties().get("height", Integer.class);
-        int tilePixelWidth = map.getProperties().get("tilewidth", Integer.class);
-        int tilePixelHeight = map.getProperties().get("tileheight", Integer.class);
-
-        mapWidthInPixels = mapWidthInTiles * tilePixelWidth;
-        mapHeightInPixels = mapHeightInTiles * tilePixelHeight;
+        // Set Initial Camera Position
+        gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0);
     }
+
+    // === Screen Lifecycle Methods ===
 
     @Override
     public void show() {
         hud.enableInput();
     }
 
-    public void update(float deltaTime) {
-        accumulator += deltaTime;
-
-        while (accumulator >= fixedTimeStep) {
-            world.step(fixedTimeStep, 6, 2);
-            accumulator -= fixedTimeStep;
-        }
-
-        for (var enemy : enemies) {
-            enemy.update(deltaTime, player.body.getPosition());
-        }
-        for (var friend : friends) {
-            friend.update(deltaTime, player.body.getPosition());
-        }
-
-        // Center camera on player while clamping within map bounds
-        gameCamera.position.x = Math.max(
-            gameCamera.viewportWidth / 2,
-            Math.min(player.body.getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2)
-        );
-
-        gameCamera.position.y = Math.max(
-            gameCamera.viewportHeight / 2,
-            Math.min(player.body.getPosition().y, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2)
-        );
-        gameCamera.update();
-
-        // Update renderer view and HUD
-        renderer.setView(gameCamera);
-        hud.update(deltaTime);
-    }
-
     @Override
-    public void render(float dt) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    public void render(float deltaTime) {
+        clearScreen();
 
-        update(dt);
-
-        player.update(dt);
-
-        // Render map
-        renderer.render();
-
-        // Render Box2D Debug
-        if (isShowBox2dDebug)
-            box2DDebugRenderer.render(world, gameCamera.combined);
-
-        drawEntities();
-
-        // Draw HUD/UI
-        hud.updateHealth(player.currentHealth, player.maxHealth);
-        hud.stage.act();
-        hud.stage.draw();
-    }
-
-    private void drawEntities() {
-        game.batch.setProjectionMatrix(gameCamera.combined);
-        game.batch.begin();
-        player.draw(game.batch);
-        for (BaseAICharacter enemy : enemies) enemy.draw(game.batch);
-        for (BaseFriendAICharacter friend : friends) friend.draw(game.batch);
-        game.batch.end();
+        update(deltaTime);
+        renderMap();
+        renderEntities();
+        renderUI();
     }
 
     @Override
     public void resize(int width, int height) {
-        // Apply and update the new viewport
         gameViewport.update(width, height, true);
-
-        // Update the UI viewport
         uiViewport.update(width, height, true);
     }
 
     @Override
-    public void pause() {
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-    }
+    public void resume() {}
 
     @Override
     public void hide() {
         hud.disableInput();
-        // Example Firebase usage
     }
 
     @Override
@@ -216,6 +138,107 @@ public class GameScreen implements Screen {
         hud.dispose();
     }
 
+    // === Core Update Logic ===
+
+    private void update(float deltaTime) {
+        updatePhysics(deltaTime);
+        updateEntities(deltaTime);
+        updateCamera();
+        hud.update(deltaTime);
+    }
+
+    private void updatePhysics(float deltaTime) {
+        accumulator += deltaTime;
+        while (accumulator >= fixedTimeStep) {
+            world.step(fixedTimeStep, 6, 2);
+            accumulator -= fixedTimeStep;
+        }
+    }
+
+    private void updateEntities(float deltaTime) {
+        player.update(deltaTime);
+
+        for (BaseAICharacter enemy : enemies) {
+            enemy.update(deltaTime, player.getBody().getPosition());
+        }
+
+        for (BaseFriendAICharacter friend : friends) {
+            friend.update(deltaTime, player.getBody().getPosition());
+        }
+    }
+
+    private void updateCamera() {
+        gameCamera.position.x = Math.max(
+            gameCamera.viewportWidth / 2,
+            Math.min(player.getBody().getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2)
+        );
+
+        gameCamera.position.y = Math.max(
+            gameCamera.viewportHeight / 2,
+            Math.min(player.getBody().getPosition().y, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2)
+        );
+
+        gameCamera.update();
+        renderer.setView(gameCamera);
+    }
+
+    // === Render Helpers ===
+
+    private void renderMap() {
+        renderer.render();
+
+        if (isShowBox2dDebug) {
+            box2DDebugRenderer.render(world, gameCamera.combined);
+        }
+    }
+
+    private void renderEntities() {
+        game.batch.setProjectionMatrix(gameCamera.combined);
+        game.batch.begin();
+        player.draw(game.batch);
+
+        for (BaseAICharacter enemy : enemies) {
+            enemy.draw(game.batch);
+        }
+
+        for (BaseFriendAICharacter friend : friends) {
+            friend.draw(game.batch);
+        }
+
+        game.batch.end();
+    }
+
+    private void renderUI() {
+        hud.updateHealth(player.getCurrentHealth(), player.getMaxHealth());
+        hud.stage.act();
+        hud.stage.draw();
+    }
+
+    // === Utility Methods ===
+
+    private void configureMapTextures() {
+        for (TiledMapTileSet tileSet : map.getTileSets()) {
+            for (TiledMapTile tile : tileSet) {
+                if (tile.getTextureRegion() != null) {
+                    tile.getTextureRegion().getTexture().setFilter(
+                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
+                    );
+                }
+            }
+        }
+    }
+
+    private int calculateMapDimension(String property) {
+        return map.getProperties().get(property, Integer.class);
+    }
+
+    private void clearScreen() {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    // === Public Accessors ===
+
     public void addEnemy(BaseAICharacter enemy) {
         enemies.add(enemy);
     }
@@ -224,11 +247,15 @@ public class GameScreen implements Screen {
         friends.add(cat);
     }
 
-    public void showGameOverScreen() {
-        game.setScreen(new GameOverScreen(game, hud.worldTimer, enemiesKilled));
+    public Player getPlayer() {
+        return player;
     }
 
     public void addEnemyKill() {
-        enemiesKilled += 1;
+        enemiesKilled++;
+    }
+
+    public void showGameOverScreen() {
+        game.setScreen(new GameOverScreen(game, hud.getWorldTimer(), enemiesKilled));
     }
 }

@@ -19,6 +19,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import javax.swing.JLayeredPane;
+
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
@@ -46,7 +48,7 @@ public class Player {
 
     private final AnimationSetFemaleAgent animationSetAgent;
     public World world;
-    public Body body;
+    private Body body;
 
     private float stateTime;
     private AnimationType currentAnimationState = AnimationType.IDLE;
@@ -341,7 +343,7 @@ public class Player {
     private void handleDeath() {
         if (animationSetAgent.getCurrentFrame(currentAnimationState).isAnimationFinished(stateTime)) {
             stateTime = animationSetAgent.getCurrentFrame(currentAnimationState).getAnimationDuration();
-            if(gameScreen!=null) {
+            if (gameScreen != null) {
                 gameScreen.showGameOverScreen();
             }
             return;
@@ -568,5 +570,17 @@ public class Player {
 
     public Array<Projectile> getProjectiles() {
         return projectiles;
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 }
