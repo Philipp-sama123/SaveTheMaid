@@ -1,26 +1,22 @@
 package krazy.cat.games.SaveTheMaid;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.*;
 
-import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.*;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
-import krazy.cat.games.SaveTheMaid.Sprites.Apple;
-import krazy.cat.games.SaveTheMaid.Sprites.Goal;
+import krazy.cat.games.SaveTheMaid.Sprites.*;
 
 public class WorldContactListener implements ContactListener {
+    // Collision Categories
     public static final short CATEGORY_PLAYER = 0x0001;
     public static final short CATEGORY_ENEMY = 0x0002;
     public static final short CATEGORY_PROJECTILE = 0x0004;
     public static final short CATEGORY_GROUND = 0x0008;
     public static final short CATEGORY_CAT = 0x0010;
 
+    // Collision Masks
     public static final short MASK_GROUND_ONLY = CATEGORY_GROUND;
     public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_CAT;
     public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
@@ -33,71 +29,93 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof BaseAICharacter) {
-            handleProjectileHitEnemy((Projectile) fixtureA.getUserData(), (BaseAICharacter) fixtureB.getUserData());
-        } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof BaseAICharacter) {
-            handleProjectileHitEnemy((Projectile) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
-        } else if (fixtureA.getUserData() instanceof Projectile && fixtureB.getUserData() instanceof Player) {
-            handleProjectileHitPlayer((Projectile) fixtureA.getUserData(), (Player) fixtureB.getUserData());
-        } else if (fixtureB.getUserData() instanceof Projectile && fixtureA.getUserData() instanceof Player) {
-            handleProjectileHitPlayer((Projectile) fixtureB.getUserData(), (Player) fixtureA.getUserData());
-        } else if (fixtureA.getUserData() instanceof Projectile && "environment".equals(fixtureB.getUserData())) {
-            handleProjectileEnvironmentCollision((Projectile) fixtureA.getUserData());
-        } else if (fixtureB.getUserData() instanceof Projectile && "environment".equals(fixtureA.getUserData())) {
-            handleProjectileEnvironmentCollision((Projectile) fixtureB.getUserData());
-        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseAICharacter) {
-            handleAttackCollision((Player) fixtureA.getUserData(), (BaseAICharacter) fixtureB.getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseAICharacter) {
-            handleAttackCollision((Player) fixtureB.getUserData(), (BaseAICharacter) fixtureA.getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof BaseFriendAICharacter) {
-            ((BaseFriendAICharacter) fixtureA.getUserData()).activate(((Player) fixtureB.getUserData()));
-            ((Player) fixtureB.getUserData()).setFriendReference(((BaseFriendAICharacter) fixtureA.getUserData()));
-        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof BaseFriendAICharacter) {
-            ((BaseFriendAICharacter) fixtureA.getUserData()).activate(((Player) fixtureB.getUserData()));
-        } else if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Apple) {
-            ((Apple) fixtureB.getUserData()).onPlayerCollision((Player) fixtureA.getUserData());
-        } else if (fixtureB.getUserData() instanceof Player && fixtureA.getUserData() instanceof Apple) {
-            ((Apple) fixtureA.getUserData()).onPlayerCollision((Player) fixtureB.getUserData());
-        } else if (fixtureA.getUserData() instanceof Goal && fixtureB.getUserData() instanceof CatCharacter) {
-            ((Goal) fixtureA.getUserData()).onCatCollision();
-            ((CatCharacter) fixtureB.getUserData()).disappear();
-        } else if (fixtureB.getUserData() instanceof Goal && fixtureA.getUserData() instanceof CatCharacter) {
-            ((Goal) fixtureB.getUserData()).onCatCollision();
-            ((CatCharacter) fixtureA.getUserData()).disappear();
+        Object userDataA = fixtureA.getUserData();
+        Object userDataB = fixtureB.getUserData();
+
+        // Handle projectile collisions
+        if (userDataA instanceof Projectile) {
+            handleProjectileCollision((Projectile) userDataA, userDataB);
+        } else if (userDataB instanceof Projectile) {
+            handleProjectileCollision((Projectile) userDataB, userDataA);
+        }
+        // Handle player and enemy collisions
+        else if (userDataA instanceof Player && userDataB instanceof BaseAICharacter) {
+            handleAttackCollision((Player) userDataA, (BaseAICharacter) userDataB);
+        } else if (userDataB instanceof Player && userDataA instanceof BaseAICharacter) {
+            handleAttackCollision((Player) userDataB, (BaseAICharacter) userDataA);
+        }
+        // Handle player and friend interactions
+        else if (userDataA instanceof Player && userDataB instanceof BaseFriendAICharacter) {
+            handleFriendInteraction((Player) userDataA, (BaseFriendAICharacter) userDataB);
+        } else if (userDataB instanceof Player && userDataA instanceof BaseFriendAICharacter) {
+            handleFriendInteraction((Player) userDataB, (BaseFriendAICharacter) userDataA);
+        }
+        // Handle player collecting apples
+        else if (userDataA instanceof Player && userDataB instanceof Apple) {
+            ((Apple) userDataB).onPlayerCollision((Player) userDataA);
+        } else if (userDataB instanceof Player && userDataA instanceof Apple) {
+            ((Apple) userDataA).onPlayerCollision((Player) userDataB);
+        }
+        // Handle cat reaching goal
+        else if (userDataA instanceof Goal && userDataB instanceof CatCharacter) {
+            handleGoalCollision((Goal) userDataA, (CatCharacter) userDataB);
+        } else if (userDataB instanceof Goal && userDataA instanceof CatCharacter) {
+            handleGoalCollision((Goal) userDataB, (CatCharacter) userDataA);
         }
     }
 
     @Override
     public void endContact(Contact contact) {
-    }
-
-
-    private void handleProjectileEnvironmentCollision(Projectile projectile) {
-        projectile.onCollision(); // Set the projectile for destruction when it hits the environment
-    }
-
-    private void handleAttackCollision(Player player, BaseAICharacter enemy) {
-        player.onStartEnemyAttackCollision(); // Apply damage to the player
-    }
-
-    private void handleProjectileHitEnemy(Projectile projectile, BaseAICharacter enemy) {
-        // Flag the projectile and enemy for destruction or update their states
-        projectile.onCollision();
-        enemy.onHit();  // Ensure `onHit` method is in your `Enemy` class for handling hit logic
-    }
-
-    private void handleProjectileHitPlayer(Projectile projectile, Player player) {
-        // Flag the projectile and enemy for destruction or update their states
-        projectile.onCollision();
-        player.onStartEnemyAttackCollision();
+        // Add end-contact logic if needed in the future
     }
 
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
+        // Add pre-solve logic if necessary
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
+        // Add post-solve logic if necessary
+    }
 
+    // === Private Helper Methods ===
+
+    /**
+     * Handle collisions involving a projectile.
+     */
+    private void handleProjectileCollision(Projectile projectile, Object target) {
+        if (target instanceof BaseAICharacter) {
+            projectile.onCollision();
+            ((BaseAICharacter) target).onHit(); // Ensure this method handles enemy hit logic
+        } else if (target instanceof Player) {
+            projectile.onCollision();
+            ((Player) target).onStartEnemyAttackCollision();
+        } else if ("environment".equals(target)) {
+            projectile.onCollision();
+        }
+    }
+
+    /**
+     * Handle collisions between a player and an enemy.
+     */
+    private void handleAttackCollision(Player player, BaseAICharacter enemy) {
+        player.onStartEnemyAttackCollision(); // Apply damage or attack logic to the player
+    }
+
+    /**
+     * Handle interactions between a player and a friendly AI character.
+     */
+    private void handleFriendInteraction(Player player, BaseFriendAICharacter friend) {
+        friend.activate(player);
+        player.setFriendReference(friend);
+    }
+
+    /**
+     * Handle collisions where a cat character reaches a goal.
+     */
+    private void handleGoalCollision(Goal goal, CatCharacter cat) {
+        goal.onCatCollision();
+        cat.disappear(); // Remove the cat after reaching the goal
     }
 }

@@ -62,13 +62,6 @@ public class SaveTheMaidGame extends Game {
         return assetManager;
     }
 
-//    public boolean isUserSignedIn() {
-//        FirebaseUser user = firebaseInterface.getCurrentUser(); // Assuming getCurrentUser() returns the current Firebase user if signed in
-//        Gdx.app.log("USER", "firebaseInterface.getUserEmail()" + firebaseInterface.getUserEmail());
-//        Gdx.app.log("USER", "firebaseInterface.getUserDisplayName()" + firebaseInterface.getUserDisplayName());
-//        return user != null;
-//    }
-
     @Override
     public void dispose() {
         GameAssetManager.getInstance().dispose(); // Dispose assets when the game ends
