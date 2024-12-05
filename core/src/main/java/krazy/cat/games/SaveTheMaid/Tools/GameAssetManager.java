@@ -22,13 +22,14 @@ public class GameAssetManager {
     }
 
     private void loadAssets() {
-        // Enemy Assets
-        assetManager.load(AssetPaths.SWIPE_SOUND, Sound.class);
-        assetManager.load(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
-        assetManager.load(AssetPaths.ZOMBIE_ATTACK_SOUND, Sound.class);
+        //-Enemy Assets
         assetManager.load(AssetPaths.RAT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.BAT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.ZOMBIE_GREY_TEXTURE, Texture.class);
+        // --SFX
+        assetManager.load(AssetPaths.SWIPE_SOUND, Sound.class);
+        assetManager.load(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
+        assetManager.load(AssetPaths.ZOMBIE_ATTACK_SOUND, Sound.class);
 
         // Maid Character
         assetManager.load(AssetPaths.MAID_CHARACTER_BLACK, Texture.class);
@@ -38,14 +39,22 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
+
+        //SFX
         assetManager.load(AssetPaths.JUMP_SOUND, Sound.class);
         assetManager.load(AssetPaths.SHOOT_SOUND, Sound.class);
+        assetManager.load(AssetPaths.PLAYER_FOOTSTEP_SOUND, Sound.class);
+        assetManager.load(AssetPaths.PLAYER_SLIDE_SOUND, Sound.class);
+
+        assetManager.load(AssetPaths.CAT_PICKUP_SOUND, Sound.class);
+        assetManager.load(AssetPaths.CAT_GOAL_SOUND, Sound.class);
 
         assetManager.load(AssetPaths.HEALTH_BAR_CONTAINER, Texture.class);
         assetManager.load(AssetPaths.HEALTH_BAR_ANIMATIONS, Texture.class);
         assetManager.load(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
 
         assetManager.load(AssetPaths.CAT_TEXTURE_2, Texture.class);
+
     }
 
     public AssetManager getAssetManager() {

@@ -1,6 +1,12 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.JUMP_SOUND;
+import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_FOOTSTEP_SOUND;
+import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_HIT_SOUND;
+import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_SLIDE_SOUND;
+import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.SHOOT_SOUND;
+import static krazy.cat.games.SaveTheMaid.Tools.Utils.createAnimation;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
 
@@ -28,6 +34,7 @@ import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
+import krazy.cat.games.SaveTheMaid.Tools.Utils;
 
 public class Player {
     private static final int MAX_JUMPS = 3;
@@ -46,99 +53,72 @@ public class Player {
     float walkSpeed = 50 / PPM;
     float runSpeed = 100 / PPM;
 
-    private final AnimationSetFemaleAgent animationSetAgent;
+    private AnimationSetFemaleAgent animationSetAgent;
     public World world;
     private Body body;
 
     private float stateTime;
     private AnimationType currentAnimationState = AnimationType.IDLE;
 
-    public boolean isCrouching = false;
-    private boolean isShooting = false;
-    private boolean isShootingUp = false;
-    private boolean isFacingRight = false;
-
     private Array<Projectile> projectiles;
     private Texture projectileTexture;
-    private float damageTimer;
 
+    // Effects
     private Animation<TextureRegion> jumpEffectAnimation;
+    private Animation<TextureRegion> bloodEffectAnimation;
+
     private float jumpEffectTime;
     private boolean showJumpEffect;
-    private Animation<TextureRegion> bloodEffectAnimation;
     private float bloodEffectTime;
     private boolean showBloodEffect;
 
-    public final int maxHealth = 100;
-    public int currentHealth = maxHealth;
+    private final int maxHealth = 100;
+    private int currentHealth = maxHealth;
 
-    private boolean isDead = false;
+    private boolean isShooting = false;
+    private boolean isShootingUp = false;
+    private boolean isFacingRight = false;
+    private boolean isCrouching = false;
     private boolean isSliding = false;
+    private boolean isDead = false;
 
-
+    private int lastFootstepFrame = -1; // To prevent duplicate sound triggering
     private float slideTime;
+
     private Sound jumpSound;
     private Sound hitSound;
     private Sound shootSound;
+    private Sound footstepSound;
+    private Sound slideSound;
 
     private BaseFriendAICharacter friendAICharacter;
 
     public Player(World world) {
         this.world = world;
+        initializePlayerAssets();
+    }
 
+    public Player(World world, GameScreen gameScreen) {
+        this(world);
+        this.gameScreen = gameScreen;
+    }
+
+    private void initializePlayerAssets() {
         animationSetAgent = new AnimationSetFemaleAgent(
             GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
         );
 
-        Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
-        Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
-
-        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
-        Array<TextureRegion> jumpFrames = new Array<>();
-        for (int i = 0; i < 4; i++) {
-            jumpFrames.add(tmpFrames[0][i]);  // Assuming there's only one row with four frames
-        }
-        jumpEffectAnimation = new Animation<>(0.1f, jumpFrames, Animation.PlayMode.NORMAL);
-
-        TextureRegion[][] tmpFramesBlood = TextureRegion.split(bloodSpriteSheet, 110, 86);
-
-        Array<TextureRegion> bloodFrames = new Array<>();
-        for (int i = 0; i < 4; i++) {
-            bloodFrames.add(tmpFramesBlood[0][i]);  // Assuming there's only one row with four frames
-        }
-        bloodEffectAnimation = new Animation<>(0.1f, bloodFrames, Animation.PlayMode.NORMAL);
-
+        loadEffects();
         definePlayer();
         initializeSounds();
     }
 
-    public Player(World world, GameScreen gameScreen) {
-        this.world = world;
-        this.gameScreen = gameScreen;
-        animationSetAgent = new AnimationSetFemaleAgent(
-            GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
-        );
-
+    private void loadEffects() {
         Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
 
-        TextureRegion[][] tmpFrames = TextureRegion.split(jumpSpriteSheet, 252, 40);
-        Array<TextureRegion> jumpFrames = new Array<>();
-        for (int i = 0; i < 4; i++) {
-            jumpFrames.add(tmpFrames[0][i]);  // Assuming there's only one row with four frames
-        }
-        jumpEffectAnimation = new Animation<>(0.1f, jumpFrames, Animation.PlayMode.NORMAL);
-
-        TextureRegion[][] tmpFramesBlood = TextureRegion.split(bloodSpriteSheet, 110, 86);
-
-        Array<TextureRegion> bloodFrames = new Array<>();
-        for (int i = 0; i < 4; i++) {
-            bloodFrames.add(tmpFramesBlood[0][i]);  // Assuming there's only one row with four frames
-        }
-        bloodEffectAnimation = new Animation<>(0.1f, bloodFrames, Animation.PlayMode.NORMAL);
-
-        definePlayer();
-        initializeSounds();
+        jumpEffectAnimation = createAnimation(jumpSpriteSheet, 252, 40, 4, 0.1f);
+        bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 4, 0.1f);
     }
 
     public void update(float delta) {
@@ -146,7 +126,7 @@ public class Player {
             handleDeath();
             // ToDo: fix the end of the animation somehow (!)
         }
-
+        handleFootstepSound();
         stateTime += delta;
 
         updateProjectiles(delta);
@@ -202,11 +182,12 @@ public class Player {
         rectShape.dispose();
     }
 
-
     private void initializeSounds() {
-        jumpSound = Gdx.audio.newSound(Gdx.files.internal("SFX/Jump.wav"));
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("SFX/Shoot.wav"));
-        hitSound = Gdx.audio.newSound(Gdx.files.internal("SFX/PlayerHit.wav"));
+        jumpSound = GameAssetManager.getInstance().getAssetManager().get(JUMP_SOUND);
+        shootSound = GameAssetManager.getInstance().getAssetManager().get(SHOOT_SOUND);
+        hitSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_HIT_SOUND);
+        footstepSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_FOOTSTEP_SOUND);
+        slideSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_SLIDE_SOUND);
     }
 
     public void draw(Batch batch) {
@@ -248,7 +229,7 @@ public class Player {
 
             // Start jump effect animation
             jumpEffectTime = 0;
-            jumpSound.play();
+            jumpSound.play(.25f);
             showJumpEffect = true;
 
             if (friendAICharacter != null)
@@ -270,6 +251,9 @@ public class Player {
 
         // Set animation state to slide or slide+shoot
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
+
+        if (slideSound != null)
+            slideSound.play(.25f);
 
         if (friendAICharacter != null)
             friendAICharacter.slide();
@@ -566,6 +550,39 @@ public class Player {
 
     public void appleHeal() {
         currentHealth = maxHealth;
+    }
+
+    private void handleFootstepSound() {
+        Gdx.app.log("handleFootstepSound", "ENTRY");
+        Gdx.app.log("handleFootstepSound", "currentAnimationState: " + currentAnimationState);
+
+        if (currentAnimationState == AnimationType.WALK || currentAnimationState == AnimationType.RUN) {
+            Animation<TextureRegion> currentAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
+            Gdx.app.log("handleFootstepSound", "currentAnimation: " + currentAnimation);
+
+            // Reset stateTime to prevent overflow and handle looping
+            if (stateTime > currentAnimation.getAnimationDuration()) {
+                stateTime -= currentAnimation.getAnimationDuration();
+                Gdx.app.log("StateTime Reset", "stateTime reset after animation loop");
+            }
+            int currentFrameIndex = currentAnimation.getKeyFrameIndex(stateTime);
+            Gdx.app.log("handleFootstepSound", "currentFrameIndex: " + currentFrameIndex);
+
+            if ((currentFrameIndex == 0 || currentFrameIndex == 4) && currentFrameIndex != lastFootstepFrame) {
+                if (footstepSound != null) {
+                    footstepSound.stop();
+                    footstepSound.play(.25f, currentAnimationState == AnimationType.WALK ? 0.f : .5f, 0.0f);
+                }
+                Gdx.app.log("TRIGGER", "FOOTSTEP PLAYING at frame: " + currentFrameIndex);
+                lastFootstepFrame = currentFrameIndex;
+            }
+
+            if (currentAnimation.isAnimationFinished(stateTime)) {
+                lastFootstepFrame = -1;
+            }
+        } else {
+            lastFootstepFrame = -1;
+        }
     }
 
     public Array<Projectile> getProjectiles() {

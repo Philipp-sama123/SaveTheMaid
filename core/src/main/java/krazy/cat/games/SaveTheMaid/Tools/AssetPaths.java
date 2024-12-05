@@ -4,6 +4,10 @@ public class AssetPaths {
     // Enemy Assets
     public static final String SWIPE_SOUND = "SFX/swipe.mp3";
     public static final String PLAYER_HIT_SOUND = "SFX/PlayerHit.wav";
+    public static final String PLAYER_FOOTSTEP_SOUND = "SFX/platformer-sounds/knock.wav";
+    public static final String CAT_PICKUP_SOUND = "SFX/RetroSounds/GameSFX/Events/Negative/Retro Negative Short 07.wav";
+    public static final String CAT_GOAL_SOUND = "SFX/RetroSounds/GameSFX/PickUp/Retro PickUp Coin 04.wav";
+    public static final String PLAYER_SLIDE_SOUND = "SFX/RetroSounds/GameSFX/Swoosh/Retro Swooosh 16.wav";
     public static final String ZOMBIE_ATTACK_SOUND = "SFX/ZombieAttack.wav";
     public static final String RAT_TEXTURE = "Characters/Enemies/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png";
     public static final String BAT_TEXTURE = "Characters/Enemies/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png";

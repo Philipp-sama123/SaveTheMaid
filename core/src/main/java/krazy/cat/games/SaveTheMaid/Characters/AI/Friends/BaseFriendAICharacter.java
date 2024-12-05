@@ -17,12 +17,10 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
 
 public abstract class BaseFriendAICharacter<T extends Enum<T>> {
-    protected static final float MOVEMENT_SPEED = 15f / PPM;
+    protected static final float MOVEMENT_SPEED = .25f; // Adjust speed as necessary
 
-    public Sound ATTACK_SOUND = GameAssetManager.getInstance().get(AssetPaths.SWIPE_SOUND, Sound.class);
-    public Sound HIT_SOUND = GameAssetManager.getInstance().get(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
-    public Sound DEATH_SOUND = GameAssetManager.getInstance().get(AssetPaths.ZOMBIE_ATTACK_SOUND, Sound.class);
-
+    public Sound pickUpSound = GameAssetManager.getInstance().get(AssetPaths.CAT_PICKUP_SOUND, Sound.class);
+    public Sound goalSound = GameAssetManager.getInstance().get(AssetPaths.CAT_GOAL_SOUND, Sound.class);
     public int health = 100;
     public int currentDamage = 20;
 
@@ -81,13 +79,17 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
     }
 
     public void activate(Player player) {
-        isActive = true;
-        playerReference = player;
+        if (!isActive) {
+            isActive = true;
+            playerReference = player;
+            pickUpSound.play(.25f);
+        }
     }
 
     public void registerSavedFriend() {
         if (gameScreen != null) {
             gameScreen.addCatSaved();
+            goalSound.play(.35f);
         }
     }
 }

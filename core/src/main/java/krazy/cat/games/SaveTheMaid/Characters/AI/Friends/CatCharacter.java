@@ -31,7 +31,6 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     private boolean isSliding = false;
     private boolean markedForDisposal = false;
 
-    private static final float MOVEMENT_SPEED = .25f; // Adjust speed as necessary
 
     public CatCharacter(World world, Vector2 position, GameScreen gameScreen) {
         super(world, position,gameScreen);

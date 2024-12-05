@@ -213,7 +213,7 @@ public class Hud implements Disposable {
 
     private void createMovementJoystick() {
         // Load textures for the joystick background and knob
-        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/2dStick.png"));
+        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootPad.png"));
         Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/MoveStick.png"));
 
         // Check if textures are loaded
