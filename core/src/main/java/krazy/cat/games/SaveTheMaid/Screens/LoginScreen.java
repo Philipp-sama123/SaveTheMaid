@@ -29,16 +29,16 @@ public class LoginScreen implements Screen {
     private final Texture backgroundTexture;
 
     private final Skin skin;
-    private TextButton logInButton;
-    private TextButton backButton;
-    private TextButton createUserButton;
+    private final TextButton logInButton;
+    private final TextButton backButton;
+    private final TextButton createUserButton;
 
-    private TextField emailField;
-    private TextField passwordField;
-    private TextField usernameField;
+    private final TextField emailField;
+    private final TextField passwordField;
+    private final TextField usernameField;
 
-    private Label errorLabel;
-    private Label loadingLabel;
+    private final Label errorLabel;
+    private final Label loadingLabel;
 
     private final Preferences preferences;
 

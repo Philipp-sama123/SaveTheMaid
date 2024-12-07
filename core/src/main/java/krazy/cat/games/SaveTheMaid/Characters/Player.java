@@ -36,6 +36,7 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
 import krazy.cat.games.SaveTheMaid.Tools.Utils;
 
+// ToDo: PlayerEffectsManager (!)
 public class Player {
     private static final int MAX_JUMPS = 3;
     private static final float SLIDE_IMPULSE = 1.5f;
@@ -66,11 +67,15 @@ public class Player {
     // Effects
     private Animation<TextureRegion> jumpEffectAnimation;
     private Animation<TextureRegion> bloodEffectAnimation;
+    private Animation<TextureRegion> slideEffectAnimation;
+
+    private boolean showJumpEffect;
+    private boolean showSlideEffect;
+    private boolean showBloodEffect;
 
     private float jumpEffectTime;
-    private boolean showJumpEffect;
     private float bloodEffectTime;
-    private boolean showBloodEffect;
+    private float slideEffectTime;
 
     private final int maxHealth = 100;
     private int currentHealth = maxHealth;
@@ -116,9 +121,11 @@ public class Player {
     private void loadEffects() {
         Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
+        Texture slideSmokeSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_SLIDE_EFFECT_TEXTURE, Texture.class);
 
         jumpEffectAnimation = createAnimation(jumpSpriteSheet, 252, 40, 4, 0.1f);
-        bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 4, 0.1f);
+        bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 5, 0.1f);
+        slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 50, 32, 8, 0.1f);
     }
 
     public void update(float delta) {
@@ -143,6 +150,12 @@ public class Player {
             jumpEffectTime += delta;
             if (jumpEffectAnimation.isAnimationFinished(jumpEffectTime)) {
                 showJumpEffect = false;
+            }
+        }
+        if (showSlideEffect) {
+            slideEffectTime += delta;
+            if (slideEffectAnimation.isAnimationFinished(slideEffectTime)) {
+                showSlideEffect = false;
             }
         }
         if (showBloodEffect) {
@@ -198,6 +211,21 @@ public class Player {
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
+        // Draw the slide effect
+        if (showSlideEffect) {
+            TextureRegion slideEffectFrame = slideEffectAnimation.getKeyFrame(slideEffectTime);
+
+            // Check if the current frame needs to be flipped
+            if ((isFacingRight && slideEffectFrame.isFlipX()) || (!isFacingRight && !slideEffectFrame.isFlipX())) {
+                slideEffectFrame.flip(true, false); // Flip horizontally
+            }
+
+            float effectPosX = (body.getPosition().x) - ((float) slideEffectFrame.getRegionWidth() / 2 / PPM) - (isFacingRight ? 20 / PPM : -20 / PPM);
+            float effectPosY = (body.getPosition().y) - 25 / PPM;
+
+            batch.draw(slideEffectFrame, effectPosX, effectPosY, slideEffectFrame.getRegionWidth() / PPM, slideEffectFrame.getRegionHeight() / PPM);
+        }
+
         // Draw the jump effect
         if (showJumpEffect) {
             TextureRegion jumpEffectFrame = jumpEffectAnimation.getKeyFrame(jumpEffectTime);
@@ -228,10 +256,10 @@ public class Player {
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
 
             // Start jump effect animation
+            if (jumpSound != null)
+                jumpSound.play(.25f);
             jumpEffectTime = 0;
-            jumpSound.play(.25f);
             showJumpEffect = true;
-
             if (friendAICharacter != null)
                 friendAICharacter.jump();
         }
@@ -254,7 +282,8 @@ public class Player {
 
         if (slideSound != null)
             slideSound.play(.25f);
-
+        slideEffectTime = 0;
+        showSlideEffect = true;
         if (friendAICharacter != null)
             friendAICharacter.slide();
     }
@@ -396,6 +425,7 @@ public class Player {
 
             if (isSliding) {
                 position.y -= 16 / PPM;
+                position.x += isFacingRight ? 16 / PPM : -16 / PPM;
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
             shootSound.play();
@@ -410,13 +440,11 @@ public class Player {
         showBloodEffect = true;  // Trigger blood effect for feedback
         bloodEffectTime = 0;
 
-
         if (currentHealth <= 0) {
             currentHealth = 0;
             isDead = true;
             onDeath();
         }
-
     }
 
     private TextureRegion getCurrentUpperBodyFrame() {

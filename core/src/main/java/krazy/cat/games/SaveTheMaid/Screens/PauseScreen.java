@@ -20,11 +20,11 @@ import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class PauseScreen implements Screen {
     private final SaveTheMaidGame game;
-    private Stage stage;
-    private Texture backgroundTexture;
-    private ImageButton resumeButton;
-    private ImageButton homeButton;
-    private ImageButton restartButton;
+    private final Stage stage;
+    private final Texture backgroundTexture;
+    private final ImageButton resumeButton;
+    private final ImageButton homeButton;
+    private final ImageButton restartButton;
 
     public PauseScreen(SaveTheMaidGame game) {
         this.game = game;

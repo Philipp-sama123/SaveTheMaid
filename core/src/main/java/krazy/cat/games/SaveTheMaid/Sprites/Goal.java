@@ -8,9 +8,9 @@ import com.badlogic.gdx.physics.box2d.*;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class Goal {
-    private World world;
+    private final World world;
     private Body body;
-    private Rectangle bounds;
+    private final Rectangle bounds;
 
     public Goal(World world, TiledMap map, Rectangle bounds) {
         this.world = world;

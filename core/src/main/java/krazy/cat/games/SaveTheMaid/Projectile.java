@@ -19,8 +19,8 @@ public class Projectile {
     private boolean isDestroyed = false;
     private boolean setToDestroy = false;
 
-    private boolean isFacingRight;
-    private boolean isShootingUp; // New flag to indicate upward shooting
+    private final boolean isFacingRight;
+    private final boolean isShootingUp; // New flag to indicate upward shooting
     private boolean isFlipped = false;
 
     private final float X_OFFSET_BULLET = 2 / PPM;

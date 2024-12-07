@@ -9,7 +9,7 @@ public class ScoreSystemManager {
     private int highScore;
 
     // Preferences for persistent storage
-    private Preferences preferences;
+    private final Preferences preferences;
     private static final String HIGH_SCORE_KEY = "high_score";
 
     private ScoreSystemManager() {

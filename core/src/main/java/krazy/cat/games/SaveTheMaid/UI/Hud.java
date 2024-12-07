@@ -25,24 +25,24 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
 
 public class Hud implements Disposable {
-    private SaveTheMaidGame game;
+    private final SaveTheMaidGame game;
     private InputMultiplexer inputMultiplexer;
     public Stage stage;
     public Viewport viewport;
 
     private Integer worldTimer;
     private float timeCount;
-    private Integer health;
+    private final Integer health;
 
-    private Label countdownLabel;
-    private Label timeLabel;
-    private Label levelLabel;
-    private Label worldLabel;
-    private Label playerLabel;
-    private Label scoreLabel; // NEW: Label to display the score
-    private Label highScoreLabel; // NEW: Label for the high score
+    private final Label countdownLabel;
+    private final Label timeLabel;
+    private final Label levelLabel;
+    private final Label worldLabel;
+    private final Label playerLabel;
+    private final Label scoreLabel; // NEW: Label to display the score
+    private final Label highScoreLabel; // NEW: Label for the high score
 
-    private Image healthBar;
+    private final Image healthBar;
     private ImageButton jumpButton;
     private ImageButton shootButton;
     private ImageButton shootUpButton;

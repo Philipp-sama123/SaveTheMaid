@@ -27,7 +27,7 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     private float slidingTimer = 0f;
     private static final float SLIDING_DURATION = 1.5f; // Sliding duration in seconds
 
-    private float SLIDE_IMPULSE = 1.5f;
+    private final float SLIDE_IMPULSE = 1.5f;
     private boolean isSliding = false;
     private boolean markedForDisposal = false;
 

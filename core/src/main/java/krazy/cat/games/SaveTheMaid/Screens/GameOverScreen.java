@@ -21,8 +21,8 @@ import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 
 public class GameOverScreen implements Screen {
     private final SaveTheMaidGame game;
-    private Stage stage;
-    private Texture backgroundTexture;
+    private final Stage stage;
+    private final Texture backgroundTexture;
 
     public GameOverScreen(SaveTheMaidGame game, float timePlayed, int enemiesKilled,int catsSaved) {
         this.game = game;

@@ -7,7 +7,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.States.State;
 
 public class StateMachine {
     private State currentState;
-    private BaseAICharacter enemy;
+    private final BaseAICharacter enemy;
 
     public StateMachine(BaseAICharacter enemy) {
         this.enemy = enemy;

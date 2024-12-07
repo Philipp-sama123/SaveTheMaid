@@ -28,7 +28,7 @@ public class StartupScreen implements Screen {
     private final Viewport viewport;
     Texture backgroundTexture;
     private String userEmail;
-    private Label greetingLabel;
+    private final Label greetingLabel;
 
     public StartupScreen(SaveTheMaidGame game) {
         this.game = game;
