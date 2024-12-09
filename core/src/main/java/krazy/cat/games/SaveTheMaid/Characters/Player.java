@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -175,25 +176,57 @@ public class Player {
     }
 
     private void definePlayer() {
+        // Body definition
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(100 / PPM, 100 / PPM); // Convert to meters
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
+        // Initialize the projectiles and texture
         projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         projectiles = new Array<>();
 
+        // Central rectangle shape
         PolygonShape rectShape = new PolygonShape();
-        rectShape.setAsBox(8f / PPM, 24f / PPM); // Convert dimensions to meters
+        rectShape.setAsBox(8f / PPM, 16f / PPM); // Adjusted for capsule middle
 
+        // Fixture for rectangle part of capsule
         FixtureDef playerFixtureDef = new FixtureDef();
         playerFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
         playerFixtureDef.filter.maskBits = MASK_PLAYER;
         playerFixtureDef.shape = rectShape;
         body.createFixture(playerFixtureDef).setUserData(this);
 
+        // Top circle
+        CircleShape topCircle = new CircleShape();
+        topCircle.setRadius(8f / PPM); // Radius matches rectangle width
+        topCircle.setPosition(new Vector2(0, 16f / PPM)); // Centered above the rectangle
+
+        // Fixture for top circle
+        FixtureDef topCircleFixtureDef = new FixtureDef();
+        topCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        topCircleFixtureDef.filter.maskBits = MASK_PLAYER;
+        topCircleFixtureDef.shape = topCircle;
+        body.createFixture(topCircleFixtureDef).setUserData(this);
+
+        // Bottom circle
+        CircleShape bottomCircle = new CircleShape();
+        bottomCircle.setRadius(8f / PPM); // Radius matches rectangle width
+        bottomCircle.setPosition(new Vector2(0, -16f / PPM)); // Centered below the rectangle
+
+        // Fixture for bottom circle
+        FixtureDef bottomCircleFixtureDef = new FixtureDef();
+        bottomCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        bottomCircleFixtureDef.filter.maskBits = MASK_PLAYER;
+        bottomCircleFixtureDef.shape = bottomCircle;
+        body.createFixture(bottomCircleFixtureDef).setUserData(this);
+
+        // Dispose of shapes to free memory
         rectShape.dispose();
+        topCircle.dispose();
+        bottomCircle.dispose();
     }
+
 
     private void initializeSounds() {
         jumpSound = GameAssetManager.getInstance().getAssetManager().get(JUMP_SOUND);
