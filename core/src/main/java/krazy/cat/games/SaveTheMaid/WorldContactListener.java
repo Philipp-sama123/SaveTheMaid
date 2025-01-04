@@ -44,6 +44,14 @@ public class WorldContactListener implements ContactListener {
         } else if (userDataB instanceof Player && userDataA instanceof BaseAICharacter) {
             handleAttackCollision((Player) userDataB, (BaseAICharacter) userDataA);
         }
+        // Handle player and water collisions
+        else if (userDataA instanceof Player && userDataB instanceof WaterEffect) {
+            ((Player) userDataA).onStartEnemyAttackCollision(); // ToDo: Own function if it stays
+        } else if (userDataB instanceof Player && userDataA instanceof WaterEffect) {
+            //    handleAttackCollision((Player) userDataB, (BaseAICharacter) userDataA);
+            ((Player) userDataB).onStartEnemyAttackCollision(); // ToDo: Own function if it stays
+
+        }
         // Handle player and friend interactions
         else if (userDataA instanceof Player && userDataB instanceof BaseFriendAICharacter) {
             handleFriendInteraction((Player) userDataA, (BaseFriendAICharacter) userDataB);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="94">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="104">
  <tileset firstgid="1" source="PlatformerAssets.tsx"/>
  <layer id="2" name="Background" width="100" height="100">
   <data encoding="base64" compression="zlib">
@@ -55,6 +55,12 @@
   <object id="89" x="1282.82" y="1696.75" width="92" height="30"/>
   <object id="90" x="1122.38" y="1632.85" width="92" height="30"/>
   <object id="91" x="962.396" y="1568.96" width="92" height="30"/>
+  <object id="102" x="981.078" y="3168.25">
+   <polygon points="0,0 -55.1015,-64.1224 -55.0679,0.976142"/>
+  </object>
+  <object id="103" x="713.006" y="3168.25">
+   <polygon points="0,0 55.1015,-64.1224 55.0679,0.976142"/>
+  </object>
  </objectgroup>
  <objectgroup id="5" name="Goal">
   <object id="46" x="32" y="3122" width="20" height="46"/>
@@ -67,7 +73,6 @@
  </objectgroup>
  <objectgroup id="4" name="Bricks"/>
  <objectgroup id="7" name="SpawnPoints">
-  <object id="27" x="865.4" y="3072.27" width="32" height="32"/>
   <object id="28" x="1248.55" y="2237.95" width="32" height="32"/>
   <object id="29" x="1184" y="3136" width="32" height="32"/>
   <object id="30" x="448" y="3136" width="32" height="32"/>

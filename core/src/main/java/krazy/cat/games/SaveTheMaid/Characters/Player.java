@@ -227,7 +227,6 @@ public class Player {
         bottomCircle.dispose();
     }
 
-
     private void initializeSounds() {
         jumpSound = GameAssetManager.getInstance().getAssetManager().get(JUMP_SOUND);
         shootSound = GameAssetManager.getInstance().getAssetManager().get(SHOOT_SOUND);
@@ -351,27 +350,48 @@ public class Player {
 
     // Restore the original collider
     private void restoreCollider() {
-        // Remove the sliding fixture
-        Array<Fixture> fixturesToDestroy = new Array<>();
-        for (Fixture fixture : body.getFixtureList()) {
-            fixturesToDestroy.add(fixture);
-        }
+        // Remove all existing fixtures
+        Array<Fixture> fixturesToDestroy = new Array<>(body.getFixtureList());
         for (Fixture fixture : fixturesToDestroy) {
             body.destroyFixture(fixture);
         }
 
-        // Create the original fixture
-        PolygonShape originalShape = new PolygonShape();
-        originalShape.setAsBox(8f / PPM, 24f / PPM);
+        // Recreate the central rectangle shape
+        PolygonShape rectShape = new PolygonShape();
+        rectShape.setAsBox(8f / PPM, 16f / PPM); // Adjusted for the middle part of the capsule
 
-        FixtureDef originalFixtureDef = new FixtureDef();
-        originalFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        originalFixtureDef.filter.maskBits = MASK_PLAYER;
-        originalFixtureDef.shape = originalShape;
+        FixtureDef rectFixtureDef = new FixtureDef();
+        rectFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        rectFixtureDef.filter.maskBits = MASK_PLAYER;
+        rectFixtureDef.shape = rectShape;
+        body.createFixture(rectFixtureDef).setUserData(this);
+        rectShape.dispose();
 
-        body.createFixture(originalFixtureDef).setUserData(this);
-        originalShape.dispose();
+        // Recreate the top circle
+        CircleShape topCircle = new CircleShape();
+        topCircle.setRadius(8f / PPM); // Matches rectangle width
+        topCircle.setPosition(new Vector2(0, 16f / PPM)); // Positioned above the rectangle
+
+        FixtureDef topCircleFixtureDef = new FixtureDef();
+        topCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        topCircleFixtureDef.filter.maskBits = MASK_PLAYER;
+        topCircleFixtureDef.shape = topCircle;
+        body.createFixture(topCircleFixtureDef).setUserData(this);
+        topCircle.dispose();
+
+        // Recreate the bottom circle
+        CircleShape bottomCircle = new CircleShape();
+        bottomCircle.setRadius(8f / PPM); // Matches rectangle width
+        bottomCircle.setPosition(new Vector2(0, -16f / PPM)); // Positioned below the rectangle
+
+        FixtureDef bottomCircleFixtureDef = new FixtureDef();
+        bottomCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
+        bottomCircleFixtureDef.filter.maskBits = MASK_PLAYER;
+        bottomCircleFixtureDef.shape = bottomCircle;
+        body.createFixture(bottomCircleFixtureDef).setUserData(this);
+        bottomCircle.dispose();
     }
+
 
 
     private void onDeath() {

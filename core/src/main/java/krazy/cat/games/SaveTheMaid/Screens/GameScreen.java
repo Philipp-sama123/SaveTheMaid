@@ -17,6 +17,7 @@ import krazy.cat.games.SaveTheMaid.*;
 import krazy.cat.games.SaveTheMaid.Characters.AI.*;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Sprites.WaterEffect;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
 import krazy.cat.games.SaveTheMaid.UI.Hud;
@@ -59,6 +60,10 @@ public class GameScreen implements Screen {
     public final int mapHeightInPixels;
     private int enemiesKilled;
     private int catsSaved;
+
+
+    private Array<WaterEffect> waterEffects = new Array<>();
+    private Texture waterTexture = new Texture("PlatformerAssets/AnimatedSprites/WaterTiles.png");
 
     public GameScreen(SaveTheMaidGame game) {
         this.game = game;
@@ -150,6 +155,7 @@ public class GameScreen implements Screen {
         updateEntities(deltaTime);
         updateCamera();
         hud.update(deltaTime);
+        waterEffects.forEach(waterEffect -> waterEffect.update(deltaTime));
     }
 
     private void updatePhysics(float deltaTime) {
@@ -210,6 +216,7 @@ public class GameScreen implements Screen {
             friend.draw(game.batch);
         }
 
+        waterEffects.forEach(waterEffect -> waterEffect.render(game.batch));
         game.batch.end();
     }
 
@@ -270,5 +277,13 @@ public class GameScreen implements Screen {
 
     public void showGameOverScreen() {
         game.setScreen(new GameOverScreen(game, hud.getWorldTimer(), enemiesKilled, catsSaved));
+    }
+
+    public Texture getWaterTexture() {
+        return waterTexture;
+    }
+
+    public void addWaterEffect(WaterEffect waterEffect) {
+        waterEffects.add(waterEffect);
     }
 }
