@@ -65,18 +65,6 @@ public class StartupScreen implements Screen {
             }
         });
 
-        // Load button textures
-        Texture loginTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Shop.png"));
-        Texture loginPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Shop.png")); // Add pressed texture
-
-        // Set up Login button
-        ImageButton loginButton = new ImageButton(new TextureRegionDrawable(loginTexture), new TextureRegionDrawable(loginPressedTexture));
-        loginButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LoginScreen(game));
-            }
-        });
         BitmapFont font = new BitmapFont(); // Use your own font if you have one
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
@@ -93,7 +81,6 @@ public class StartupScreen implements Screen {
         table.add(playButton).size(50).pad(5);
         table.add(customizeButton).size(50).pad(5);
         table.add(logoutButton).size(50).pad(5);
-        table.add(loginButton).size(50).pad(5);
 
         stage.addActor(table);
     }
