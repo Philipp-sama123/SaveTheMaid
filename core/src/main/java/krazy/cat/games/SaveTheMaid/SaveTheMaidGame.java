@@ -5,7 +5,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+import krazy.cat.games.SaveTheMaid.Screens.HellLevel;
 import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
@@ -19,9 +21,18 @@ public class SaveTheMaidGame extends Game {
     public SpriteBatch batch;
 
     private GameScreen gameScreen;
+    private HellLevel hellLevel;
     private PauseScreen pauseScreen;
     private StartupScreen startupScreen;
+    private BaseLevel activeLevel;
 
+    public void setActiveLevel(BaseLevel level) {
+        activeLevel = level;
+    }
+
+    public BaseLevel getActiveLevel() {
+        return activeLevel;
+    }
 
     public SaveTheMaidGame() {
     }
@@ -35,6 +46,7 @@ public class SaveTheMaidGame extends Game {
         batch = new SpriteBatch();
         startupScreen = new StartupScreen(this);
         gameScreen = new GameScreen(this);
+        hellLevel = new HellLevel(this);
         pauseScreen = new PauseScreen(this);
 
         setScreen(getStartupScreen());
@@ -47,6 +59,10 @@ public class SaveTheMaidGame extends Game {
 
     public GameScreen getGameScreen() {
         return gameScreen;
+    }
+
+    public HellLevel getHellLevel() {
+        return hellLevel;
     }
 
     public StartupScreen getStartupScreen() {

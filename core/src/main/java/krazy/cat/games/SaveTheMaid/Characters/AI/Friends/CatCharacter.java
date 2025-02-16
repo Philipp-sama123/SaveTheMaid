@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetCat;
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
@@ -32,8 +33,8 @@ public class CatCharacter extends BaseFriendAICharacter<AnimationSetCat.CatAnima
     private boolean markedForDisposal = false;
 
 
-    public CatCharacter(World world, Vector2 position, GameScreen gameScreen) {
-        super(world, position,gameScreen);
+    public CatCharacter(World world, Vector2 position, BaseLevel baseLevel) {
+        super(world, position,baseLevel);
 
         this.currentState = AnimationSetCat.CatAnimationType.APPEAR;
 

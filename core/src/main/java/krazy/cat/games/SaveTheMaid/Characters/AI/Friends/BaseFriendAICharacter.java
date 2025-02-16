@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.Player;
-import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -33,12 +33,12 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
     public boolean isDestroyed = false;
     protected boolean isActive = false;
     protected Player playerReference;
-    private GameScreen gameScreen = null;
+    private BaseLevel baseLevel = null;
 
-    public BaseFriendAICharacter(World world, Vector2 position, GameScreen gameScreen) {
+    public BaseFriendAICharacter(World world, Vector2 position, BaseLevel baseLevel) {
         this.world = world;
         this.stateTime = 0f;
-        this.gameScreen = gameScreen;
+        this.baseLevel = baseLevel;
 
         defineFriend(position);
     }
@@ -87,8 +87,8 @@ public abstract class BaseFriendAICharacter<T extends Enum<T>> {
     }
 
     public void registerSavedFriend() {
-        if (gameScreen != null) {
-            gameScreen.addCatSaved();
+        if (baseLevel != null) {
+            baseLevel.addCatSaved();
             goalSound.play(.35f);
         }
     }

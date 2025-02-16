@@ -26,20 +26,18 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
-import javax.swing.JLayeredPane;
-
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
-import krazy.cat.games.SaveTheMaid.Tools.Utils;
 
 // ToDo: PlayerEffectsManager (!)
 public class Player {
-    private static final int MAX_JUMPS = 3;
+    private static final int MAX_JUMPS = 2;
     private static final float SLIDE_IMPULSE = 1.5f;
     private static final float SLIDE_DURATION = 1.f;
     private final float PROJECTILE_VELOCITY_X = 2.f;
@@ -47,7 +45,7 @@ public class Player {
     private final int JUMP_EFFECT_Y_OFFSET = 40;
     private final int BLOOD_EFFECT_X_OFFSET = 25;
     private final float SLIDE_COLLIDER_VERTICAL_OFFSET = -32 / PPM;
-    private GameScreen gameScreen = null;
+    private BaseLevel baseLevel = null; // TODO REMOVE !
 
     private int jumpCount = 0;
 
@@ -96,17 +94,30 @@ public class Player {
     private Sound shootSound;
     private Sound footstepSound;
     private Sound slideSound;
-
     private BaseFriendAICharacter friendAICharacter;
+    private int groundedCount = 0;
+
+    public boolean isGrounded() {
+        return groundedCount > 0;
+    }
+
+    public void increaseGroundedCount() {
+        jumpCount = 0; // mjeeh
+        groundedCount++;
+    }
+
+    public void decreaseGroundedCount() {
+        if (groundedCount > 0) groundedCount--;
+    }
 
     public Player(World world) {
         this.world = world;
         initializePlayerAssets();
     }
 
-    public Player(World world, GameScreen gameScreen) {
+    public Player(World world, BaseLevel baseLevel) {
         this(world);
-        this.gameScreen = gameScreen;
+        this.baseLevel = baseLevel;
     }
 
     private void initializePlayerAssets() {
@@ -134,11 +145,11 @@ public class Player {
             handleDeath();
             // ToDo: fix the end of the animation somehow (!)
         }
+
         handleFootstepSound();
         stateTime += delta;
 
         updateProjectiles(delta);
-        checkGrounded();
 
         if (isShooting) {
             handleShootingAnimation();
@@ -393,7 +404,6 @@ public class Player {
     }
 
 
-
     private void onDeath() {
         // Reset jump, movement, or shooting states
         jumpCount = 0;
@@ -409,8 +419,8 @@ public class Player {
     private void handleDeath() {
         if (animationSetAgent.getCurrentFrame(currentAnimationState).isAnimationFinished(stateTime)) {
             stateTime = animationSetAgent.getCurrentFrame(currentAnimationState).getAnimationDuration();
-            if (gameScreen != null) {
-                gameScreen.showGameOverScreen();
+            if (baseLevel != null) {
+                baseLevel.showGameOverScreen();
             }
             return;
         }
@@ -431,11 +441,10 @@ public class Player {
             return;
 
         float accelerationFactor = 0.1f;
-        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f;
 
         // Determine the target speed based on input strength
         if (!isCrouching) {
-            float targetSpeed = calculateTargetSpeed(moveInput, isGrounded);
+            float targetSpeed = calculateTargetSpeed(moveInput);
             smoothSpeedTransition(targetSpeed, accelerationFactor);
         } else {
             smoothSpeedTransition(0, accelerationFactor);
@@ -452,9 +461,7 @@ public class Player {
 
 
     public void shootUp() {
-        boolean isGrounded = Math.abs(body.getLinearVelocity().y) < 0.01f; // ToDo: Make this ground check general
-
-        if (isGrounded && !isShootingUp && !isShooting && !isSliding) {
+        if (isGrounded() && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
 
@@ -516,12 +523,6 @@ public class Player {
     }
 
 
-    private void checkGrounded() {
-        if (Math.abs(body.getLinearVelocity().y) < 0.01f && jumpCount > 0) {
-            jumpCount = 0;
-        }
-    }
-
     private void handleShootingAnimation() {
         Animation<TextureRegion> shootAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
         if (shootAnimation.isAnimationFinished(stateTime)) {
@@ -540,7 +541,7 @@ public class Player {
         }
     }
 
-    private float calculateTargetSpeed(float moveInput, boolean isGrounded) {
+    private float calculateTargetSpeed(float moveInput) {
         float targetSpeed = 0;
         float absMoveInput = Math.abs(moveInput);
 
@@ -551,7 +552,7 @@ public class Player {
         } else if (Math.abs(moveInput) > 0.75f) {
             targetSpeed = runSpeed * Math.signum(moveInput);
         }
-        if (!isGrounded)
+        if (!isGrounded())
             targetSpeed /= 2;
 
         return targetSpeed;

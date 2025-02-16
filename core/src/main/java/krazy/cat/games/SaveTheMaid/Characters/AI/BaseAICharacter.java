@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
@@ -49,11 +50,13 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     protected Texture healthBar;
     protected float healthBarYOffset = 15;
-    protected GameScreen gameScreen = null;
+    protected BaseLevel baseLevel = null;
+    private int groundedCount = 0;
 
-    public BaseAICharacter(World world, Vector2 position, GameScreen gameScreen) {
+
+    public BaseAICharacter(World world, Vector2 position, BaseLevel baseLevel) {
         this.world = world;
-        this.gameScreen = gameScreen;
+        this.baseLevel = baseLevel;
         this.stateTime = 0f;
 
         healthBar = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
@@ -144,8 +147,8 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     }
 
     public void registerKillOnGameScreen() {
-        if (gameScreen != null) {
-            gameScreen.addEnemyKill();
+        if (baseLevel != null) {
+            baseLevel.addEnemyKill();
         }
     }
 
@@ -156,5 +159,16 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
             body = null;
         }
         //animationSet.dispose(); ToDo: OOOOUU this is bad (!) when this is activated all the other rats get a null :O
+    }
+    public boolean isGrounded() {
+        return groundedCount > 0;
+    }
+
+    public void increaseGroundedCount() {
+        groundedCount++;
+    }
+
+    public void decreaseGroundedCount() {
+        if (groundedCount > 0) groundedCount--;
     }
 }

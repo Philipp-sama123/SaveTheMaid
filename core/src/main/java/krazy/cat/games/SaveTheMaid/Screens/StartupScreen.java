@@ -46,15 +46,26 @@ public class StartupScreen implements Screen {
         Texture logoutPressedTexture = new Texture(Gdx.files.internal("UiSprites/128 px/Yellow/Exit.png")); // Add pressed texture
         // Set up Logout button
         ImageButton logoutButton = new ImageButton(new TextureRegionDrawable(logoutTexture), new TextureRegionDrawable(logoutPressedTexture));
-
         // Set up Play button
         ImageButton playButton = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getGameScreen());
+                BaseLevel level = game.getGameScreen();
+                game.setActiveLevel(level);
+                game.setScreen(level);
+            }
+        });      // Set up Play 2 button
+        ImageButton playLevel2Button = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
+        playLevel2Button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                BaseLevel level = new HellLevel(game);
+                game.setActiveLevel(level);
+                game.setScreen(level);
             }
         });
+
 
         // Set up Customize button
         ImageButton customizeButton = new ImageButton(new TextureRegionDrawable(customizeTexture), new TextureRegionDrawable(customizePressedTexture));
@@ -79,6 +90,7 @@ public class StartupScreen implements Screen {
         table.add(greetingLabel).padBottom(20).row();  // Add greeting label
 
         table.add(playButton).size(50).pad(5);
+        table.add(playLevel2Button).size(50).pad(5);
         table.add(customizeButton).size(50).pad(5);
         table.add(logoutButton).size(50).pad(5);
 

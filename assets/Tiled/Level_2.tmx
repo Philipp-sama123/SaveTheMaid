@@ -55,12 +55,6 @@
   <object id="89" x="1282.82" y="1696.75" width="92" height="30"/>
   <object id="90" x="1122.38" y="1632.85" width="92" height="30"/>
   <object id="91" x="962.396" y="1568.96" width="92" height="30"/>
-  <object id="102" x="981.078" y="3168.25">
-   <polygon points="0,0 -55.1015,-64.1224 -55.0679,0.976142"/>
-  </object>
-  <object id="103" x="713.006" y="3168.25">
-   <polygon points="0,0 55.1015,-64.1224 55.0679,0.976142"/>
-  </object>
  </objectgroup>
  <objectgroup id="5" name="Goal">
   <object id="46" x="32" y="3122" width="20" height="46"/>

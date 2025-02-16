@@ -70,11 +70,42 @@ public class WorldContactListener implements ContactListener {
         } else if (userDataB instanceof Goal && userDataA instanceof CatCharacter) {
             handleGoalCollision((Goal) userDataB, (CatCharacter) userDataA);
         }
+        // Check if player touches the ground
+        if (userDataA instanceof Player && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((Player) userDataA).increaseGroundedCount();
+        } else if (userDataB instanceof Player && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((Player) userDataB).increaseGroundedCount();
+        }
+
+        // Check if enemy touches the ground
+        if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((BaseAICharacter) userDataA).increaseGroundedCount();
+        } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((BaseAICharacter) userDataB).increaseGroundedCount();
+        }
     }
 
     @Override
     public void endContact(Contact contact) {
-        // Add end-contact logic if needed in the future
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        Object userDataA = fixtureA.getUserData();
+        Object userDataB = fixtureB.getUserData();
+
+        // Check if player leaves the ground
+        if (userDataA instanceof Player && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((Player) userDataA).decreaseGroundedCount();
+        } else if (userDataB instanceof Player && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((Player) userDataB).decreaseGroundedCount();
+        }
+
+        // Check if enemy leaves the ground
+        if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((BaseAICharacter) userDataA).decreaseGroundedCount();
+        } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+            ((BaseAICharacter) userDataB).decreaseGroundedCount();
+        }
     }
 
     @Override

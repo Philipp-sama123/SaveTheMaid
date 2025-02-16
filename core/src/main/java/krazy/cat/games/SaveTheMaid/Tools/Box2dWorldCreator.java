@@ -24,6 +24,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
+import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Apple;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
@@ -31,7 +32,7 @@ import krazy.cat.games.SaveTheMaid.Sprites.Goal;
 import krazy.cat.games.SaveTheMaid.Sprites.WaterEffect;
 
 public class Box2dWorldCreator {
-    public Box2dWorldCreator(World world, TiledMap map, GameScreen gameScreen) {
+    public Box2dWorldCreator(World world, TiledMap map, BaseLevel baseLevel) {
 
 
         // Create bodies for "Ground" layer
@@ -109,23 +110,24 @@ public class Box2dWorldCreator {
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
 
-            gameScreen.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                (rectangle.y + 100) / PPM), gameScreen)); // Adjusted for PPM
-            gameScreen.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
-            gameScreen.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
+            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+                (rectangle.y + 100) / PPM), baseLevel)); // Adjusted for PPM
+            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
+                rectangle.y / PPM), baseLevel)); // Adjusted for PPM
+            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+                rectangle.y / PPM), baseLevel)); // Adjusted for PPM
         }
 
         // Create Friend objects for "SpawnPointsFriend" layer
         for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            gameScreen.addCat(new CatCharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM), gameScreen)); // Adjusted for PPM
+            baseLevel.addCat(new CatCharacter(world, new Vector2(rectangle.x / PPM,
+                rectangle.y / PPM), baseLevel)); // Adjusted for PPM
         }
-      //  createMultipleWaterEffects(world, map, gameScreen);
+        //  createMultipleWaterEffects(world, map, baseLevel);
 
     }
+
     private void createMultipleWaterEffects(World world, TiledMap map, GameScreen gameScreen) {
         // Texture for the water sprite sheet (load globally if reused)
         Texture waterTexture = gameScreen.getWaterTexture();

@@ -8,6 +8,25 @@
         "."
     ],
     "fileStates": {
+        "BackgroundFull.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Background_Full.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "BathingMaid.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "DungeonTiles32x32.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "FireRed.tsx": {
+            "scaleInEditor": 1
+        },
         "FirstLevel.tmx": {
             "expandedObjectLayers": [
                 9,
@@ -21,36 +40,66 @@
                 "y": 6746.865781710914
             }
         },
-        "Level_1.tmx": {
-            "scale": 0.4634,
-            "selectedLayer": 7,
+        "HellLevel.tmx": {
+            "expandedObjectLayers": [
+                5,
+                3,
+                8
+            ],
+            "scale": 0.7479,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 3199.179974104445,
-                "y": 3199.179974104445
+                "x": 299.50528145473993,
+                "y": 2954.2719614921784
+            }
+        },
+        "HellTiles32x32.tsx": {
+            "scaleInDock": 1.35,
+            "scaleInEditor": 1
+        },
+        "Level_1.tmx": {
+            "expandedObjectLayers": [
+                3
+            ],
+            "scale": 0.2675,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1641.1214953271028,
+                "y": 6480.373831775701
             }
         },
         "Level_2.tmx": {
             "expandedObjectLayers": [
                 5,
+                3,
                 8
             ],
-            "scale": 5.2784,
+            "scale": 0.7742,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 958.1501970294028,
-                "y": 3158.817065777508
+                "x": 395.24670627744774,
+                "y": 3007.620769826918
             }
+        },
+        "MaidBathing.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "PlatformerAssets.tsx": {
             "scaleInDock": 1.1961,
             "scaleInEditor": 1
+        },
+        "volcanoe_tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
-    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/PlatformerAssets",
+    "frame.defaultDuration": 250,
+    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/Volcanic Area Files/layers",
     "map.height": 100,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "3",
-    "map.width": 100,
+    "map.width": 500,
     "openFiles": [
         "PlatformerAssets.tsx",
         "Level_1.tmx",
@@ -58,10 +107,22 @@
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "volcanoe_tiles.tsx",
+        "Background_Full.tsx",
+        "BackgroundFull.tsx",
         "PlatformerAssets.tsx",
+        "MaidBathing.tsx",
+        "FireRed.tsx",
+        "BathingMaid.tsx",
+        "DungeonTiles32x32.tsx",
+        "HellTiles32x32.tsx",
         "Level_1.tmx",
         "Level_2.tmx",
-        "FirstLevel.tmx"
+        "HellLevel.tmx"
     ],
-    "tileset.lastUsedFormat": "tsx"
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
 }
