@@ -65,7 +65,6 @@ public class SaveTheMaidGame extends Game {
             hellLevel = null;
             hellLevel = new HellLevel(this);
         }
-
     }
 
     public VillageLevel getVillageLevel() {

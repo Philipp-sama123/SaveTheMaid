@@ -70,14 +70,17 @@ public class Player {
     private Animation<TextureRegion> jumpEffectAnimation;
     private Animation<TextureRegion> bloodEffectAnimation;
     private Animation<TextureRegion> slideEffectAnimation;
-    private Animation<TextureRegion> destroyAnimation;
+    private Animation<TextureRegion> destroyEffectAnimation;
 
     private boolean showJumpEffect;
     private boolean showSlideEffect;
     private boolean showBloodEffect;
+    private boolean showDestroyEffect;
+
     private float jumpEffectTime;
     private float bloodEffectTime;
     private float slideEffectTime;
+    private float destroyEffectTime;
 
     private float deathTimer = 0f;
 
@@ -134,8 +137,8 @@ public class Player {
 
         jumpEffectAnimation = createAnimation(jumpSpriteSheet, 32, 16, 10, 0.05f);
         bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 7, 0.1f);
-        slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 50, 32, 8, 0.1f);
-        destroyAnimation = createAnimation(destroySpriteSheet, 64, 64, 13, 0.1f);
+        slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 48, 32, 9, 0.1f);
+        destroyEffectAnimation = createAnimation(destroySpriteSheet, 64, 64, 13, 0.1f);
     }
 
     private void initializeSounds() {
@@ -250,6 +253,12 @@ public class Player {
                 showBloodEffect = false;
             }
         }
+        if (showDestroyEffect) {
+            destroyEffectTime += delta;
+            if (destroyEffectAnimation.isAnimationFinished(destroyEffectTime)) {
+                showDestroyEffect = false;
+            }
+        }
     }
 
     public void draw(Batch batch) {
@@ -294,6 +303,15 @@ public class Player {
             batch.draw(bloodEffectFrame, effectPosX, effectPosY,
                 (bloodEffectFrame.getRegionWidth() / PPM) * BLOOD_EFFECT_SCALE,
                 (bloodEffectFrame.getRegionHeight() / PPM) * BLOOD_EFFECT_SCALE);
+        }
+        // Draw blood effect
+        if (showDestroyEffect) {
+            TextureRegion destroyEffectFrame = destroyEffectAnimation.getKeyFrame(destroyEffectTime);
+            float effectPosX = body.getPosition().x - (destroyEffectFrame.getRegionWidth() / 2f / PPM);
+            float effectPosY = body.getPosition().y - (destroyEffectFrame.getRegionHeight() / 2f / PPM);
+            batch.draw(destroyEffectFrame, effectPosX, effectPosY,
+                (destroyEffectFrame.getRegionWidth() / PPM),
+                (destroyEffectFrame.getRegionHeight() / PPM));
         }
     }
 
@@ -651,6 +669,7 @@ public class Player {
     public void die() {
         if (isDead) return;
         takeDamage(100);
+        showDestroyEffect = true;
     }
 
     // --- Footstep Sound Handling ---
