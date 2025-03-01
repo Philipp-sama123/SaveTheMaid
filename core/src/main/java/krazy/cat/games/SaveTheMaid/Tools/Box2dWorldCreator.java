@@ -1,12 +1,12 @@
 package krazy.cat.games.SaveTheMaid.Tools;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_DESTROY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_GROUND;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -25,11 +25,10 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
-import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Sprites.Apple;
 import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Goal;
-import krazy.cat.games.SaveTheMaid.Sprites.WaterEffect;
+import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class Box2dWorldCreator {
     public Box2dWorldCreator(World world, TiledMap map, BaseLevel baseLevel) {
@@ -101,11 +100,33 @@ public class Box2dWorldCreator {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             new Apple(world, rectangle);
         }
-        // Create Brick objects for "Bricks" layer
+        // Create bodies for "Destroy" layer
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            new Brick(world, map, rectangle); // Bricks are using raw LibGDX coordinates, adjust internally if needed
+
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.type = BodyDef.BodyType.StaticBody;
+            // Center the body in the rectangle
+            bodyDef.position.set((rectangle.getX() + rectangle.getWidth() / 2) / PPM,
+                (rectangle.getY() + rectangle.getHeight() / 2) / PPM);
+
+            Body body = world.createBody(bodyDef);
+
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox((rectangle.getWidth() / 2) / PPM, (rectangle.getHeight() / 2) / PPM);
+
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = shape;
+            // Set the collision category for the destroy zone
+            fixtureDef.filter.categoryBits = CATEGORY_DESTROY;
+            // Only allow collisions with the player and enemies
+            fixtureDef.filter.maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY;
+
+            body.createFixture(fixtureDef).setUserData("destroy");
+
+            shape.dispose(); // Clean up shape resources
         }
+
         // Create enemies for "SpawnPoints" layer
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
@@ -124,57 +145,5 @@ public class Box2dWorldCreator {
             baseLevel.addCat(new CatCharacter(world, new Vector2(rectangle.x / PPM,
                 rectangle.y / PPM), baseLevel)); // Adjusted for PPM
         }
-        //  createMultipleWaterEffects(world, map, baseLevel);
-
     }
-
-    private void createMultipleWaterEffects(World world, TiledMap map, GameScreen gameScreen) {
-        // Texture for the water sprite sheet (load globally if reused)
-        Texture waterTexture = gameScreen.getWaterTexture();
-
-        // Starting position for the water effects
-        float startX = 80; // Starting X position of the first water effect
-        float startY = 0; // Y position (same for all)
-
-        // Number of water effects and spacing
-        int numEffects = 10; // Number of water effects to create
-        float spacing = 160; // Horizontal spacing between effects (adjust as needed)
-
-        // Loop to create multiple water effects
-        for (int i = 0; i < numEffects; i++) {
-            float worldX = (startX + i * spacing) / PPM; // Calculate X position for each effect
-            float worldY = startY / PPM; // Y position remains constant
-
-            // Create a new water effect at the calculated position
-            WaterEffect waterEffect = new WaterEffect(world, new Vector2(worldX, worldY), waterTexture);
-
-            // Add the water effect to the game screen for rendering
-            gameScreen.addWaterEffect(waterEffect);
-
-            System.out.println("Water effect " + (i + 1) + " created at position: (" + worldX + ", " + worldY + ")");
-        }
-    }
-
-    private void createSingleWaterEffect(World world, TiledMap map, GameScreen gameScreen) {
-        // Texture for the water sprite sheet (load globally if reused)
-        Texture waterTexture = gameScreen.getWaterTexture();
-
-        // Determine the start position of the map
-        float startX = 80; // Starting X position (adjust as needed)
-        float startY = 10; // Starting Y position (adjust as needed)
-
-        // Convert to world coordinates
-        float worldX = startX / PPM;
-        float worldY = startY / PPM;
-
-        // Create a new water effect at the start of the map
-        WaterEffect waterEffect = new WaterEffect(world, new Vector2(worldX, worldY), waterTexture);
-
-        // Add the water effect to the game screen for rendering
-        gameScreen.addWaterEffect(waterEffect);
-
-        System.out.println("Single water effect created at the start of the map.");
-    }
-
-
 }

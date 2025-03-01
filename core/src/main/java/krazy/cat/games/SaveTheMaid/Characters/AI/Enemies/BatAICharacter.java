@@ -3,7 +3,6 @@ package krazy.cat.games.SaveTheMaid.Characters.AI.Enemies;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_ENEMY_BAT;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
@@ -20,9 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetBat;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
-import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 

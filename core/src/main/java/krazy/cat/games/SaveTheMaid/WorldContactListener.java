@@ -15,11 +15,11 @@ public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_PROJECTILE = 0x0004;
     public static final short CATEGORY_GROUND = 0x0008;
     public static final short CATEGORY_CAT = 0x0010;
-
+    public static final short CATEGORY_DESTROY = 0x0020;
     // Collision Masks
     public static final short MASK_GROUND_ONLY = CATEGORY_GROUND;
-    public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_CAT;
-    public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE;
+    public static final short MASK_PLAYER = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_CAT | CATEGORY_DESTROY;
+    public static final short MASK_ENEMY = CATEGORY_GROUND | CATEGORY_PROJECTILE | CATEGORY_DESTROY;
     public static final short MASK_ENEMY_BAT = CATEGORY_PROJECTILE;
     public static final short MASK_PROJECTILE = CATEGORY_GROUND | CATEGORY_PLAYER | CATEGORY_ENEMY;
     public static final short MASK_CAT = CATEGORY_GROUND | CATEGORY_PLAYER;
@@ -82,6 +82,21 @@ public class WorldContactListener implements ContactListener {
             ((BaseAICharacter) userDataA).increaseGroundedCount();
         } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((BaseAICharacter) userDataB).increaseGroundedCount();
+        }
+
+        // Check for collision with the destroy zone
+        if ("destroy".equals(userDataA)) {
+            if (userDataB instanceof Player) {
+                ((Player) userDataB).die(); // Implement die() to handle player death
+            } else if (userDataB instanceof BaseAICharacter) {
+                ((BaseAICharacter) userDataB).onDie(); // Implement die() to handle enemy removal
+            }
+        } else if ("destroy".equals(userDataB)) {
+            if (userDataA instanceof Player) {
+                ((Player) userDataA).die();
+            } else if (userDataA instanceof BaseAICharacter) {
+                ((BaseAICharacter) userDataA).onDie();
+            }
         }
     }
 

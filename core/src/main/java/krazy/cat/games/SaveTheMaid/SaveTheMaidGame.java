@@ -1,12 +1,11 @@
 package krazy.cat.games.SaveTheMaid;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
-import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
+import krazy.cat.games.SaveTheMaid.Screens.VillageLevel;
 import krazy.cat.games.SaveTheMaid.Screens.HellLevel;
 import krazy.cat.games.SaveTheMaid.Screens.PauseScreen;
 import krazy.cat.games.SaveTheMaid.Screens.StartupScreen;
@@ -20,19 +19,12 @@ public class SaveTheMaidGame extends Game {
 
     public SpriteBatch batch;
 
-    private GameScreen gameScreen;
+    private VillageLevel villageLevel;
     private HellLevel hellLevel;
     private PauseScreen pauseScreen;
     private StartupScreen startupScreen;
-    private BaseLevel activeLevel;
+    private BaseLevel currentLevel;
 
-    public void setActiveLevel(BaseLevel level) {
-        activeLevel = level;
-    }
-
-    public BaseLevel getActiveLevel() {
-        return activeLevel;
-    }
 
     public SaveTheMaidGame() {
     }
@@ -44,25 +36,52 @@ public class SaveTheMaidGame extends Game {
         ScoreSystemManager.getInstance();
 
         batch = new SpriteBatch();
+
         startupScreen = new StartupScreen(this);
-        gameScreen = new GameScreen(this);
+
+        villageLevel = new VillageLevel(this);
         hellLevel = new HellLevel(this);
+
         pauseScreen = new PauseScreen(this);
 
         setScreen(getStartupScreen());
     }
 
-    public void reinitializeGameScreen() {
-        gameScreen = null;
-        gameScreen = new GameScreen(this);
+    public void startHellLevel() {
+        setCurrentLevel(hellLevel);
+        setScreen(hellLevel);
     }
 
-    public GameScreen getGameScreen() {
-        return gameScreen;
+    public void startVillageLevel() {
+        setCurrentLevel(villageLevel);
+        setScreen(villageLevel);
+    }
+
+    public void reloadCurrentLevel() {
+        if (currentLevel instanceof VillageLevel) {
+            villageLevel = null;
+            villageLevel = new VillageLevel(this);
+        } else if (currentLevel instanceof HellLevel) {
+            hellLevel = null;
+            hellLevel = new HellLevel(this);
+        }
+
+    }
+
+    public VillageLevel getVillageLevel() {
+        return villageLevel;
     }
 
     public HellLevel getHellLevel() {
         return hellLevel;
+    }
+
+    public void setCurrentLevel(BaseLevel level) {
+        currentLevel = level;
+    }
+
+    public BaseLevel getCurrentLevel() {
+        return currentLevel;
     }
 
     public StartupScreen getStartupScreen() {

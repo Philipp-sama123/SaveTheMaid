@@ -74,8 +74,8 @@ public class GameOverScreen implements Screen {
         replayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.reinitializeGameScreen();
-                game.setScreen(game.getGameScreen());
+                game.reloadCurrentLevel();
+                game.setScreen(game.getVillageLevel());
             }
         });
 

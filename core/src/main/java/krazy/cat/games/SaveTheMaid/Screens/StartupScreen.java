@@ -1,11 +1,9 @@
 package krazy.cat.games.SaveTheMaid.Screens;
 
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_HEIGHT;
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.GAME_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -51,18 +48,14 @@ public class StartupScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BaseLevel level = game.getGameScreen();
-                game.setActiveLevel(level);
-                game.setScreen(level);
+                game.startVillageLevel();
             }
         });      // Set up Play 2 button
         ImageButton playLevel2Button = new ImageButton(new TextureRegionDrawable(playTexture), new TextureRegionDrawable(playPressedTexture));
         playLevel2Button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BaseLevel level = new HellLevel(game);
-                game.setActiveLevel(level);
-                game.setScreen(level);
+                game.startHellLevel();
             }
         });
 

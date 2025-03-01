@@ -3,13 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level_2.tmx",
+    "activeFile": "HellLevel.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "BackgroundFull.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 0.7021,
             "scaleInEditor": 1
         },
         "Background_Full.tsx": {
@@ -25,6 +25,7 @@
             "scaleInEditor": 1
         },
         "FireRed.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "FirstLevel.tmx": {
@@ -42,19 +43,20 @@
         },
         "HellLevel.tmx": {
             "expandedObjectLayers": [
-                5,
                 3,
+                5,
+                7,
                 8
             ],
-            "scale": 0.7479,
-            "selectedLayer": 3,
+            "scale": 1.8432,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 299.50528145473993,
-                "y": 2954.2719614921784
+                "x": 527.8862847222222,
+                "y": 2990.9939236111113
             }
         },
         "HellTiles32x32.tsx": {
-            "scaleInDock": 1.35,
+            "scaleInDock": 0.5716,
             "scaleInEditor": 1
         },
         "Level_1.tmx": {
@@ -64,21 +66,16 @@
             "scale": 0.2675,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1641.1214953271028,
-                "y": 6480.373831775701
+                "x": 3200,
+                "y": 3200
             }
         },
         "Level_2.tmx": {
-            "expandedObjectLayers": [
-                5,
-                3,
-                8
-            ],
-            "scale": 0.7742,
-            "selectedLayer": 2,
+            "scale": 1.2563,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 395.24670627744774,
-                "y": 3007.620769826918
+                "x": 1599.93632094245,
+                "y": 1595.1603916262038
             }
         },
         "MaidBathing.tsx": {
@@ -86,43 +83,54 @@
             "scaleInEditor": 1
         },
         "PlatformerAssets.tsx": {
-            "scaleInDock": 1.1961,
+            "dynamicWrapping": false,
+            "scaleInDock": 0.7525,
             "scaleInEditor": 1
         },
+        "lava-tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 3.9525
+        },
         "volcanoe_tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "water.tsx": {
+            "dynamicWrapping": true,
             "scaleInDock": 1,
             "scaleInEditor": 1
         }
     },
     "frame.defaultDuration": 250,
-    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/Volcanic Area Files/layers",
+    "last.externalTilesetPath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/Tiled",
+    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/SSWorlds_SET1_v1.0/_PNG/anim",
     "map.height": 100,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "3",
     "map.width": 500,
     "openFiles": [
-        "PlatformerAssets.tsx",
+        "Level_2.tmx",
         "Level_1.tmx",
-        "Level_2.tmx"
+        "HellLevel.tmx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "Level_2.tmx",
+        "Level_1.tmx",
+        "HellLevel.tmx",
+        "water.tsx",
+        "lava-tileset.tsx",
         "volcanoe_tiles.tsx",
         "Background_Full.tsx",
         "BackgroundFull.tsx",
         "PlatformerAssets.tsx",
         "MaidBathing.tsx",
         "FireRed.tsx",
-        "BathingMaid.tsx",
-        "DungeonTiles32x32.tsx",
-        "HellTiles32x32.tsx",
-        "Level_1.tmx",
-        "Level_2.tmx",
-        "HellLevel.tmx"
+        "BathingMaid.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
         "height": 32,
-        "width": 32
+        "width": 128
     }
 }

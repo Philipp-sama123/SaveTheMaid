@@ -12,10 +12,10 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.DeathState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
-import krazy.cat.games.SaveTheMaid.Screens.GameScreen;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
@@ -77,6 +77,9 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     public void onHit() {
         stateMachine.changeState(new HitState());
+    }
+    public void onDie() {
+        stateMachine.changeState(new DeathState());
     }
 
     public void activateAttackCollider() {

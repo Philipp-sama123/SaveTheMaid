@@ -49,7 +49,7 @@ public class PauseScreen implements Screen {
         resumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getGameScreen()); // Switch back to GameScreen
+                game.setScreen(game.getVillageLevel()); // Switch back to GameScreen
             }
         });
         Texture homeTextureUp = new Texture(Gdx.files.internal("UiSprites/128 px/Blue/Home.png"));
@@ -63,7 +63,7 @@ public class PauseScreen implements Screen {
         homeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.reinitializeGameScreen();
+                game.reloadCurrentLevel();
                 game.setScreen(game.getStartupScreen()); // Switch back to GameScreen
             }
         });
@@ -78,8 +78,8 @@ public class PauseScreen implements Screen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.reinitializeGameScreen();
-                game.setScreen(game.getGameScreen()); // Switch back to GameScreen
+                game.reloadCurrentLevel();
+                game.setScreen(game.getVillageLevel()); // Switch back to GameScreen
             }
         });
 

@@ -206,7 +206,7 @@ public class Hud implements Disposable {
         debugButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.getActiveLevel().isShowBox2dDebug = !game.getActiveLevel().isShowBox2dDebug; // Switch back to GameScreen
+                game.getCurrentLevel().isShowBox2dDebug = !game.getCurrentLevel().isShowBox2dDebug; // Switch back to GameScreen
             }
         });
     }
@@ -271,26 +271,26 @@ public class Hud implements Disposable {
         }
 
         if (shootUpButton.isPressed()) {
-            game.getActiveLevel().getPlayer().shootUp();
+            game.getCurrentLevel().getPlayer().shootUp();
         }
         if (shootButton.isPressed()) {
-            game.getActiveLevel().getPlayer().shoot();
+            game.getCurrentLevel().getPlayer().shoot();
         }
 
         if (jumpButton.isPressed()) {
             if (!jumpPressed) {
-                game.getActiveLevel().getPlayer().jump();
+                game.getCurrentLevel().getPlayer().jump();
                 jumpPressed = true;
             }
         } else {
             jumpPressed = false; // Reset when button is released
         }
         if (slideButton.isPressed()) {
-            game.getActiveLevel().getPlayer().slide();
+            game.getCurrentLevel().getPlayer().slide();
         }
         float joystickPercentX = movementJoystick.getKnobPercentX(); // Knob percentage movement on the X-axis
-        game.getActiveLevel().getPlayer().move(joystickPercentX);
-        game.getActiveLevel().getPlayer().crouch(movementJoystick.getKnobPercentY() < -0.75);
+        game.getCurrentLevel().getPlayer().move(joystickPercentX);
+        game.getCurrentLevel().getPlayer().crouch(movementJoystick.getKnobPercentY() < -0.75);
     }
 
     public void updateHealth(int currentHealth, int maxHealth) {

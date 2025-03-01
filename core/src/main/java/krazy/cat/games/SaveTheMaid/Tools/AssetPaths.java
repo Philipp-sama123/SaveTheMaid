@@ -19,9 +19,10 @@ public class AssetPaths {
 
     // Player Assets
     public static final String PLAYER_TEXTURE = "Characters/FemaleAgent/Full/Red.png";
-    public static final String PLAYER_JUMP_EFFECT_TEXTURE = "Effects/PlayerJumpEffect.png";
-    public static final String PLAYER_BLOOD_EFFECT_TEXTURE = "Effects/PlayerBloodEffect.png";
+    public static final String PLAYER_JUMP_EFFECT_TEXTURE = "Effects/SmokeFX/Smoke_VFX_03.png";
+    public static final String PLAYER_BLOOD_EFFECT_TEXTURE = "Effects/VFX_PlayerBlood.png";
     public static final String PLAYER_SLIDE_EFFECT_TEXTURE = "Effects/SmokeFX/Smoke_VFX_01.png";
+    public static final String PLAYER_DESTROY_EFFECT_TEXTURE = "Effects/SmokeFX/Smoke_VFX_02.png";
     public static final String AGENT_PIXEL_BULLET_TEXTURE = "Characters/FemaleAgent/PixelBullet16x16.png";
     public static final String JUMP_SOUND = "SFX/Jump.wav";
     public static final String SHOOT_SOUND = "SFX/Shoot.wav";

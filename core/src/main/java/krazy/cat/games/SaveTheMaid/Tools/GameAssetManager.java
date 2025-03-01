@@ -38,6 +38,7 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.PLAYER_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_SLIDE_EFFECT_TEXTURE, Texture.class);
+        assetManager.load(AssetPaths.PLAYER_DESTROY_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
 
