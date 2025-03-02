@@ -43,20 +43,20 @@
         },
         "HellLevel.tmx": {
             "expandedObjectLayers": [
-                3,
-                5,
                 7,
-                8
+                5,
+                8,
+                3
             ],
-            "scale": 1.8432,
-            "selectedLayer": 6,
+            "scale": 0.7278,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 527.8862847222222,
-                "y": 2990.9939236111113
+                "x": 1003.0228084638638,
+                "y": 2936.2462214894203
             }
         },
         "HellTiles32x32.tsx": {
-            "scaleInDock": 0.5716,
+            "scaleInDock": 1.5354,
             "scaleInEditor": 1
         },
         "Level_1.tmx": {
