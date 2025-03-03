@@ -1,17 +1,6 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
-import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.JUMP_SOUND;
-import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_FOOTSTEP_SOUND;
-import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_HIT_SOUND;
-import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_SLIDE_SOUND;
-import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.SHOOT_SOUND;
-import static krazy.cat.games.SaveTheMaid.Tools.Utils.createAnimation;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
-import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PLAYER;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,12 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
@@ -38,14 +23,16 @@ public class Player {
     // --- Managers ---
     private final PlayerEffectManager playerEffectManager;
     private final PlayerSoundManager playerSoundManager;
+    private PlayerColliderManager colliderManager;
+
     // --- Constants ---
     private static final int MAX_JUMPS = 2;
     private static final float SLIDE_IMPULSE = 1.5f;
     private static final float SLIDE_DURATION = 1.0f;
     private static final float PROJECTILE_VELOCITY_X = 2.0f;
     private static final float PROJECTILE_VELOCITY_Y = 1.5f;
-    private static final float SLIDE_COLLIDER_VERTICAL_OFFSET = -32 / PPM;
     private static final float DEATH_SCREEN_DELAY = 5.0f; // Delay before showing death screen
+
     // --- Movement speeds (in meters per second) ---
     private final float slowSpeed = 25 / PPM;
     private final float walkSpeed = 50 / PPM;
@@ -65,7 +52,7 @@ public class Player {
 
     private float deathTimer = 0f;
 
-    // Movement/State flags
+    // Movement/State flagsØ
     private int jumpCount = 0;
     private int groundedCount = 0;
     private boolean isShooting = false;
@@ -77,10 +64,9 @@ public class Player {
     private float slideTime;
     private float stateTime;
     private AnimationType currentAnimationState = AnimationType.IDLE;
-    private int lastFootstepFrame = -1; // To prevent duplicate sound triggering
+    // (lastFootstepFrame is now handled inside PlayerSoundManager)
 
     private BaseFriendAICharacter friendAICharacter;
-
 
     // --- Constructors ---
     public Player(World world) {
@@ -93,7 +79,6 @@ public class Player {
     public Player(World world, BaseLevel baseLevel) {
         this(world);
         this.baseLevel = baseLevel;
-
     }
 
     // --- Initialization Methods ---
@@ -101,54 +86,23 @@ public class Player {
         animationSetAgent = new AnimationSetFemaleAgent(
             GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
         );
-
         playerEffectManager.loadEffects();
         definePlayer();
     }
 
     private void definePlayer() {
-        // Body definition
+        // Create the Box2D body.
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(100 / PPM, 100 / PPM); // Convert to meters
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        // Initialize projectiles and texture
+        // Initialize projectiles and load the projectile texture.
         projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         projectiles = new Array<>();
 
-        // --- Create Capsule-like Collider ---
-        // Central rectangle
-        PolygonShape rectShape = new PolygonShape();
-        rectShape.setAsBox(8f / PPM, 16f / PPM);
-        FixtureDef rectFixtureDef = new FixtureDef();
-        rectFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        rectFixtureDef.filter.maskBits = MASK_PLAYER;
-        rectFixtureDef.shape = rectShape;
-        body.createFixture(rectFixtureDef).setUserData(this);
-        rectShape.dispose();
-
-        // Top circle
-        CircleShape topCircle = new CircleShape();
-        topCircle.setRadius(8f / PPM);
-        topCircle.setPosition(new Vector2(0, 16f / PPM));
-        FixtureDef topCircleFixtureDef = new FixtureDef();
-        topCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        topCircleFixtureDef.filter.maskBits = MASK_PLAYER;
-        topCircleFixtureDef.shape = topCircle;
-        body.createFixture(topCircleFixtureDef).setUserData(this);
-        topCircle.dispose();
-
-        // Bottom circle
-        CircleShape bottomCircle = new CircleShape();
-        bottomCircle.setRadius(8f / PPM);
-        bottomCircle.setPosition(new Vector2(0, -16f / PPM));
-        FixtureDef bottomCircleFixtureDef = new FixtureDef();
-        bottomCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        bottomCircleFixtureDef.filter.maskBits = MASK_PLAYER;
-        bottomCircleFixtureDef.shape = bottomCircle;
-        body.createFixture(bottomCircleFixtureDef).setUserData(this);
-        bottomCircle.dispose();
+        // Delegate collider creation to the PlayerColliderManager.
+        colliderManager = new PlayerColliderManager(this, world, body);
     }
 
     // --- Update & Draw Methods ---
@@ -156,10 +110,8 @@ public class Player {
         if (isDead) {
             Animation<TextureRegion> deathAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
             float deathAnimDuration = deathAnimation.getAnimationDuration();
-
             stateTime = Math.min(stateTime + delta, deathAnimDuration);
-            deathTimer += delta; // accumulate death timer
-
+            deathTimer += delta;
             if (deathTimer >= DEATH_SCREEN_DELAY && baseLevel != null) {
                 baseLevel.showGameOverScreen();
             }
@@ -167,7 +119,10 @@ public class Player {
             stateTime += delta;
         }
 
-        playerSoundManager.handleFootstepSound(currentAnimationState, animationSetAgent.getCurrentFrame(currentAnimationState), stateTime);
+        // Handle footstep sounds.
+        Animation<TextureRegion> currentAnim = animationSetAgent.getCurrentFrame(currentAnimationState);
+        playerSoundManager.handleFootstepSound(currentAnimationState, currentAnim, stateTime);
+
         updateProjectiles(delta);
 
         if (isShooting) {
@@ -176,14 +131,13 @@ public class Player {
         if (isShootingUp) {
             handleShootingUpAnimation();
         }
-        // ToDo: EffectManager
         playerEffectManager.updateEffects(delta);
 
         if (isSliding) {
             slideTime += delta;
             if (slideTime >= SLIDE_DURATION) {
                 isSliding = false;
-                restoreCollider();
+                colliderManager.restoreCollider();
             }
         }
     }
@@ -192,13 +146,11 @@ public class Player {
         setBatchColorForDamage(batch);
         drawAnimation(batch, getCurrentFrame());
         batch.setColor(1, 1, 1, 1);
-
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
         playerEffectManager.drawEffects(batch);
     }
-
 
     // --- Player Actions ---
     public void jump() {
@@ -208,10 +160,8 @@ public class Player {
             jumpCount++;
             stateTime = 0;
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-
             playerSoundManager.playJumpSound();
             playerEffectManager.triggerJumpEffect();
-
             if (friendAICharacter != null) {
                 friendAICharacter.jump();
             }
@@ -220,33 +170,25 @@ public class Player {
 
     public void slide() {
         if (isSliding || isDead) return;
-
-        rotateColliderForSlide();
+        colliderManager.rotateColliderForSlide();
         isSliding = true;
         slideTime = 0;
-
         float slideImpulseX = isFacingRight ? SLIDE_IMPULSE : -SLIDE_IMPULSE;
         body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
-        // EFFECTS
         playerSoundManager.playSlideSound();
         playerEffectManager.triggerSlideEffect();
-
         if (friendAICharacter != null) {
             friendAICharacter.slide();
         }
     }
 
-    /**
-     * Shoots a projectile upward if the player is on the ground and not busy with other actions.
-     */
     public void shootUp() {
         if (isGrounded() && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
             Vector2 position = body.getPosition().cpy().add(0, 40 / PPM);
             Vector2 velocity = new Vector2(0, PROJECTILE_VELOCITY_Y);
-
             playerSoundManager.playShootSound();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
@@ -256,10 +198,10 @@ public class Player {
         if (!isShooting && !isShootingUp) {
             isShooting = true;
             stateTime = 0f;
-            Vector2 position = body.getPosition().cpy().add(isFacingRight ? 20 / PPM : -20 / PPM,
+            Vector2 position = body.getPosition().cpy().add(
+                isFacingRight ? 20 / PPM : -20 / PPM,
                 isCrouching ? 2 / PPM : 10 / PPM);
             Vector2 velocity = new Vector2(isFacingRight ? PROJECTILE_VELOCITY_X : -PROJECTILE_VELOCITY_X, 0);
-
             if (isSliding) {
                 position.y -= 16 / PPM;
                 position.x += isFacingRight ? 16 / PPM : -16 / PPM;
@@ -277,9 +219,7 @@ public class Player {
         if (isDead) return;
         playerSoundManager.playHitSound();
         currentHealth -= damage;
-
         playerEffectManager.triggerBloodEffect();
-
         if (currentHealth <= 0) {
             currentHealth = 0;
             isDead = true;
@@ -306,16 +246,13 @@ public class Player {
 
     public void move(float moveInput) {
         if (isDead || isSliding) return;
-
         float accelerationFactor = 0.1f;
         float targetSpeed = !isCrouching ? calculateTargetSpeed(moveInput) : 0;
         smoothSpeedTransition(targetSpeed, accelerationFactor);
-
         if (moveInput != 0) {
             isFacingRight = moveInput > 0;
             adjustFrameOrientation();
         }
-
         updateAnimationStateBasedOnMovement();
     }
 
@@ -323,70 +260,6 @@ public class Player {
         if (!isSliding) {
             takeDamage(5);
         }
-    }
-
-    // --- Collider Handling ---
-
-    /**
-     * Rotates the collider to a horizontal (sliding) orientation.
-     */
-    private void rotateColliderForSlide() {
-        Array<Fixture> fixturesToDestroy = new Array<>();
-        for (Fixture fixture : body.getFixtureList()) {
-            fixturesToDestroy.add(fixture);
-        }
-        for (Fixture fixture : fixturesToDestroy) {
-            body.destroyFixture(fixture);
-        }
-        PolygonShape rotatedShape = new PolygonShape();
-        rotatedShape.setAsBox(24f / PPM, 8f / PPM, new Vector2(0, SLIDE_COLLIDER_VERTICAL_OFFSET / 2), 0);
-        FixtureDef slideFixtureDef = new FixtureDef();
-        slideFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        slideFixtureDef.filter.maskBits = MASK_PLAYER;
-        slideFixtureDef.shape = rotatedShape;
-        body.createFixture(slideFixtureDef).setUserData(this);
-        rotatedShape.dispose();
-    }
-
-    /**
-     * Restores the original collider shape (capsule shape).
-     */
-    private void restoreCollider() {
-        Array<Fixture> fixturesToDestroy = new Array<>(body.getFixtureList());
-        for (Fixture fixture : fixturesToDestroy) {
-            body.destroyFixture(fixture);
-        }
-        // Central rectangle
-        PolygonShape rectShape = new PolygonShape();
-        rectShape.setAsBox(8f / PPM, 16f / PPM);
-        FixtureDef rectFixtureDef = new FixtureDef();
-        rectFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        rectFixtureDef.filter.maskBits = MASK_PLAYER;
-        rectFixtureDef.shape = rectShape;
-        body.createFixture(rectFixtureDef).setUserData(this);
-        rectShape.dispose();
-
-        // Top circle
-        CircleShape topCircle = new CircleShape();
-        topCircle.setRadius(8f / PPM);
-        topCircle.setPosition(new Vector2(0, 16f / PPM));
-        FixtureDef topCircleFixtureDef = new FixtureDef();
-        topCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        topCircleFixtureDef.filter.maskBits = MASK_PLAYER;
-        topCircleFixtureDef.shape = topCircle;
-        body.createFixture(topCircleFixtureDef).setUserData(this);
-        topCircle.dispose();
-
-        // Bottom circle
-        CircleShape bottomCircle = new CircleShape();
-        bottomCircle.setRadius(8f / PPM);
-        bottomCircle.setPosition(new Vector2(0, -16f / PPM));
-        FixtureDef bottomCircleFixtureDef = new FixtureDef();
-        bottomCircleFixtureDef.filter.categoryBits = CATEGORY_PLAYER;
-        bottomCircleFixtureDef.filter.maskBits = MASK_PLAYER;
-        bottomCircleFixtureDef.shape = bottomCircle;
-        body.createFixture(bottomCircleFixtureDef).setUserData(this);
-        bottomCircle.dispose();
     }
 
     // --- Animation & Rendering Helpers ---
@@ -422,7 +295,6 @@ public class Player {
     private void updateAnimationStateBasedOnMovement() {
         float currentVelocityX = body.getLinearVelocity().x;
         float currentVelocityY = body.getLinearVelocity().y;
-
         if (isSliding) {
             currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
         } else if (isShootingUp) {
@@ -554,8 +426,6 @@ public class Player {
     public void die() {
         if (isDead) return;
         takeDamage(100);
-        // ToDo: one function
         playerEffectManager.triggerDestroyEffect();
     }
-
 }
