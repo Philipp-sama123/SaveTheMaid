@@ -37,7 +37,7 @@ import krazy.cat.games.SaveTheMaid.Projectile;
 public class Player {
     // --- Managers ---
     private final PlayerEffectManager playerEffectManager;
-
+    private final PlayerSoundManager playerSoundManager;
     // --- Constants ---
     private static final int MAX_JUMPS = 2;
     private static final float SLIDE_IMPULSE = 1.5f;
@@ -79,19 +79,14 @@ public class Player {
     private AnimationType currentAnimationState = AnimationType.IDLE;
     private int lastFootstepFrame = -1; // To prevent duplicate sound triggering
 
-    // Sounds
-    private Sound jumpSound;
-    private Sound hitSound;
-    private Sound shootSound;
-    private Sound footstepSound;
-    private Sound slideSound;
-
     private BaseFriendAICharacter friendAICharacter;
+
 
     // --- Constructors ---
     public Player(World world) {
         this.world = world;
         playerEffectManager = new PlayerEffectManager(this);
+        playerSoundManager = new PlayerSoundManager(this);
         initializePlayerAssets();
     }
 
@@ -109,15 +104,6 @@ public class Player {
 
         playerEffectManager.loadEffects();
         definePlayer();
-        initializeSounds();
-    }
-
-    private void initializeSounds() {
-        jumpSound = GameAssetManager.getInstance().getAssetManager().get(JUMP_SOUND);
-        shootSound = GameAssetManager.getInstance().getAssetManager().get(SHOOT_SOUND);
-        hitSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_HIT_SOUND);
-        footstepSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_FOOTSTEP_SOUND);
-        slideSound = GameAssetManager.getInstance().getAssetManager().get(PLAYER_SLIDE_SOUND);
     }
 
     private void definePlayer() {
@@ -181,7 +167,7 @@ public class Player {
             stateTime += delta;
         }
 
-        handleFootstepSound();
+        playerSoundManager.handleFootstepSound(currentAnimationState, animationSetAgent.getCurrentFrame(currentAnimationState), stateTime);
         updateProjectiles(delta);
 
         if (isShooting) {
@@ -222,10 +208,8 @@ public class Player {
             jumpCount++;
             stateTime = 0;
             currentAnimationState = isShooting ? AnimationType.JUMP_SHOOT : AnimationType.JUMP;
-            if (jumpSound != null) {
-                jumpSound.play(.25f);
-            }
 
+            playerSoundManager.playJumpSound();
             playerEffectManager.triggerJumpEffect();
 
             if (friendAICharacter != null) {
@@ -244,10 +228,8 @@ public class Player {
         float slideImpulseX = isFacingRight ? SLIDE_IMPULSE : -SLIDE_IMPULSE;
         body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
-        if (slideSound != null) {
-            slideSound.play(.25f);
-        }
-
+        // EFFECTS
+        playerSoundManager.playSlideSound();
         playerEffectManager.triggerSlideEffect();
 
         if (friendAICharacter != null) {
@@ -264,7 +246,8 @@ public class Player {
             stateTime = 0f;
             Vector2 position = body.getPosition().cpy().add(0, 40 / PPM);
             Vector2 velocity = new Vector2(0, PROJECTILE_VELOCITY_Y);
-            shootSound.play();
+
+            playerSoundManager.playShootSound();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
@@ -282,7 +265,7 @@ public class Player {
                 position.x += isFacingRight ? 16 / PPM : -16 / PPM;
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
-            shootSound.play();
+            playerSoundManager.playShootSound();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
@@ -292,7 +275,7 @@ public class Player {
      */
     private void takeDamage(float damage) {
         if (isDead) return;
-        hitSound.play();
+        playerSoundManager.playHitSound();
         currentHealth -= damage;
 
         playerEffectManager.triggerBloodEffect();
@@ -575,36 +558,4 @@ public class Player {
         playerEffectManager.triggerDestroyEffect();
     }
 
-
-    // --- Footstep Sound Handling ---
-    private void handleFootstepSound() {
-        Gdx.app.log("handleFootstepSound", "ENTRY");
-        Gdx.app.log("handleFootstepSound", "currentAnimationState: " + currentAnimationState);
-
-        if (currentAnimationState == AnimationType.WALK || currentAnimationState == AnimationType.RUN) {
-            Animation<TextureRegion> currentAnimation = animationSetAgent.getCurrentFrame(currentAnimationState);
-            if (stateTime > currentAnimation.getAnimationDuration()) {
-                stateTime -= currentAnimation.getAnimationDuration();
-                Gdx.app.log("StateTime Reset", "stateTime reset after animation loop");
-            }
-            int currentFrameIndex = currentAnimation.getKeyFrameIndex(stateTime);
-            Gdx.app.log("handleFootstepSound", "currentFrameIndex: " + currentFrameIndex);
-
-            if ((currentFrameIndex == 0 || currentFrameIndex == 4) && currentFrameIndex != lastFootstepFrame) {
-                if (footstepSound != null) {
-                    footstepSound.stop();
-                    footstepSound.play(.25f,
-                        currentAnimationState == AnimationType.WALK ? 0.f : .5f, 0.0f);
-                }
-                Gdx.app.log("TRIGGER", "FOOTSTEP PLAYING at frame: " + currentFrameIndex);
-                lastFootstepFrame = currentFrameIndex;
-            }
-
-            if (currentAnimation.isAnimationFinished(stateTime)) {
-                lastFootstepFrame = -1;
-            }
-        } else {
-            lastFootstepFrame = -1;
-        }
-    }
 }
