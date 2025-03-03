@@ -1,6 +1,5 @@
 package krazy.cat.games.SaveTheMaid.Characters.AI.Friends;
 
-import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_GROUND_ONLY;
 
 import com.badlogic.gdx.audio.Sound;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;

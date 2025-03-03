@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.Player;
 
 import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.JUMP_SOUND;
 import static krazy.cat.games.SaveTheMaid.Tools.AssetPaths.PLAYER_FOOTSTEP_SOUND;

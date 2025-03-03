@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid;
+package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;

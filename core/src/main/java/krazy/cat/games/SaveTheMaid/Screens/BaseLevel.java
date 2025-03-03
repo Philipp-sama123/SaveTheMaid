@@ -22,10 +22,8 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
-import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;

@@ -12,7 +12,7 @@ import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
-import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 
 public class Apple {
     private final Body body;

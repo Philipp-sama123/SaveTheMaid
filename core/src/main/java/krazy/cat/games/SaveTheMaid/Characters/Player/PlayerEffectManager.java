@@ -1,4 +1,4 @@
-package krazy.cat.games.SaveTheMaid.Characters;
+package krazy.cat.games.SaveTheMaid.Characters.Player;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
 import static krazy.cat.games.SaveTheMaid.Tools.Utils.createAnimation;

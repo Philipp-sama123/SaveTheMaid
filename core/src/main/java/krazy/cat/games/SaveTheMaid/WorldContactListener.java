@@ -1,11 +1,11 @@
 package krazy.cat.games.SaveTheMaid;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.*;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
-import krazy.cat.games.SaveTheMaid.Characters.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
+import krazy.cat.games.SaveTheMaid.Characters.Projectile;
 import krazy.cat.games.SaveTheMaid.Sprites.*;
 
 public class WorldContactListener implements ContactListener {
