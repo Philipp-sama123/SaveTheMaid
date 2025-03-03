@@ -6,6 +6,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.*;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.Characters.Projectile;
+import krazy.cat.games.SaveTheMaid.Characters.ProjectileUp;
 import krazy.cat.games.SaveTheMaid.Sprites.*;
 
 public class WorldContactListener implements ContactListener {
@@ -37,6 +38,11 @@ public class WorldContactListener implements ContactListener {
             handleProjectileCollision((Projectile) userDataA, userDataB);
         } else if (userDataB instanceof Projectile) {
             handleProjectileCollision((Projectile) userDataB, userDataA);
+        }
+        if (userDataA instanceof ProjectileUp) {
+            handleProjectileUpCollision((ProjectileUp) userDataA, userDataB);
+        } else if (userDataB instanceof ProjectileUp) {
+            handleProjectileUpCollision((ProjectileUp) userDataB, userDataA);
         }
         // Handle player and enemy collisions
         else if (userDataA instanceof Player && userDataB instanceof BaseAICharacter) {
@@ -147,6 +153,17 @@ public class WorldContactListener implements ContactListener {
             ((Player) target).onStartEnemyAttackCollision();
         } else if ("environment".equals(target)) {
             projectile.onCollision();
+        }
+    }
+    private void handleProjectileUpCollision(ProjectileUp projectileUp, Object target) {
+        if (target instanceof BaseAICharacter) {
+            projectileUp.onCollision();
+            ((BaseAICharacter) target).onHit(); // Ensure this method handles enemy hit logic
+        } else if (target instanceof Player) {
+            projectileUp.onCollision();
+            ((Player) target).onStartEnemyAttackCollision();
+        } else if ("environment".equals(target)) {
+            projectileUp.onCollision();
         }
     }
 

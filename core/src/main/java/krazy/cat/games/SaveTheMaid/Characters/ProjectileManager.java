@@ -19,17 +19,25 @@ public class ProjectileManager {
     private static final float PROJECTILE_VELOCITY_Y = 1.5f;
 
     private Array<Projectile> projectiles;
+    private Array<ProjectileUp> projectilesUp;
     private Texture projectileTexture;
+    private Texture projectileUpTexture;
 
     public ProjectileManager(World world) {
         projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
+        projectileUpTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_SHOOT_UP_TEXTURE, Texture.class);
         projectiles = new Array<>();
+        projectilesUp = new Array<>();
         this.world = world;
     }
 
 
     private void addProjectile(Vector2 position, Vector2 velocity) {
         projectiles.add(new Projectile(world, position, velocity, projectileTexture));
+    }
+
+    private void addProjectileUp(Vector2 position, Vector2 velocity) {
+        projectilesUp.add(new ProjectileUp(world, position, velocity, projectileUpTexture, 0));
     }
 
     public void updateProjectiles(float delta) {
@@ -40,12 +48,19 @@ public class ProjectileManager {
                 projectiles.removeIndex(i);
             }
         }
+        for (int i = projectilesUp.size - 1; i >= 0; i--) {
+            ProjectileUp projectileUp = projectilesUp.get(i);
+            projectileUp.update(delta);
+            if (projectileUp.isDestroyed()) {
+                projectilesUp.removeIndex(i);
+            }
+        }
     }
 
     public void addShootUpProjectile(Body body) {
         Vector2 position = body.getPosition().cpy().add(0, 40 / PPM);
         Vector2 velocity = new Vector2(0, PROJECTILE_VELOCITY_Y);
-        addProjectile(position, velocity);
+        addProjectileUp(position, velocity);
     }
 
     public void addShootProjectile(Body body, boolean isFacingRight, boolean isCrouching, boolean isSliding) {
@@ -64,6 +79,9 @@ public class ProjectileManager {
     public void drawProjectiles(Batch batch) {
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
+        }
+        for (ProjectileUp projectileUp : projectilesUp) {
+            projectileUp.draw(batch);
         }
     }
 
