@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="500" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="125">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="500" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="138">
  <tileset firstgid="1" source="PlatformerAssets.tsx"/>
  <tileset firstgid="1081" source="HellTiles32x32.tsx"/>
  <tileset firstgid="1234" source="MaidBathing.tsx"/>
  <tileset firstgid="1254" source="FireRed.tsx"/>
  <tileset firstgid="1260" source="BackgroundFull.tsx"/>
  <tileset firstgid="1580" source="lava-tileset.tsx"/>
- <layer id="2" name="Background" width="500" height="100" visible="0">
+ <layer id="2" name="Background" width="500" height="100">
   <data encoding="base64" compression="zlib">
    eJzt2VOsZoceh+FV7Kk5tW3bndq27WPbtm3b5jq2bbt2e4rznttzdS52spLZz5O8SdPO7N/3JWv+XckMAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/OnpmWHBMHVvH1fF1Qp1YJ9XJdUqdWqfV6XVGnVln1dl1Tp1b59X5dUFdWBfVxXVJXVqX1eV1RV1ZV5X9ub0/9fMPsLDYppu6bW1X29cOtWPtVDvXLrVr7Va71x61Z+1Ve9c+tW/tV/vXgjqgDqyD6uA6pA6tw+rwOqKOrKPK/tzen/r5B1hYLNtNXa6WrxVqxVqpVq75tUqtWqvV6rVGrVlr1dq1Tq1b69X6tUFtWBvVxrVJbVqb1ea1RW1ZW9XWZX9u70/9/AMsLK5efFhwTV1b19X1dUPdWDfVzXVL3Vq31e11R91Z/6676u66p+6toRu9SC1ai9XiNVPzaolaspaqpWuZsj+396d+/gEWFt3zoXs+dM+H7vnQPR+650P3fOieD93zoXs+dM+H7vnQPR+650P3fOieD93zoXs+dM+H7vnQPR+650P3fOieD93zoXs+dM+H7vnQPR+650P3fOieT74/9d8fT71fY/889u/G/tvYrxn7tWO/Z+z3jv2MsZ819jPHfvbYxtjW2ObY9thnGPssY59p7LONfcaxzzr2mcc++9h3GPsuY99p7LuNfcex7zr2nce++zjx4w+w0Jj6/6f27dufbh9YeCzbn+nlavlaoVaslWrlml+r1Kq1Wq1ea9SatVatXevUurVerV8b1Ia1UW1cm9SmtVltXlvUlrVVbT1j3779Kfenfp+Y6/swm7bpmdq2tqvta4fasXaqnWuX2rV2q91rj9qz9qq9a5/at/ar/WtBHVAH1kF1cB1Sh9ZhdXgdUUfWUTP27dufcn/q94m5vg+z6eieqWPq2Dqujq8T6sQ6qU6uU+rUOq1OrzPqzDqrzq5z6tw6r86vC+rCuqgurkvq0rqsLq8r6sq6asa+fftT7k/9PjHX92E23adn6r51v7p/PaAeWA+qB9dD6qH1sHp4PaIeWY+qR9dj6rH1uHp8PaGeWE+qJ9dT6qn1tHp6PaOeWc+qZ8/Yt29/yv2p3yfm+j7Mpuf0TD23nlfPrxfUC+tF9eJ6Sb20XlYvr1fUK+tV9ep6Tb22XlevrzfUG+tN9eZ6S7213lZvr3fUO+td9e4Z+/btT7k/9fvEXN+H2fSenqn31vvq/fWB+mB9qD5cH6mP1sfq4/WJ+mR9qj5dn6nP1ufq8zXWF+qL9aX6cn2lvlpfq6/XN+qb9a0Z+/btT7k/9fvEXN+H2fTtnqnv1Hfre/X9+kH9sH5UP66f1E/rZ/Xz+kX9sn5Vv67f1G/rd/X7+kP9sf5Uf66/1F/rb/X3+kf9s/41Y9++/Sn3p36fmOv7MJuu7pm6pq6t6+r6uqFurJvq5rqlbq3b6va6o+6sf9dddXfdU/f+9/mcNwyL1KK1WC1eMzWvlqgla6laupaZZ9++/Sn3p36fmOv7MJuW7c/0crV8rVAr1kq1cs2vVWrVWq1WrzVqzVqr1q51at1ar9avDWrD2qg2rk1q09qsNq8tasvaqraeZ9++/Sn3p36fmOv7MJumvidzdX/+/zTXvr99+/anvv4sbP4DML/Oww==
   </data>
  </layer>
  <layer id="1" name="Graphics" width="500" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt200KgkAYBmAX0mnqANUlok1BtajOVtFRWneHztHnIkJJ+zeGngdeRlAGXL3M6GQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD83im/BgBIUz96fBAZ6nMASNYsenweWehzAPgr9ugBIH326AHguy5r5upYvX6HPXoA+K5i7byqyaPr6U08t43s9DUA/MQ4OvhQk5F+BoAk6HMASN8zfb7X7wDQqmNeTmES4zQvnx97tM99IweA9l3OiDWl+Odt3dDny0i3k2W9zmfGuty7/0xuzfXJ+Zvme/X9b80DAIUz24NLrg==
+   eJzt20FugkAYBlAWxtPYA9guvYBp7aq6aI1H06YXMF7BtXfoOfqzIFIiCEiq1PeSL5BAJmH1zQyQJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcH3fg2MAgH4aR48/Rp7O9PlE3wPAzXqLnp5HFhV9/RLXZpFXnQ4AvbbKdbk9egDov7p79ABAO9mauXgsnl+izh49ANBeunb+KEnd9fQ67ttEPvU1AFzFc3TwviTTG+3nbP7QNOYbAPxXfexzALhn2+jnXaGjm/T5V8P9965iXQ3AvToMficv/51b3T73jhwA/l72j1hV0m/elhV9/h4ZDZPkYdjNsSznrjfJqbG6HL9qvLbPf2ocAEj9AHdyZDk=
   </data>
  </layer>
  <objectgroup id="3" name="Ground">
@@ -26,17 +26,28 @@
   <object id="116" x="1120.6" y="2946.29" width="94.1074" height="59.3601"/>
   <object id="122" x="642" y="3137" width="92" height="10"/>
   <object id="124" x="866" y="3009" width="92" height="10"/>
+  <object id="127" x="160" y="3104" width="64" height="10"/>
+  <object id="128" x="993" y="2881" width="94" height="30"/>
+  <object id="129" x="1025" y="2849" width="30" height="94"/>
+  <object id="131" x="995" y="3105" width="668" height="13"/>
+  <object id="133" x="1762" y="3040" width="476" height="15"/>
  </objectgroup>
- <objectgroup id="5" name="Goal" visible="0"/>
- <objectgroup id="6" name="Apple" visible="0"/>
+ <objectgroup id="5" name="Goal"/>
+ <objectgroup id="6" name="Apple"/>
  <objectgroup id="4" name="Destroy">
   <object id="117" x="577" y="3168" width="10000" height="32"/>
   <object id="118" x="594.608" y="3468.95"/>
  </objectgroup>
- <objectgroup id="7" name="SpawnPoints" visible="0">
+ <objectgroup id="7" name="SpawnPoints">
   <object id="108" x="512.198" y="2977.3" width="31.5572" height="27.916"/>
   <object id="109" x="413.885" y="2979.73" width="33.9847" height="26.7023"/>
   <object id="110" x="349.557" y="2976.09" width="36.4122" height="26.7023"/>
+  <object id="125" x="1156.91" y="2914.26" width="24.7321" height="16.488"/>
+  <object id="126" x="735.092" y="2802.97" width="32.9761" height="23.3581"/>
+  <object id="134" x="2177.43" y="3009.5" width="30.1927" height="28.4167"/>
+  <object id="135" x="1950.98" y="3013.94" width="36.4088" height="22.2005"/>
+  <object id="136" x="2083.3" y="2958.88" width="22.2005" height="11.5443"/>
+  <object id="137" x="1849.75" y="2950.89" width="10.6562" height="14.2083"/>
  </objectgroup>
- <objectgroup id="8" name="SpawnPointsFriend" visible="0"/>
+ <objectgroup id="8" name="SpawnPointsFriend"/>
 </map>

@@ -121,7 +121,7 @@ public class PlayerEffectManager {
 
         jumpEffectAnimation = createAnimation(jumpSpriteSheet, 32, 16, 10, 0.05f);
         bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 7, 0.1f);
-        slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 48, 32, 9, 0.1f);
+        slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 48, 32, 9, 0.05f);
         destroyEffectAnimation = createAnimation(destroySpriteSheet, 64, 64, 13, 0.1f);
     }
 
@@ -139,9 +139,10 @@ public class PlayerEffectManager {
         showJumpEffect = true;
         jumpEffectTime = 0;
     }
+
     protected void triggerSlideEffect() {
-        showJumpEffect = true;
-        jumpEffectTime = 0;
+        showSlideEffect = true;
+        slideEffectTime = 0;
     }
 
     public boolean isShowBloodEffect() {

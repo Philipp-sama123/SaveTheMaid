@@ -1,6 +1,7 @@
 package krazy.cat.games.SaveTheMaid.Characters;
 
 import static krazy.cat.games.SaveTheMaid.SaveTheMaidGame.PPM;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -23,7 +24,7 @@ public class Player {
     // --- Managers ---
     private final PlayerEffectManager playerEffectManager;
     private final PlayerSoundManager playerSoundManager;
-    private PlayerColliderManager colliderManager;
+    private PlayerColliderManager playerColliderManager;
 
     // --- Constants ---
     private static final int MAX_JUMPS = 2;
@@ -43,6 +44,7 @@ public class Player {
     private World world;
     private Body body;
     private AnimationSetFemaleAgent animationSetAgent;
+    // ToDo Projectile Manager
     private Array<Projectile> projectiles;
     private Texture projectileTexture;
 
@@ -73,7 +75,7 @@ public class Player {
         this.world = world;
         playerEffectManager = new PlayerEffectManager(this);
         playerSoundManager = new PlayerSoundManager(this);
-        initializePlayerAssets();
+        definePlayer();
     }
 
     public Player(World world, BaseLevel baseLevel) {
@@ -82,27 +84,24 @@ public class Player {
     }
 
     // --- Initialization Methods ---
-    private void initializePlayerAssets() {
+    private void definePlayer() {
         animationSetAgent = new AnimationSetFemaleAgent(
             GameAssetManager.getInstance().get(AssetPaths.PLAYER_TEXTURE, Texture.class)
         );
         playerEffectManager.loadEffects();
-        definePlayer();
-    }
-
-    private void definePlayer() {
         // Create the Box2D body.
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(100 / PPM, 100 / PPM); // Convert to meters
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
+        // ToDo: projectileManager
         // Initialize projectiles and load the projectile texture.
         projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         projectiles = new Array<>();
 
         // Delegate collider creation to the PlayerColliderManager.
-        colliderManager = new PlayerColliderManager(this, world, body);
+        playerColliderManager = new PlayerColliderManager(this, world, body);
     }
 
     // --- Update & Draw Methods ---
@@ -123,6 +122,7 @@ public class Player {
         Animation<TextureRegion> currentAnim = animationSetAgent.getCurrentFrame(currentAnimationState);
         playerSoundManager.handleFootstepSound(currentAnimationState, currentAnim, stateTime);
 
+        // ToDo: projectileManager
         updateProjectiles(delta);
 
         if (isShooting) {
@@ -137,7 +137,7 @@ public class Player {
             slideTime += delta;
             if (slideTime >= SLIDE_DURATION) {
                 isSliding = false;
-                colliderManager.restoreCollider();
+                playerColliderManager.restoreCollider();
             }
         }
     }
@@ -146,6 +146,8 @@ public class Player {
         setBatchColorForDamage(batch);
         drawAnimation(batch, getCurrentFrame());
         batch.setColor(1, 1, 1, 1);
+
+        // ToDo: projectileManager
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
@@ -170,14 +172,16 @@ public class Player {
 
     public void slide() {
         if (isSliding || isDead) return;
-        colliderManager.rotateColliderForSlide();
+        playerColliderManager.rotateColliderForSlide();
         isSliding = true;
         slideTime = 0;
         float slideImpulseX = isFacingRight ? SLIDE_IMPULSE : -SLIDE_IMPULSE;
         body.applyLinearImpulse(new Vector2(slideImpulseX, 0), body.getWorldCenter(), true);
         currentAnimationState = isShooting ? AnimationType.SLIDE_SHOOT : AnimationType.SLIDE;
+
         playerSoundManager.playSlideSound();
         playerEffectManager.triggerSlideEffect();
+
         if (friendAICharacter != null) {
             friendAICharacter.slide();
         }
@@ -187,10 +191,12 @@ public class Player {
         if (isGrounded() && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
+            // ToDo ProjectileManager
             Vector2 position = body.getPosition().cpy().add(0, 40 / PPM);
             Vector2 velocity = new Vector2(0, PROJECTILE_VELOCITY_Y);
-            playerSoundManager.playShootSound();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
+
+            playerSoundManager.playShootSound();
         }
     }
 
@@ -198,6 +204,8 @@ public class Player {
         if (!isShooting && !isShootingUp) {
             isShooting = true;
             stateTime = 0f;
+            playerSoundManager.playShootSound();
+            // ToDo: projectileManager
             Vector2 position = body.getPosition().cpy().add(
                 isFacingRight ? 20 / PPM : -20 / PPM,
                 isCrouching ? 2 / PPM : 10 / PPM);
@@ -207,7 +215,6 @@ public class Player {
                 position.x += isFacingRight ? 16 / PPM : -16 / PPM;
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
-            playerSoundManager.playShootSound();
             projectiles.add(new Projectile(world, position, velocity, projectileTexture));
         }
     }
@@ -397,6 +404,7 @@ public class Player {
     }
 
     // --- Projectile & Body Accessors ---
+    // ToDo: projectileManager
     private void updateProjectiles(float delta) {
         for (int i = projectiles.size - 1; i >= 0; i--) {
             Projectile projectile = projectiles.get(i);
@@ -407,6 +415,7 @@ public class Player {
         }
     }
 
+    // ToDo: projectileManager
     public Array<Projectile> getProjectiles() {
         return projectiles;
     }
