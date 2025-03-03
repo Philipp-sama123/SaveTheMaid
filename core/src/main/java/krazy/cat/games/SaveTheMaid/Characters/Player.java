@@ -34,8 +34,9 @@ import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Projectile;
 
-// ToDo: PlayerEffectsManager (!)
 public class Player {
+    // --- Managers ---
+    private final PlayerEffectManager playerEffectManager;
 
     // --- Constants ---
     private static final int MAX_JUMPS = 2;
@@ -45,7 +46,6 @@ public class Player {
     private static final float PROJECTILE_VELOCITY_Y = 1.5f;
     private static final float SLIDE_COLLIDER_VERTICAL_OFFSET = -32 / PPM;
     private static final float DEATH_SCREEN_DELAY = 5.0f; // Delay before showing death screen
-    private final PlayerEffectManager playerEffectManager;
     // --- Movement speeds (in meters per second) ---
     private final float slowSpeed = 25 / PPM;
     private final float walkSpeed = 50 / PPM;
@@ -207,11 +207,9 @@ public class Player {
         drawAnimation(batch, getCurrentFrame());
         batch.setColor(1, 1, 1, 1);
 
-        // Draw projectiles
         for (Projectile projectile : projectiles) {
             projectile.draw(batch);
         }
-        // ToDo: EffectManager
         playerEffectManager.drawEffects(batch);
     }
 
@@ -227,9 +225,8 @@ public class Player {
             if (jumpSound != null) {
                 jumpSound.play(.25f);
             }
-            //ToDo one function
-            playerEffectManager.jumpEffectTime = 0;
-            playerEffectManager.showJumpEffect = true;
+
+            playerEffectManager.triggerJumpEffect();
 
             if (friendAICharacter != null) {
                 friendAICharacter.jump();
@@ -250,9 +247,8 @@ public class Player {
         if (slideSound != null) {
             slideSound.play(.25f);
         }
-        //ToDo one function
-        playerEffectManager.slideEffectTime = 0;
-        playerEffectManager.showSlideEffect = true;
+
+        playerEffectManager.triggerSlideEffect();
 
         if (friendAICharacter != null) {
             friendAICharacter.slide();
@@ -298,9 +294,8 @@ public class Player {
         if (isDead) return;
         hitSound.play();
         currentHealth -= damage;
-        //ToDo one function
-        playerEffectManager.showBloodEffect = true;
-        playerEffectManager.bloodEffectTime = 0;
+
+        playerEffectManager.triggerBloodEffect();
 
         if (currentHealth <= 0) {
             currentHealth = 0;
@@ -428,7 +423,7 @@ public class Player {
     }
 
     private void setBatchColorForDamage(Batch batch) {
-        if (playerEffectManager.showBloodEffect && !isDead) {
+        if (playerEffectManager.isShowBloodEffect() && !isDead) {
             batch.setColor(1, 0, 0, 1);
         } else {
             batch.setColor(1, 1, 1, 1);
@@ -577,9 +572,9 @@ public class Player {
         if (isDead) return;
         takeDamage(100);
         // ToDo: one function
-        playerEffectManager.showDestroyEffect = true;
-        playerEffectManager.destroyEffectTime = 0;
+        playerEffectManager.triggerDestroyEffect();
     }
+
 
     // --- Footstep Sound Handling ---
     private void handleFootstepSound() {

@@ -29,18 +29,17 @@ public class PlayerEffectManager {
     private Animation<TextureRegion> slideEffectAnimation;
     private Animation<TextureRegion> destroyEffectAnimation;
 
-    protected boolean showJumpEffect;
-    protected boolean showSlideEffect;
-    protected boolean showBloodEffect;
-    protected boolean showDestroyEffect;
+    private boolean showJumpEffect;
+    private boolean showSlideEffect;
+    private boolean showBloodEffect;
+    private boolean showDestroyEffect;
 
-    protected float jumpEffectTime;
-    protected float bloodEffectTime;
-    protected float slideEffectTime;
-    protected float destroyEffectTime;
+    private float jumpEffectTime;
+    private float bloodEffectTime;
+    private float slideEffectTime;
+    private float destroyEffectTime;
 
 
-    // ToDo: EffectManager
     protected void drawEffects(Batch batch) {
         // Draw slide effect
         if (showSlideEffect) {
@@ -87,7 +86,6 @@ public class PlayerEffectManager {
     /**
      * Update the timers for the jump, slide, and blood effects.
      */
-    // ToDo: EffectManager
     protected void updateEffects(float delta) {
         if (showJumpEffect) {
             jumpEffectTime += delta;
@@ -115,7 +113,6 @@ public class PlayerEffectManager {
         }
     }
 
-    // ToDo: EffectManager
     protected void loadEffects() {
         Texture jumpSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_JUMP_EFFECT_TEXTURE, Texture.class);
         Texture bloodSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
@@ -126,5 +123,40 @@ public class PlayerEffectManager {
         bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 7, 0.1f);
         slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 48, 32, 9, 0.1f);
         destroyEffectAnimation = createAnimation(destroySpriteSheet, 64, 64, 13, 0.1f);
+    }
+
+    protected void triggerDestroyEffect() {
+        showDestroyEffect = true;
+        destroyEffectTime = 0;
+    }
+
+    protected void triggerBloodEffect() {
+        showBloodEffect = true;
+        bloodEffectTime = 0;
+    }
+
+    protected void triggerJumpEffect() {
+        showJumpEffect = true;
+        jumpEffectTime = 0;
+    }
+    protected void triggerSlideEffect() {
+        showJumpEffect = true;
+        jumpEffectTime = 0;
+    }
+
+    public boolean isShowBloodEffect() {
+        return showBloodEffect;
+    }
+
+    public boolean isShowJumpEffect() {
+        return showJumpEffect;
+    }
+
+    public boolean isShowDestroyEffect() {
+        return showDestroyEffect;
+    }
+
+    public boolean isShowSlideEffect() {
+        return showSlideEffect;
     }
 }
