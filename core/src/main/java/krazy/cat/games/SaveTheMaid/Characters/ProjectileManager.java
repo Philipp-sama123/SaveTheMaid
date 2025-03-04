@@ -35,7 +35,7 @@ public class ProjectileManager {
 
 
     private void addProjectile(Vector2 position, Vector2 velocity) {
-        projectiles.add(new Projectile(world, position, velocity, projectileTexture));
+        projectiles.add(new Projectile(world, position, velocity, projectileTexture,explosionProjectileUpTexture));
     }
 
     private void addProjectileUp(Vector2 position, Vector2 velocity) {
