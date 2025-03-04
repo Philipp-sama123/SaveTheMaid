@@ -25,6 +25,7 @@ public class AssetPaths {
     public static final String PLAYER_DESTROY_EFFECT_TEXTURE = "Effects/SmokeFX/Smoke_VFX_02.png";
     public static final String AGENT_PIXEL_BULLET_TEXTURE = "Characters/FemaleAgent/PixelBullet16x16.png";
     public static final String AGENT_PIXEL_SHOOT_UP_TEXTURE = "Effects/ShootUpBullets.png";
+    public static final String AGENT_PIXEL_SHOOT_UP_EXPLOSION_TEXTURE = "Effects/RetroImpactEffectPack/ImpactEffects.png";
     public static final String JUMP_SOUND = "SFX/Jump.wav";
     public static final String SHOOT_SOUND = "SFX/Shoot.wav";
     public static final String MAID_CHARACTER_BLACK = "Characters/Friends/GandalfHardcoreMaid/Maid Character black.png";

@@ -22,10 +22,12 @@ public class ProjectileManager {
     private Array<ProjectileUp> projectilesUp;
     private Texture projectileTexture;
     private Texture projectileUpTexture;
+    private Texture explosionProjectileUpTexture;
 
     public ProjectileManager(World world) {
         projectileTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         projectileUpTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_SHOOT_UP_TEXTURE, Texture.class);
+        explosionProjectileUpTexture = GameAssetManager.getInstance().get(AssetPaths.AGENT_PIXEL_SHOOT_UP_EXPLOSION_TEXTURE, Texture.class);
         projectiles = new Array<>();
         projectilesUp = new Array<>();
         this.world = world;
@@ -37,7 +39,7 @@ public class ProjectileManager {
     }
 
     private void addProjectileUp(Vector2 position, Vector2 velocity) {
-        projectilesUp.add(new ProjectileUp(world, position, velocity, projectileUpTexture, 0));
+        projectilesUp.add(new ProjectileUp(world, position, velocity, projectileUpTexture, 0,explosionProjectileUpTexture ));
     }
 
     public void updateProjectiles(float delta) {

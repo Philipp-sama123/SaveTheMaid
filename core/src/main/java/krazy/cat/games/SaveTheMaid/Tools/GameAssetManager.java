@@ -42,6 +42,7 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.PLAYER_BLOOD_EFFECT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.AGENT_PIXEL_BULLET_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.AGENT_PIXEL_SHOOT_UP_TEXTURE, Texture.class);
+        assetManager.load(AssetPaths.AGENT_PIXEL_SHOOT_UP_EXPLOSION_TEXTURE, Texture.class);
 
         //SFX
         assetManager.load(AssetPaths.JUMP_SOUND, Sound.class);
