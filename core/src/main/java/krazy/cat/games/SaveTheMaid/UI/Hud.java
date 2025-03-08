@@ -25,6 +25,7 @@ import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
 
 public class Hud implements Disposable {
+
     private final SaveTheMaidGame game;
     private InputMultiplexer inputMultiplexer;
     public Stage stage;

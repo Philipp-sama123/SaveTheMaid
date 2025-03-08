@@ -31,6 +31,8 @@ import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public abstract class BaseLevel implements Screen {
+    private static float ZOOM_FACTOR = .8f;
+    private float feetOffset = 75 / PPM;
     protected final SaveTheMaidGame game;
     protected final OrthographicCamera gameCamera;
     protected final Viewport gameViewport;
@@ -64,7 +66,8 @@ public abstract class BaseLevel implements Screen {
         this.uiViewport = new StretchViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
         this.hud = new Hud(game, uiViewport);
         this.gameCamera = new OrthographicCamera();
-        this.gameViewport = new StretchViewport(GAME_WIDTH / PPM, GAME_HEIGHT / PPM, gameCamera);
+        this.gameCamera.zoom = ZOOM_FACTOR;
+        this.gameViewport = new StretchViewport((GAME_WIDTH / PPM), (GAME_HEIGHT / PPM), gameCamera);
         gameViewport.apply();
         this.mapLoader = new TmxMapLoader();
         this.map = mapLoader.load(mapPath);
@@ -148,8 +151,20 @@ public abstract class BaseLevel implements Screen {
     }
 
     private void updateCamera() {
-        gameCamera.position.x = Math.max(gameCamera.viewportWidth / 2, Math.min(player.getBody().getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2));
-        gameCamera.position.y = Math.max(gameCamera.viewportHeight / 2, Math.min(player.getBody().getPosition().y, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2));
+        float cameraX = Math.max(gameCamera.viewportWidth / 2,
+            Math.min(player.getBody().getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2));
+
+        // Assume the player's feet are 0.5 units below the center.
+        float playerFeetY = player.getBody().getPosition().y - feetOffset;
+
+        // Set the camera center so that the bottom edge (center - half viewport height) equals the player's feet.
+        float targetCameraY = playerFeetY + gameCamera.viewportHeight / 2;
+
+        // Clamp the camera Y to the map boundaries.
+        float cameraY = Math.max(gameCamera.viewportHeight / 2,
+            Math.min(targetCameraY, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2));
+
+        gameCamera.position.set(cameraX, cameraY, 0);
         gameCamera.update();
         renderer.setView(gameCamera);
     }

@@ -43,39 +43,42 @@
         },
         "HellLevel.tmx": {
             "expandedObjectLayers": [
-                7,
+                3,
                 5,
-                8,
-                3
+                7,
+                8
             ],
-            "scale": 0.7278,
+            "scale": 1.0413,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1003.0228084638638,
-                "y": 2936.2462214894203
+                "x": 303.46682032075296,
+                "y": 3027.465667915106
             }
         },
         "HellTiles32x32.tsx": {
             "scaleInDock": 1.5354,
             "scaleInEditor": 1
         },
+        "LargeStatue2.tsx": {
+            "scaleInEditor": 1
+        },
         "Level_1.tmx": {
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 0.2675,
+            "scale": 0.2555,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 3200,
-                "y": 3200
+                "x": 681.0176125244617,
+                "y": 5939.334637964775
             }
         },
         "Level_2.tmx": {
-            "scale": 1.2563,
+            "scale": 0.2435,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1599.93632094245,
-                "y": 1595.1603916262038
+                "x": 1420.9445585215608,
+                "y": 2909.650924024641
             }
         },
         "MaidBathing.tsx": {
@@ -103,7 +106,7 @@
     },
     "frame.defaultDuration": 250,
     "last.externalTilesetPath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/Tiled",
-    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/SSWorlds_SET1_v1.0/_PNG/anim",
+    "last.imagePath": "/Users/philippstampfer/Documents/LibGdx/SaveTheMaid/assets/GandalfHardcore Hell Asset Pack 32x32",
     "map.height": 100,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "3",
@@ -115,6 +118,7 @@
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "LargeStatue2.tsx",
         "Level_2.tmx",
         "Level_1.tmx",
         "HellLevel.tmx",
@@ -125,12 +129,11 @@
         "BackgroundFull.tsx",
         "PlatformerAssets.tsx",
         "MaidBathing.tsx",
-        "FireRed.tsx",
-        "BathingMaid.tsx"
+        "FireRed.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
-        "height": 32,
-        "width": 128
+        "height": 160,
+        "width": 96
     }
 }

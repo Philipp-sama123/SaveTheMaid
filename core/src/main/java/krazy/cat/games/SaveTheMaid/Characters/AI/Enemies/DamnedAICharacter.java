@@ -18,14 +18,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
-public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.ZombieAnimationType> {
+public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.ZombieAnimationType> {
     private final AnimationSetZombie animationSet;
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
@@ -36,16 +36,16 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
 
     // Inner class to tag sensor fixtures with side information
     public static class EdgeSensorData {
-        public ZombieAICharacter zombie;
+        public DamnedAICharacter zombie;
         public String side; // "left" or "right"
 
-        public EdgeSensorData(ZombieAICharacter zombie, String side) {
+        public EdgeSensorData(DamnedAICharacter zombie, String side) {
             this.zombie = zombie;
             this.side = side;
         }
     }
 
-    public ZombieAICharacter(World world, Vector2 position, BaseLevel gameScreen) {
+    public DamnedAICharacter(World world, Vector2 position, BaseLevel gameScreen) {
         super(world, position, gameScreen);
         this.currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
 

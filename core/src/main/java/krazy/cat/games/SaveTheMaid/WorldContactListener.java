@@ -3,6 +3,7 @@ package krazy.cat.games.SaveTheMaid;
 import com.badlogic.gdx.physics.box2d.*;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.*;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.Characters.Projectile;
@@ -52,11 +53,9 @@ public class WorldContactListener implements ContactListener {
         }
         // Handle player and water collisions
         else if (userDataA instanceof Player && userDataB instanceof WaterEffect) {
-            ((Player) userDataA).onStartEnemyAttackCollision(); // ToDo: Own function if it stays
+            ((Player) userDataA).onStartEnemyAttackCollision();
         } else if (userDataB instanceof Player && userDataA instanceof WaterEffect) {
-            //    handleAttackCollision((Player) userDataB, (BaseAICharacter) userDataA);
-            ((Player) userDataB).onStartEnemyAttackCollision(); // ToDo: Own function if it stays
-
+            ((Player) userDataB).onStartEnemyAttackCollision();
         }
         // Handle player and friend interactions
         else if (userDataA instanceof Player && userDataB instanceof BaseFriendAICharacter) {
@@ -82,26 +81,46 @@ public class WorldContactListener implements ContactListener {
         } else if (userDataB instanceof Player && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((Player) userDataB).increaseGroundedCount();
         }
-
         // Check if enemy touches the ground
         if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((BaseAICharacter) userDataA).increaseGroundedCount();
         } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((BaseAICharacter) userDataB).increaseGroundedCount();
         }
-
-        // Check for collision with the destroy zone
+        // Handle collision with the destroy zone
         if ("destroy".equals(userDataA)) {
             if (userDataB instanceof Player) {
-                ((Player) userDataB).die(); // Implement die() to handle player death
+                ((Player) userDataB).die();
             } else if (userDataB instanceof BaseAICharacter) {
-                ((BaseAICharacter) userDataB).onDie(); // Implement die() to handle enemy removal
+                ((BaseAICharacter) userDataB).onDie();
             }
         } else if ("destroy".equals(userDataB)) {
             if (userDataA instanceof Player) {
                 ((Player) userDataA).die();
             } else if (userDataA instanceof BaseAICharacter) {
                 ((BaseAICharacter) userDataA).onDie();
+            }
+        }
+
+        // --- Handle edge sensor collisions for zombies ---
+        if (fixtureA.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
+            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureA.getUserData();
+            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.zombie.setLeftEdgeGrounded(true);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.zombie.setRightEdgeGrounded(true);
+                }
+            }
+        }
+        if (fixtureB.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
+            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureB.getUserData();
+            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.zombie.setLeftEdgeGrounded(true);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.zombie.setRightEdgeGrounded(true);
+                }
             }
         }
     }
@@ -120,34 +139,52 @@ public class WorldContactListener implements ContactListener {
         } else if (userDataB instanceof Player && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((Player) userDataB).decreaseGroundedCount();
         }
-
         // Check if enemy leaves the ground
         if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((BaseAICharacter) userDataA).decreaseGroundedCount();
         } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
             ((BaseAICharacter) userDataB).decreaseGroundedCount();
         }
+
+        // --- Handle end of edge sensor collisions for zombies ---
+        if (fixtureA.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
+            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureA.getUserData();
+            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.zombie.setLeftEdgeGrounded(false);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.zombie.setRightEdgeGrounded(false);
+                }
+            }
+        }
+        if (fixtureB.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
+            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureB.getUserData();
+            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.zombie.setLeftEdgeGrounded(false);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.zombie.setRightEdgeGrounded(false);
+                }
+            }
+        }
     }
 
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
-        // Add pre-solve logic if necessary
+        // Pre-solve logic if needed
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
-        // Add post-solve logic if necessary
+        // Post-solve logic if needed
     }
 
-    // === Private Helper Methods ===
+    // --- Private Helper Methods ---
 
-    /**
-     * Handle collisions involving a projectile.
-     */
     private void handleProjectileCollision(Projectile projectile, Object target) {
         if (target instanceof BaseAICharacter) {
             projectile.onCollision();
-            ((BaseAICharacter) target).onHit(); // Ensure this method handles enemy hit logic
+            ((BaseAICharacter) target).onHit();
         } else if (target instanceof Player) {
             projectile.onCollision();
             ((Player) target).onStartEnemyAttackCollision();
@@ -155,10 +192,11 @@ public class WorldContactListener implements ContactListener {
             projectile.onCollision();
         }
     }
+
     private void handleProjectileUpCollision(ProjectileUp projectileUp, Object target) {
         if (target instanceof BaseAICharacter) {
             projectileUp.onCollision();
-            ((BaseAICharacter) target).onHit(); // Ensure this method handles enemy hit logic
+            ((BaseAICharacter) target).onHit();
         } else if (target instanceof Player) {
             projectileUp.onCollision();
             ((Player) target).onStartEnemyAttackCollision();
@@ -167,26 +205,17 @@ public class WorldContactListener implements ContactListener {
         }
     }
 
-    /**
-     * Handle collisions between a player and an enemy.
-     */
     private void handleAttackCollision(Player player, BaseAICharacter enemy) {
-        player.onStartEnemyAttackCollision(); // Apply damage or attack logic to the player
+        player.onStartEnemyAttackCollision();
     }
 
-    /**
-     * Handle interactions between a player and a friendly AI character.
-     */
     private void handleFriendInteraction(Player player, BaseFriendAICharacter friend) {
         friend.activate(player);
         player.setFriendReference(friend);
     }
 
-    /**
-     * Handle collisions where a cat character reaches a goal.
-     */
     private void handleGoalCollision(Goal goal, CatCharacter cat) {
         goal.onCatCollision();
-        cat.disappear(); // Remove the cat after reaching the goal
+        cat.disappear();
     }
 }
