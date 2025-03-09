@@ -61,6 +61,9 @@ public class GameAssetManager {
 
         assetManager.load(AssetPaths.CAT_TEXTURE_2, Texture.class);
 
+        assetManager.load(AssetPaths.LIFE_PICKUP_TEXTURE, Texture.class);
+        assetManager.load(AssetPaths.AMMO_PICKUP_TEXTURE, Texture.class);
+
     }
 
     public AssetManager getAssetManager() {

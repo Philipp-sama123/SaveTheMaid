@@ -9,6 +9,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.Characters.Projectile;
 import krazy.cat.games.SaveTheMaid.Characters.ProjectileUp;
+import krazy.cat.games.SaveTheMaid.Pickups.PickupObject;
 import krazy.cat.games.SaveTheMaid.Sprites.*;
 
 public class WorldContactListener implements ContactListener {
@@ -16,6 +17,7 @@ public class WorldContactListener implements ContactListener {
     public static final short CATEGORY_PLAYER = 0x0001;
     public static final short CATEGORY_ENEMY = 0x0002;
     public static final short CATEGORY_PROJECTILE = 0x0004;
+    public static final short CATEGORY_PICK_UP = 0x0030;
     public static final short CATEGORY_GROUND = 0x0008;
     public static final short CATEGORY_CAT = 0x0010;
     public static final short CATEGORY_DESTROY = 0x0020;
@@ -103,12 +105,18 @@ public class WorldContactListener implements ContactListener {
             }
         }
 
-// In beginContact
         if (userDataA instanceof EdgeSensorData) {
             handleEdgeSensorContact((EdgeSensorData) userDataA, true);
         }
         if (userDataB instanceof EdgeSensorData) {
             handleEdgeSensorContact((EdgeSensorData) userDataB, true);
+        }
+
+        // In your WorldContactListener, when a collision is detected:
+        if (fixtureA.getUserData() instanceof PickupObject && fixtureB.getUserData() instanceof Player) {
+            ((Player) fixtureB.getUserData()).pickup((PickupObject) fixtureA.getUserData());
+        } else if (fixtureB.getUserData() instanceof PickupObject && fixtureA.getUserData() instanceof Player) {
+            ((Player) fixtureA.getUserData()).pickup((PickupObject) fixtureB.getUserData());
         }
 
     }

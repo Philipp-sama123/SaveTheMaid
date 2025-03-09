@@ -32,4 +32,7 @@ public class AssetPaths {
     public static final String SHOOT_SOUND = "SFX/Shoot.wav";
     public static final String MAID_CHARACTER_BLACK = "Characters/Friends/GandalfHardcoreMaid/Maid Character black.png";
     public static final String CAT_TEXTURE_2 = "Characters/Friends/PixelCatsPack/PixelCat3.png";
+    // Pickups
+    public static final String LIFE_PICKUP_TEXTURE = "2DHealthAmmoPickups/32px/health-green 32px.png";
+    public static final String AMMO_PICKUP_TEXTURE = "2DHealthAmmoPickups/32px/ammo-pistol 32px.png";
 }

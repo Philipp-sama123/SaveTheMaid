@@ -25,6 +25,8 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.EnemySpawnPoint;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
+import krazy.cat.games.SaveTheMaid.Pickups.PickupObject;
+import krazy.cat.games.SaveTheMaid.Pickups.PickupSpawnRequest;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
 import krazy.cat.games.SaveTheMaid.Tools.Box2dWorldCreator;
 import krazy.cat.games.SaveTheMaid.Tools.ScoreSystemManager;
@@ -49,6 +51,8 @@ public abstract class BaseLevel implements Screen {
     protected final Array<BaseAICharacter> enemies = new Array<>();
     protected final Array<BaseFriendAICharacter> friends = new Array<>();
     protected final Array<EnemySpawnPoint> spawnPoints = new Array<>();
+    protected Array<PickupObject> pickups = new Array<>();
+    private Array<PickupSpawnRequest> pendingPickupSpawnRequests = new Array<>();
 
     protected Player player;
 
@@ -131,9 +135,22 @@ public abstract class BaseLevel implements Screen {
 
     private void update(float deltaTime) {
         updatePhysics(deltaTime);
+        processPickupSpawns(); // deferred PickUp Spawning
         updateEntities(deltaTime);
         updateCamera();
         hud.update(deltaTime);
+    }
+
+    private void processPickupSpawns() {
+        for (PickupSpawnRequest request : pendingPickupSpawnRequests) {
+            PickupObject pickup = new PickupObject(world, request.position, request.type);
+            addPickup(pickup);
+        }
+        pendingPickupSpawnRequests.clear();
+    }
+
+    private void addPickup(PickupObject pickup) {
+        pickups.add(pickup);
     }
 
     private void updatePhysics(float deltaTime) {
@@ -150,21 +167,27 @@ public abstract class BaseLevel implements Screen {
             enemy.update(deltaTime, player.getBody().getPosition());
         for (BaseFriendAICharacter friend : friends)
             friend.update(deltaTime, player.getBody().getPosition());
-        for(EnemySpawnPoint spawnPoint:spawnPoints){
-            spawnPoint.update(deltaTime,player.getBody().getPosition());
+        for (EnemySpawnPoint spawnPoint : spawnPoints)
+            spawnPoint.update(deltaTime, player.getBody().getPosition());
+
+        for (int i = pickups.size - 1; i >= 0; i--) {
+            PickupObject pickup = pickups.get(i);
+            pickup.update(deltaTime);
+            if (pickup.isCollected()) {
+                // Safely destroy the body now that the world is unlocked
+                if (pickup.getBody() != null) {
+                    world.destroyBody(pickup.getBody());
+                }
+                pickups.removeIndex(i);
+            }
         }
     }
 
     private void updateCamera() {
         float cameraX = Math.max(gameCamera.viewportWidth / 2,
             Math.min(player.getBody().getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2));
-
-        // Assume the player's feet are 0.5 units below the center.
         float playerFeetY = player.getBody().getPosition().y - feetOffset;
-
-        // Set the camera center so that the bottom edge (center - half viewport height) equals the player's feet.
         float targetCameraY = playerFeetY + gameCamera.viewportHeight / 2;
-
         // Clamp the camera Y to the map boundaries.
         float cameraY = Math.max(gameCamera.viewportHeight / 2,
             Math.min(targetCameraY, mapHeightInPixels / PPM - gameCamera.viewportHeight / 2));
@@ -183,8 +206,14 @@ public abstract class BaseLevel implements Screen {
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
         player.draw(game.batch);
-        for (BaseAICharacter enemy : enemies) enemy.draw(game.batch);
-        for (BaseFriendAICharacter friend : friends) friend.draw(game.batch);
+
+        for (BaseAICharacter enemy : enemies)
+            enemy.draw(game.batch);
+        for (BaseFriendAICharacter friend : friends)
+            friend.draw(game.batch);
+        for (PickupObject pickup : pickups)
+            pickup.draw(game.batch);
+
         game.batch.end();
     }
 
@@ -244,5 +273,12 @@ public abstract class BaseLevel implements Screen {
 
     public void addSpawnPoint(EnemySpawnPoint spawnPoint) {
         spawnPoints.add(spawnPoint);
+    }
+
+    public void requestPickupSpawn(Vector2 position) {
+        PickupObject.PickupType type = (Math.random() < 0.5)
+            ? PickupObject.PickupType.LIFE
+            : PickupObject.PickupType.AMMO;
+        pendingPickupSpawnRequests.add(new PickupSpawnRequest(position, type));
     }
 }

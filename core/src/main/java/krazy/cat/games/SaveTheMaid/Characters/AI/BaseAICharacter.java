@@ -12,6 +12,9 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
+import javax.swing.JLayeredPane;
+import javax.swing.text.Position;
+
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.DeathState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
@@ -49,7 +52,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     protected Texture healthBar;
     protected float healthBarYOffset = 15;
-    protected BaseLevel baseLevel = null;
+    public BaseLevel baseLevel = null;
     private int groundedCount = 0;
 
     protected boolean leftEdgeGrounded = false;
@@ -87,6 +90,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public void onHit() {
         stateMachine.changeState(new HitState());
     }
+
     public void onDie() {
         stateMachine.changeState(new DeathState());
     }
@@ -164,6 +168,12 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
         }
     }
 
+    public void spawnPickupAtDeathPosition(Vector2 deathPosition) {
+        if (baseLevel != null) {
+            baseLevel.requestPickupSpawn(deathPosition); // Pass position here
+        }
+    }
+
     public void dispose() {
         if (world != null && body != null) {
             if (attackCollider != null) body.destroyFixture(attackCollider);
@@ -172,6 +182,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
         }
         //animationSet.dispose(); ToDo: OOOOUU this is bad (!) when this is activated all the other rats get a null :O
     }
+
     public boolean isGrounded() {
         return groundedCount > 0;
     }
@@ -182,5 +193,9 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
 
     public void decreaseGroundedCount() {
         if (groundedCount > 0) groundedCount--;
+    }
+
+    public Body getBody() {
+        return body;
     }
 }

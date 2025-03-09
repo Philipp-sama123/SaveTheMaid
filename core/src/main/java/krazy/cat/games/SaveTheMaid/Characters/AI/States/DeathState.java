@@ -7,9 +7,12 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 public class DeathState implements State {
     @Override
     public void enter(BaseAICharacter enemy) {
+        enemy.spawnPickupAtDeathPosition(enemy.getBody().getPosition().cpy());
+
         enemy.DEATH_SOUND.play();
         enemy.die();
         enemy.registerKillOnGameScreen(); // ToDo: remove and improve as soon as possible (!)
+        // Capture the enemy's position before any state changes
     }
 
     @Override

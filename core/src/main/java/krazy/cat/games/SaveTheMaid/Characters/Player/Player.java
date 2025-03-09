@@ -15,6 +15,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetFemaleAgent.AnimationType;
 import krazy.cat.games.SaveTheMaid.Characters.ProjectileManager;
+import krazy.cat.games.SaveTheMaid.Pickups.PickupObject;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
@@ -63,6 +64,9 @@ public class Player {
     private AnimationType currentAnimationState = AnimationType.IDLE;
 
     private BaseFriendAICharacter friendAICharacter;
+    // Ammo
+    private int ammoCount = 0;
+
 
     // --- Constructors ---
     public Player(World world) {
@@ -398,5 +402,26 @@ public class Player {
 
     public int getMaxHealth() {
         return maxHealth;
+    }
+    public int getAmmoCount() {
+        return ammoCount;
+    }
+
+    public void addAmmo(int amount) {
+        ammoCount += amount;
+    }
+
+    public void heal(int amount) {
+        // Increase health without exceeding maxHealth
+        currentHealth = Math.min(currentHealth + amount, maxHealth);
+    }
+
+    public void pickup(PickupObject pickup) {
+        if (pickup.getType() == PickupObject.PickupType.LIFE) {
+            heal(20); // For example, heal the player by 20 points
+        } else if (pickup.getType() == PickupObject.PickupType.AMMO) {
+            addAmmo(5); // For example, add 5 units of ammunition
+        }
+        pickup.collect();
     }
 }
