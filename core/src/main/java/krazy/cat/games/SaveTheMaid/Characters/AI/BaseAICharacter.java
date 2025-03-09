@@ -19,7 +19,6 @@ import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 
-
 public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float ATTACK_COOLDOWN = 1.5f; // Time to reset attack collider
     protected static float ATTACK_RANGE = 25f / PPM;

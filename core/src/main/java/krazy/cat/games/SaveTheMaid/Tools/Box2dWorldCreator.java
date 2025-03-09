@@ -21,10 +21,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import java.util.Random;
+
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.DamnedAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.EnemyType;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.EnemySpawnPoint;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Sprites.Apple;
@@ -35,9 +39,6 @@ import krazy.cat.games.SaveTheMaid.WorldContactListener;
 public class Box2dWorldCreator {
     public Box2dWorldCreator(World world, TiledMap map, BaseLevel baseLevel) {
 
-
-        // Create bodies for "Ground" layer
-// Create bodies for "Ground" layer
         for (MapObject object : map.getLayers().get(2).getObjects()) {
             if (object instanceof PolygonMapObject) {
                 Polygon polygon = ((PolygonMapObject) object).getPolygon();
@@ -132,20 +133,40 @@ public class Box2dWorldCreator {
         // Create enemies for "SpawnPoints" layer
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
+            Vector2 spawnPosition = new Vector2(
+                (rectangle.x + rectangle.width / 2) / PPM,  // Center X
+                (rectangle.y + rectangle.height / 2) / PPM  // Center Y
+            );
 
-            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                (rectangle.y + 100) / PPM), baseLevel));
-            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM), baseLevel));
-            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                rectangle.y / PPM), baseLevel));
-            Texture spriteSheetDamnedMale = GameAssetManager.getInstance().get(AssetPaths.DAMNED_MALE, Texture.class);
-            Texture spriteSheetDamnedFemale = GameAssetManager.getInstance().get(AssetPaths.DAMNED_FEMALE, Texture.class);
+            Random rand = new Random();
+            int random = rand.nextInt(4); // 0-3 inclusive
+            EnemyType enemyType = EnemyType.ZOMBIE;
+            switch (random) {
+                case 0:
+                    enemyType = EnemyType.ZOMBIE;
+                    break;
+                case 1:
+                    enemyType = EnemyType.BAT;
+                    break;
+                case 2:
+                    enemyType = EnemyType.DAMNED;
+                    break;
+                case 3:
+                    enemyType = EnemyType.RAT;
+                    break;
+            }
+            EnemySpawnPoint spawnPoint = new EnemySpawnPoint(
+                world,
+                spawnPosition,
+                baseLevel,
+                5f,  // 5 meter trigger range
+                5f,  // 5 second spawn interval
+                5,   // Max 5 enemies
+                false,// Don't spawn all at once,
+                enemyType
+            );
 
-            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM), baseLevel, spriteSheetDamnedMale));
-            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2((rectangle.x + 500) / PPM,
-                (rectangle.y + 500) / PPM), baseLevel, spriteSheetDamnedFemale));
+            baseLevel.addSpawnPoint(spawnPoint);
         }
 
         // Create Friend objects for "SpawnPointsFriend" layer

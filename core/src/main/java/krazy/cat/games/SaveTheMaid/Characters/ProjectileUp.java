@@ -20,6 +20,7 @@ public class ProjectileUp extends ProjectileBase {
             24,
             8,
             4,
+            true,
             explosionTexture,
             29,
             6,

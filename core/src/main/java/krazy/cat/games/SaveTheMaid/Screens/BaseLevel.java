@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.EnemySpawnPoint;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.BaseFriendAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.SaveTheMaidGame;
@@ -47,6 +48,7 @@ public abstract class BaseLevel implements Screen {
 
     protected final Array<BaseAICharacter> enemies = new Array<>();
     protected final Array<BaseFriendAICharacter> friends = new Array<>();
+    protected final Array<EnemySpawnPoint> spawnPoints = new Array<>();
 
     protected Player player;
 
@@ -148,6 +150,9 @@ public abstract class BaseLevel implements Screen {
             enemy.update(deltaTime, player.getBody().getPosition());
         for (BaseFriendAICharacter friend : friends)
             friend.update(deltaTime, player.getBody().getPosition());
+        for(EnemySpawnPoint spawnPoint:spawnPoints){
+            spawnPoint.update(deltaTime,player.getBody().getPosition());
+        }
     }
 
     private void updateCamera() {
@@ -235,5 +240,9 @@ public abstract class BaseLevel implements Screen {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void addSpawnPoint(EnemySpawnPoint spawnPoint) {
+        spawnPoints.add(spawnPoint);
     }
 }

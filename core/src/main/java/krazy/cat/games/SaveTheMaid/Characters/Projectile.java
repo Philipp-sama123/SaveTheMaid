@@ -21,6 +21,7 @@ public class Projectile extends ProjectileBase {
             12,
             6,
             3,
+            false,
             explosionTexture,
             8,
             6,

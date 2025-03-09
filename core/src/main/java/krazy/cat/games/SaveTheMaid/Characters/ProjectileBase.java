@@ -26,6 +26,9 @@ public class ProjectileBase {
     protected boolean isShootingUp;
     protected boolean isFlipped = false;
 
+    // New field to control explosion functionality
+    protected boolean explosionEnabled;
+
     // Sprite dimensions (in pixels)
     protected float projectileSpriteWidth;
     protected float projectileSpriteHeight;
@@ -37,7 +40,7 @@ public class ProjectileBase {
     protected float projectileColliderWidth;
     protected float projectileColliderHeight;
 
-    // Offset used when defining the projectile’s fixture (as in your original code)
+    // Offset used when defining the projectile’s fixture
     protected final float X_OFFSET_BULLET = 2 / PPM;
 
     /**
@@ -52,6 +55,7 @@ public class ProjectileBase {
      * @param projectileSpriteHeight    the height (in pixels) of a projectile frame
      * @param projectileColliderWidth   the half-width (in pixels) for the projectile collider shape
      * @param projectileColliderHeight  the half-height (in pixels) for the projectile collider shape
+     * @param explosionEnabled          flag to enable explosion animation and collision
      * @param explosionTexture          the texture for the explosion animation
      * @param explosionAnimRow          the row index to use when splitting the explosion texture
      * @param explosionFrameCount       the number of frames for the explosion animation
@@ -62,6 +66,7 @@ public class ProjectileBase {
                           Texture projectileTexture, int projectileAnimRow,
                           float projectileSpriteWidth, float projectileSpriteHeight,
                           float projectileColliderWidth, float projectileColliderHeight,
+                          boolean explosionEnabled,
                           Texture explosionTexture, int explosionAnimRow, int explosionFrameCount,
                           float explosionSpriteWidth, float explosionSpriteHeight) {
         this.world = world;
@@ -70,6 +75,7 @@ public class ProjectileBase {
         this.projectileSpriteHeight = projectileSpriteHeight;
         this.projectileColliderWidth = projectileColliderWidth;
         this.projectileColliderHeight = projectileColliderHeight;
+        this.explosionEnabled = explosionEnabled;
         this.explosionSpriteWidth = explosionSpriteWidth;
         this.explosionSpriteHeight = explosionSpriteHeight;
         this.explosionFrameCount = explosionFrameCount;
@@ -77,18 +83,20 @@ public class ProjectileBase {
         // Build projectile animation
         TextureRegion[][] projFrames = TextureRegion.split(projectileTexture,
             (int) projectileSpriteWidth, (int) projectileSpriteHeight);
-        projectileAnimation = new Animation<>(0.1f, projFrames[projectileAnimRow]);
+        projectileAnimation = new Animation<>(0.025f, projFrames[projectileAnimRow]);
         projectileAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
-        // Build explosion animation
-        TextureRegion[][] expFrames = TextureRegion.split(explosionTexture,
-            (int) explosionSpriteWidth, (int) explosionSpriteHeight);
-        TextureRegion[] explosionFrames = new TextureRegion[explosionFrameCount];
-        for (int i = 0; i < explosionFrameCount; i++) {
-            explosionFrames[i] = expFrames[explosionAnimRow][i];
+        // Build explosion animation only if enabled
+        if (explosionEnabled) {
+            TextureRegion[][] expFrames = TextureRegion.split(explosionTexture,
+                (int) explosionSpriteWidth, (int) explosionSpriteHeight);
+            TextureRegion[] explosionFrames = new TextureRegion[explosionFrameCount];
+            for (int i = 0; i < explosionFrameCount; i++) {
+                explosionFrames[i] = expFrames[explosionAnimRow][i];
+            }
+            explosionAnimation = new Animation<>(0.1f, explosionFrames);
+            explosionAnimation.setPlayMode(Animation.PlayMode.NORMAL);
         }
-        explosionAnimation = new Animation<>(0.1f, explosionFrames);
-        explosionAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
         // Determine shooting direction
         isFacingRight = velocity.x > 0;
@@ -113,7 +121,7 @@ public class ProjectileBase {
         body = world.createBody(bdef);
 
         PolygonShape shape = new PolygonShape();
-        // Note: setAsBox expects half-width and half-height, so we convert your provided collider sizes accordingly.
+        // Note: setAsBox expects half-width and half-height.
         shape.setAsBox((projectileColliderWidth) / PPM, (projectileColliderHeight) / PPM,
             new Vector2(X_OFFSET_BULLET, 0), 0);
 
@@ -155,7 +163,6 @@ public class ProjectileBase {
         PolygonShape explosionShape = new PolygonShape();
         float explosionColliderWidth = explosionSpriteWidth / PPM;
         float explosionColliderHeight = explosionSpriteHeight / PPM;
-        // setAsBox requires half-width and half-height:
         explosionShape.setAsBox(explosionColliderWidth / 2, explosionColliderHeight / 2);
 
         FixtureDef fdef = new FixtureDef();
@@ -191,11 +198,15 @@ public class ProjectileBase {
         }
 
         if (setToDestroy && !isExploding) {
-            triggerExplosion();
+            if (explosionEnabled) {
+                triggerExplosion();
+            } else {
+                destroy();
+            }
         }
 
         // Once exploding, wait for the explosion animation to finish before destroying the body.
-        if (isExploding && explosionAnimation.isAnimationFinished(stateTime)) {
+        if (isExploding && explosionAnimation != null && explosionAnimation.isAnimationFinished(stateTime)) {
             destroy();
         }
     }
@@ -206,7 +217,7 @@ public class ProjectileBase {
     public void draw(Batch batch) {
         if (!isDestroyed) {
             TextureRegion frame;
-            if (isExploding) {
+            if (isExploding && explosionEnabled && explosionAnimation != null) {
                 frame = explosionAnimation.getKeyFrame(stateTime);
                 float width = explosionSpriteWidth / PPM;
                 float height = explosionSpriteHeight / PPM;
