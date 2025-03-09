@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import krazy.cat.games.SaveTheMaid.Characters.AI.EdgeSensorData;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
@@ -29,21 +30,6 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
     private final AnimationSetZombie animationSet;
     private AnimationSetZombie.ZombieAnimationType currentState;
     private AnimationSetZombie.ZombieAnimationType previousState;
-
-    // Flags for edge sensors
-    private boolean leftEdgeGrounded = false;
-    private boolean rightEdgeGrounded = false;
-
-    // Inner class to tag sensor fixtures with side information
-    public static class EdgeSensorData {
-        public ZombieAICharacter zombie;
-        public String side; // "left" or "right"
-
-        public EdgeSensorData(ZombieAICharacter zombie, String side) {
-            this.zombie = zombie;
-            this.side = side;
-        }
-    }
 
     public ZombieAICharacter(World world, Vector2 position, BaseLevel gameScreen) {
         super(world, position, gameScreen);
@@ -115,15 +101,6 @@ public class ZombieAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
         Fixture rightSensorFixture = body.createFixture(rightSensorDef);
         rightSensorFixture.setUserData(new EdgeSensorData(this, "right"));
         rightSensorShape.dispose();
-    }
-
-    // Setter methods called from the contact listener.
-    public void setLeftEdgeGrounded(boolean grounded) {
-        this.leftEdgeGrounded = grounded;
-    }
-
-    public void setRightEdgeGrounded(boolean grounded) {
-        this.rightEdgeGrounded = grounded;
     }
 
     @Override

@@ -103,48 +103,14 @@ public class WorldContactListener implements ContactListener {
             }
         }
 
-        // --- Handle edge sensor collisions for zombies ---
-        if (fixtureA.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
-            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureA.getUserData();
-            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.zombie.setLeftEdgeGrounded(true);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.zombie.setRightEdgeGrounded(true);
-                }
-            }
+// In beginContact
+        if (userDataA instanceof EdgeSensorData) {
+            handleEdgeSensorContact((EdgeSensorData) userDataA, true);
         }
-        if (fixtureB.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
-            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureB.getUserData();
-            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.zombie.setLeftEdgeGrounded(true);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.zombie.setRightEdgeGrounded(true);
-                }
-            }
+        if (userDataB instanceof EdgeSensorData) {
+            handleEdgeSensorContact((EdgeSensorData) userDataB, true);
         }
-        // --- Handle edge sensor collisions ---
-        if (fixtureA.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
-            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureA.getUserData();
-            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setLeftEdgeGrounded(true);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setRightEdgeGrounded(true);
-                }
-            }
-        }
-        if (fixtureB.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
-            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureB.getUserData();
-            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setLeftEdgeGrounded(true);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setRightEdgeGrounded(true);
-                }
-            }
-        }
+
     }
 
     @Override
@@ -169,45 +135,11 @@ public class WorldContactListener implements ContactListener {
         }
 
         // --- Handle end of edge sensor collisions ---
-        if (fixtureA.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
-            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureA.getUserData();
-            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.zombie.setLeftEdgeGrounded(false);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.zombie.setRightEdgeGrounded(false);
-                }
-            }
+        if (userDataA instanceof EdgeSensorData) {
+            handleEdgeSensorContact((EdgeSensorData) userDataA, false);
         }
-        if (fixtureB.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
-            ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureB.getUserData();
-            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.zombie.setLeftEdgeGrounded(false);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.zombie.setRightEdgeGrounded(false);
-                }
-            }
-        }
-        if (fixtureA.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
-            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureA.getUserData();
-            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setLeftEdgeGrounded(false);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setRightEdgeGrounded(false);
-                }
-            }
-        }
-        if (fixtureB.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
-            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureB.getUserData();
-            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-                if ("left".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setLeftEdgeGrounded(false);
-                } else if ("right".equals(sensorData.side)) {
-                    sensorData.damnedAICharacter.setRightEdgeGrounded(false);
-                }
-            }
+        if (userDataB instanceof EdgeSensorData) {
+            handleEdgeSensorContact((EdgeSensorData) userDataB, false);
         }
     }
 
@@ -222,6 +154,18 @@ public class WorldContactListener implements ContactListener {
     }
 
     // --- Private Helper Methods ---
+    private void handleEdgeSensorContact(EdgeSensorData sensorData, boolean isContact) {
+        if (sensorData.character == null) return;
+
+        switch (sensorData.side) {
+            case "left":
+                sensorData.character.setLeftEdgeGrounded(isContact);
+                break;
+            case "right":
+                sensorData.character.setRightEdgeGrounded(isContact);
+                break;
+        }
+    }
 
     private void handleProjectileCollision(Projectile projectile, Object target) {
         if (target instanceof BaseAICharacter) {

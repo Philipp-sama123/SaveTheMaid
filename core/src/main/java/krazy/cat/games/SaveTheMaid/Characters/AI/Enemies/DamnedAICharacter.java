@@ -9,6 +9,7 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.MASK_PROJECTILE;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.EdgeSensorData;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetDamned;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
@@ -31,26 +33,10 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetDamned.Damned
     private AnimationSetDamned.DamnedAnimationType currentState;
     private AnimationSetDamned.DamnedAnimationType previousState;
 
-    // Flags for edge sensors
-    private boolean leftEdgeGrounded = false;
-    private boolean rightEdgeGrounded = false;
-
-    // Inner class to tag sensor fixtures with side information
-    public static class EdgeSensorData {
-        public DamnedAICharacter damnedAICharacter;
-        public String side; // "left" or "right"
-
-        public EdgeSensorData(DamnedAICharacter damnedAICharacter, String side) {
-            this.damnedAICharacter = damnedAICharacter;
-            this.side = side;
-        }
-    }
-
-    public DamnedAICharacter(World world, Vector2 position, BaseLevel gameScreen) {
+    public DamnedAICharacter(World world, Vector2 position, BaseLevel gameScreen, Texture spriteSheet) {
         super(world, position, gameScreen);
         this.currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
 
-        Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.DAMNED_MALE, Texture.class);
         this.animationSet = new AnimationSetDamned(spriteSheet);
         isFacingLeft = true;
         createEdgeSensors();

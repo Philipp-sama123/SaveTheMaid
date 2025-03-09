@@ -7,6 +7,7 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_GROUND;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -132,14 +133,19 @@ public class Box2dWorldCreator {
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
 
-//            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-//                (rectangle.y + 100) / PPM), baseLevel));
-//            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
-//                rectangle.y / PPM), baseLevel));
-//            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-//                rectangle.y / PPM), baseLevel));
-            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2(rectangle.x / PPM,
+            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+                (rectangle.y + 100) / PPM), baseLevel));
+            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
                 rectangle.y / PPM), baseLevel));
+            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+                rectangle.y / PPM), baseLevel));
+            Texture spriteSheetDamnedMale = GameAssetManager.getInstance().get(AssetPaths.DAMNED_MALE, Texture.class);
+            Texture spriteSheetDamnedFemale = GameAssetManager.getInstance().get(AssetPaths.DAMNED_FEMALE, Texture.class);
+
+            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2(rectangle.x / PPM,
+                rectangle.y / PPM), baseLevel, spriteSheetDamnedMale));
+            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2((rectangle.x + 500) / PPM,
+                (rectangle.y + 500) / PPM), baseLevel, spriteSheetDamnedFemale));
         }
 
         // Create Friend objects for "SpawnPointsFriend" layer

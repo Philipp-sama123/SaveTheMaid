@@ -53,6 +53,16 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     protected BaseLevel baseLevel = null;
     private int groundedCount = 0;
 
+    protected boolean leftEdgeGrounded = false;
+    protected boolean rightEdgeGrounded = false;
+
+    public void setLeftEdgeGrounded(boolean grounded) {
+        this.leftEdgeGrounded = grounded;
+    }
+
+    public void setRightEdgeGrounded(boolean grounded) {
+        this.rightEdgeGrounded = grounded;
+    }
 
     public BaseAICharacter(World world, Vector2 position, BaseLevel baseLevel) {
         this.world = world;
