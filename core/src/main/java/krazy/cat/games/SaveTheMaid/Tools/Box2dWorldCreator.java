@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.DamnedAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
@@ -131,12 +132,14 @@ public class Box2dWorldCreator {
         for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
 
-            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                (rectangle.y + 100) / PPM), baseLevel)); // Adjusted for PPM
-            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
-                rectangle.y / PPM), baseLevel)); // Adjusted for PPM
-            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
-                rectangle.y / PPM), baseLevel)); // Adjusted for PPM
+//            baseLevel.addEnemy(new BatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+//                (rectangle.y + 100) / PPM), baseLevel));
+//            baseLevel.addEnemy(new ZombieAICharacter(world, new Vector2(rectangle.x / PPM,
+//                rectangle.y / PPM), baseLevel));
+//            baseLevel.addEnemy(new RatAICharacter(world, new Vector2((rectangle.x + 100) / PPM,
+//                rectangle.y / PPM), baseLevel));
+            baseLevel.addEnemy(new DamnedAICharacter(world, new Vector2(rectangle.x / PPM,
+                rectangle.y / PPM), baseLevel));
         }
 
         // Create Friend objects for "SpawnPointsFriend" layer

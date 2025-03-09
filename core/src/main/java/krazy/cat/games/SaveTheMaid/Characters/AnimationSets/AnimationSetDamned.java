@@ -14,7 +14,7 @@ public class AnimationSetDamned implements AnimationSet<AnimationSetDamned.Damne
     private static final int SPRITE_SHEET_COLUMNS = 10; // 10 frames per row
 
     public enum DamnedAnimationType {
-        IDLE, WALK, ATTACK, EAT_PREY, WALK_ATTACK, HIT, DEATH, CRAWL_IDLE, CRAWL, CRAWL_EAT_PREY, CRAWL_DEATH
+        IDLE, WALK, HIT, DEATH, ATTACK
     }
 
     private final Map<DamnedAnimationType, Animation<TextureRegion>> animations;
@@ -28,6 +28,7 @@ public class AnimationSetDamned implements AnimationSet<AnimationSetDamned.Damne
         animations.put(DamnedAnimationType.WALK, createAnimation(textureRegions, 1, 0, 8));
         animations.put(DamnedAnimationType.ATTACK, createAnimation(textureRegions, 2, 0, 6));
         animations.put(DamnedAnimationType.DEATH, createAnimation(textureRegions, 3, 0, 6));
+        animations.put(DamnedAnimationType.HIT, createAnimation(textureRegions, 0, 0, 5));
 
         // Debug: Check that all animations are created
         for (DamnedAnimationType type : DamnedAnimationType.values()) {

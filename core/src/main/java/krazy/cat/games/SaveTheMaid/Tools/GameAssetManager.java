@@ -26,6 +26,7 @@ public class GameAssetManager {
         assetManager.load(AssetPaths.RAT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.BAT_TEXTURE, Texture.class);
         assetManager.load(AssetPaths.ZOMBIE_GREY_TEXTURE, Texture.class);
+        assetManager.load(AssetPaths.DAMNED_MALE, Texture.class);
         // --SFX
         assetManager.load(AssetPaths.SWIPE_SOUND, Sound.class);
         assetManager.load(AssetPaths.PLAYER_HIT_SOUND, Sound.class);

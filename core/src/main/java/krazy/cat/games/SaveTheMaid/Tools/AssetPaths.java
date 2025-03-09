@@ -12,6 +12,7 @@ public class AssetPaths {
     public static final String RAT_TEXTURE = "Characters/Enemies/Rat/Rat_v3/Sprite Sheet/Rat_v3_Sheet.png";
     public static final String BAT_TEXTURE = "Characters/Enemies/Bat/Bat_v1/Sprite Sheet/Bat_v1_Sheet.png";
     public static final String ZOMBIE_GREY_TEXTURE = "Characters/Enemies/Zombie/Colors/Grey.png";
+    public static final String DAMNED_MALE = "GandalfHardcore The Damned Enemies/Male Damned.png";
 
     public static final String HEALTH_BAR_ANIMATIONS = "UiSprites/HealthBars/HealthBar_Animations.png";
     public static final String HEALTH_BAR_CONTAINER = "UiSprites/HealthBars/HealthBar_Container.png";

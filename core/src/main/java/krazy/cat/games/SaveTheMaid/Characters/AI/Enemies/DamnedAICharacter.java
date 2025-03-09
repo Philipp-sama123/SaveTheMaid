@@ -19,16 +19,17 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
+import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetDamned;
 import krazy.cat.games.SaveTheMaid.Characters.AnimationSets.AnimationSetZombie;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
 import krazy.cat.games.SaveTheMaid.Tools.AssetPaths;
 import krazy.cat.games.SaveTheMaid.Tools.GameAssetManager;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
-public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.ZombieAnimationType> {
-    private final AnimationSetZombie animationSet;
-    private AnimationSetZombie.ZombieAnimationType currentState;
-    private AnimationSetZombie.ZombieAnimationType previousState;
+public class DamnedAICharacter extends BaseAICharacter<AnimationSetDamned.DamnedAnimationType> {
+    private final AnimationSetDamned animationSet;
+    private AnimationSetDamned.DamnedAnimationType currentState;
+    private AnimationSetDamned.DamnedAnimationType previousState;
 
     // Flags for edge sensors
     private boolean leftEdgeGrounded = false;
@@ -36,21 +37,21 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
 
     // Inner class to tag sensor fixtures with side information
     public static class EdgeSensorData {
-        public DamnedAICharacter zombie;
+        public DamnedAICharacter damnedAICharacter;
         public String side; // "left" or "right"
 
-        public EdgeSensorData(DamnedAICharacter zombie, String side) {
-            this.zombie = zombie;
+        public EdgeSensorData(DamnedAICharacter damnedAICharacter, String side) {
+            this.damnedAICharacter = damnedAICharacter;
             this.side = side;
         }
     }
 
     public DamnedAICharacter(World world, Vector2 position, BaseLevel gameScreen) {
         super(world, position, gameScreen);
-        this.currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+        this.currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
 
-        Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.ZOMBIE_GREY_TEXTURE, Texture.class);
-        this.animationSet = new AnimationSetZombie(spriteSheet);
+        Texture spriteSheet = GameAssetManager.getInstance().get(AssetPaths.DAMNED_MALE, Texture.class);
+        this.animationSet = new AnimationSetDamned(spriteSheet);
         isFacingLeft = true;
         createEdgeSensors();
     }
@@ -130,7 +131,7 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
 
-        boolean looping = currentState != AnimationSetZombie.ZombieAnimationType.DEATH;
+        boolean looping = currentState != AnimationSetDamned.DamnedAnimationType.DEATH;
         TextureRegion currentFrame = animationSet.getFrame(currentState, stateTime, looping);
 
         drawHealthBar(batch);
@@ -190,12 +191,12 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
 
         // If player is left and left sensor is not grounded, idle.
         if (deltaX < 0 && !leftEdgeGrounded) {
-            currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+            currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
             return;
         }
         // If player is right and right sensor is not grounded, idle.
         else if (deltaX > 0 && !rightEdgeGrounded) {
-            currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+            currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
             return;
         }
 
@@ -205,36 +206,36 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
 
         // Set state accordingly.
         if (direction.len() > 0) {
-            currentState = AnimationSetZombie.ZombieAnimationType.WALK;
+            currentState = AnimationSetDamned.DamnedAnimationType.WALK;
         } else {
-            currentState = AnimationSetZombie.ZombieAnimationType.IDLE;
+            currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
         }
     }
 
     @Override
-    public void setAnimation(AnimationSetZombie.ZombieAnimationType type) {
+    public void setAnimation(AnimationSetDamned.DamnedAnimationType type) {
         currentState = type;
         stateTime = 0;
     }
 
     @Override
     public boolean isDeathAnimationComplete() {
-        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.DEATH).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetDamned.DamnedAnimationType.DEATH).isAnimationFinished(stateTime);
     }
 
     @Override
     public boolean isAttackAnimationFinished() {
-        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetDamned.DamnedAnimationType.ATTACK).isAnimationFinished(stateTime);
     }
 
     @Override
     public boolean isHitAnimationFinished() {
-        return animationSet.getAnimation(AnimationSetZombie.ZombieAnimationType.HIT).isAnimationFinished(stateTime);
+        return animationSet.getAnimation(AnimationSetDamned.DamnedAnimationType.HIT).isAnimationFinished(stateTime);
     }
 
     @Override
     public void attack() {
-        setAnimation(AnimationSetZombie.ZombieAnimationType.ATTACK);
+        setAnimation(AnimationSetDamned.DamnedAnimationType.ATTACK);
         activateAttackCollider();
         updateAttackColliderPosition();
         ATTACK_SOUND.play();
@@ -243,26 +244,26 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetZombie.Zombie
 
     @Override
     public void chase() {
-        setAnimation(AnimationSetZombie.ZombieAnimationType.WALK);
+        setAnimation(AnimationSetDamned.DamnedAnimationType.WALK);
     }
 
     @Override
     public void die() {
-        setAnimation(AnimationSetZombie.ZombieAnimationType.DEATH);
+        setAnimation(AnimationSetDamned.DamnedAnimationType.DEATH);
         disableCollision();
     }
 
     @Override
     public void hit() {
         stateTime = 0;
-        setAnimation(AnimationSetZombie.ZombieAnimationType.HIT);
+        setAnimation(AnimationSetDamned.DamnedAnimationType.HIT);
         body.setLinearVelocity(0, body.getLinearVelocity().y);
     }
 
     @Override
     public void idle() {
         stateTime = 0;
-        setAnimation(AnimationSetZombie.ZombieAnimationType.IDLE);
+        setAnimation(AnimationSetDamned.DamnedAnimationType.IDLE);
         body.setLinearVelocity(0, 0);
     }
 

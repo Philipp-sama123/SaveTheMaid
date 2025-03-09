@@ -3,6 +3,7 @@ package krazy.cat.games.SaveTheMaid;
 import com.badlogic.gdx.physics.box2d.*;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.*;
+import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.DamnedAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
@@ -123,6 +124,27 @@ public class WorldContactListener implements ContactListener {
                 }
             }
         }
+        // --- Handle edge sensor collisions ---
+        if (fixtureA.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
+            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureA.getUserData();
+            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setLeftEdgeGrounded(true);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setRightEdgeGrounded(true);
+                }
+            }
+        }
+        if (fixtureB.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
+            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureB.getUserData();
+            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setLeftEdgeGrounded(true);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setRightEdgeGrounded(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -146,7 +168,7 @@ public class WorldContactListener implements ContactListener {
             ((BaseAICharacter) userDataB).decreaseGroundedCount();
         }
 
-        // --- Handle end of edge sensor collisions for zombies ---
+        // --- Handle end of edge sensor collisions ---
         if (fixtureA.getUserData() instanceof ZombieAICharacter.EdgeSensorData) {
             ZombieAICharacter.EdgeSensorData sensorData = (ZombieAICharacter.EdgeSensorData) fixtureA.getUserData();
             if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
@@ -164,6 +186,26 @@ public class WorldContactListener implements ContactListener {
                     sensorData.zombie.setLeftEdgeGrounded(false);
                 } else if ("right".equals(sensorData.side)) {
                     sensorData.zombie.setRightEdgeGrounded(false);
+                }
+            }
+        }
+        if (fixtureA.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
+            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureA.getUserData();
+            if (fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setLeftEdgeGrounded(false);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setRightEdgeGrounded(false);
+                }
+            }
+        }
+        if (fixtureB.getUserData() instanceof DamnedAICharacter.EdgeSensorData) {
+            DamnedAICharacter.EdgeSensorData sensorData = (DamnedAICharacter.EdgeSensorData) fixtureB.getUserData();
+            if (fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
+                if ("left".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setLeftEdgeGrounded(false);
+                } else if ("right".equals(sensorData.side)) {
+                    sensorData.damnedAICharacter.setRightEdgeGrounded(false);
                 }
             }
         }
