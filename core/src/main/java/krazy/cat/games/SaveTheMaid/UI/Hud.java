@@ -213,37 +213,25 @@ public class Hud implements Disposable {
     }
 
     private void createMovementJoystick() {
-        // Load textures for the joystick background and knob
-        Texture joystickBackground = new Texture(Gdx.files.internal("UiSprites/Joystick/ShootPad.png"));
-        Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/MoveStick.png"));
-
-        // Check if textures are loaded
-        if (!joystickBackground.getTextureData().isPrepared()) {
-            joystickBackground.getTextureData().prepare();
-        }
-        if (!joystickKnob.getTextureData().isPrepared()) {
-            joystickKnob.getTextureData().prepare();
-        }
+        // We still need to load the knob texture
+        Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/MoveKnob.png"));
 
         // Create joystick style
         Touchpad.TouchpadStyle movementJoystickStyle = new Touchpad.TouchpadStyle();
 
-        // Set background and knob using TextureRegionDrawable
-        movementJoystickStyle.background = new TextureRegionDrawable(new TextureRegion(joystickBackground));
+        // Remove the background by setting it to null
+        movementJoystickStyle.background = null;
+        // Set the knob drawable as usual
         movementJoystickStyle.knob = new TextureRegionDrawable(new TextureRegion(joystickKnob));
 
-        // Adjust knob size relative to background
+        // Adjust knob size relative to the desired scale
         TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
-        float knobWidth = joystickKnob.getWidth() * .1f;  // Scale down the knob width
-        float knobHeight = joystickKnob.getHeight() * .1f; // Scale down the knob height
-
-        knobDrawable.setMinWidth(knobWidth);  // Adjust knob size
+        float knobWidth = joystickKnob.getWidth() * 0.1f;
+        float knobHeight = joystickKnob.getHeight() * 0.1f;
+        knobDrawable.setMinWidth(knobWidth);
         knobDrawable.setMinHeight(knobHeight);
 
-        // Create the Touchpad with a smaller size
-        float joystickWidth = joystickBackground.getWidth() * .1f; // Scale down the joystick background width
-        float joystickHeight = joystickBackground.getHeight() * .1f; // Scale down the joystick background height
-
+        // Create the Touchpad with a deadzone value
         movementJoystick = new Touchpad(10, movementJoystickStyle);
 
         // Place the joystick in the bottom left corner
@@ -251,9 +239,9 @@ public class Hud implements Disposable {
         table.setFillParent(true);
         table.bottom().left();
 
-        // Use the scaled size for the joystick
-        table.add(movementJoystick).size(joystickWidth, joystickHeight).pad(25);
-
+        // Set a fixed size for the touchpad (the size is still used for input bounds)
+        float joystickSize = 100; // adjust as needed
+        table.add(movementJoystick).size(joystickSize, joystickSize);
         stage.addActor(table);
     }
 

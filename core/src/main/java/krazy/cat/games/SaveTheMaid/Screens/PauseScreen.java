@@ -79,7 +79,7 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.reloadCurrentLevel();
-                game.setScreen(game.getVillageLevel()); // Switch back to GameScreen
+                game.setScreen(game.getCurrentLevel());
             }
         });
 

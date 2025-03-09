@@ -61,9 +61,11 @@ public class SaveTheMaidGame extends Game {
         if (currentLevel instanceof VillageLevel) {
             villageLevel = null;
             villageLevel = new VillageLevel(this);
+            setCurrentLevel(villageLevel);
         } else if (currentLevel instanceof HellLevel) {
             hellLevel = null;
             hellLevel = new HellLevel(this);
+            setCurrentLevel(hellLevel);
         }
     }
 
