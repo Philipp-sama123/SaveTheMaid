@@ -6,24 +6,24 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 
 public class AttackState implements State {
     @Override
-    public void enter(BaseAICharacter enemy) {
+    public void enter(BaseAICharacter<?> enemy) {
         if (enemy.canAttack()) {
             enemy.attack();
         } else {
-            enemy.getStateMachine().changeState(new IdleState()); // Switch back if cooldown is active
+            enemy.getStateMachine().changeState(enemy.idleState); // Switch back if cooldown is active
         }
     }
 
 
     @Override
-    public void update(BaseAICharacter enemy, float deltaTime, Vector2 playerPosition) {
+    public void update(BaseAICharacter<?> enemy, float deltaTime, Vector2 playerPosition) {
         if (enemy.isAttackAnimationFinished()) {
-            enemy.getStateMachine().changeState(new IdleState());
+            enemy.getStateMachine().changeState(enemy.idleState);
         }
     }
 
     @Override
-    public void exit(BaseAICharacter enemy) {
+    public void exit(BaseAICharacter<?> enemy) {
         enemy.deactivateAttackCollider();
     }
 }

@@ -34,7 +34,7 @@ import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public abstract class BaseLevel implements Screen {
-    private static final double PICKUP_SPAWN_PROBABILITY = 0.2;
+    private static final double PICKUP_SPAWN_PROBABILITY = 0.3f;
     private static final float ZOOM_FACTOR = .8f;
     private final float PLAYER_FEET_OFFSET = 75 / PPM;
     private final float PHYSICS_TIME_STEP = 1 / 60f;

@@ -15,6 +15,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import javax.swing.JLayeredPane;
 import javax.swing.text.Position;
 
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.AttackState;
+import krazy.cat.games.SaveTheMaid.Characters.AI.States.ChaseState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.DeathState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.HitState;
 import krazy.cat.games.SaveTheMaid.Characters.AI.States.IdleState;
@@ -28,7 +30,17 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     protected static float PLAYER_SEARCH_DISTANCE = 300 / PPM;
     protected static final float MOVEMENT_SPEED = 15f / PPM;
     protected static final float ATTACK_COLLIDER_UPDATE_DELAY = .4f; // Delay in seconds for updating the collider position
-
+    /**
+     * States
+     **/
+    public IdleState idleState = new IdleState();
+    public ChaseState chaseState = new ChaseState();
+    public AttackState attackState = new AttackState();
+    protected HitState hitState = new HitState();
+    public DeathState deathState = new DeathState();
+    /**
+     * Sound Effects
+     */
     public Sound ATTACK_SOUND = GameAssetManager.getInstance().get(AssetPaths.SWIPE_SOUND, Sound.class);
     public Sound HIT_SOUND = GameAssetManager.getInstance().get(AssetPaths.PLAYER_HIT_SOUND, Sound.class);
     public Sound DEATH_SOUND = GameAssetManager.getInstance().get(AssetPaths.ZOMBIE_ATTACK_SOUND, Sound.class);
@@ -76,7 +88,7 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
         defineEnemy(position);
         deactivateAttackCollider();
         stateMachine = new StateMachine(this);
-        stateMachine.changeState(new IdleState());
+        stateMachine.changeState(idleState);
     }
 
     public void disableCollision() {
@@ -88,11 +100,11 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     }
 
     public void onHit() {
-        stateMachine.changeState(new HitState());
+        stateMachine.changeState(hitState);
     }
 
     public void onDie() {
-        stateMachine.changeState(new DeathState());
+        stateMachine.changeState(deathState);
     }
 
     public void activateAttackCollider() {
@@ -126,34 +138,6 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public boolean isPlayerInRange(Vector2 playerPosition) {
         return body.getPosition().dst(playerPosition) < PLAYER_SEARCH_DISTANCE;
     }
-
-    protected abstract void defineEnemy(Vector2 position);
-
-    public abstract void setAnimation(T animationType);
-
-    public abstract void moveToPlayer(Vector2 playerPosition);
-
-    public abstract void updateAttackColliderPosition();
-
-    public abstract boolean isAttackAnimationFinished();
-
-    public abstract boolean isDeathAnimationComplete();
-
-    public abstract boolean isHitAnimationFinished();
-
-    public abstract void attack();
-
-    public abstract void chase();
-
-    public abstract void die();
-
-    public abstract void hit();
-
-    public abstract void idle();
-
-    public abstract void update(float dt, Vector2 position);
-
-    public abstract void draw(Batch batch);
 
     public void drawHealthBar(Batch batch) {
         batch.setColor(1, 1, 1, .5f);
@@ -198,4 +182,33 @@ public abstract class BaseAICharacter<T extends Enum<T>> {
     public Body getBody() {
         return body;
     }
+
+    protected abstract void defineEnemy(Vector2 position);
+
+    public abstract void setAnimation(T animationType);
+
+    public abstract void moveToPlayer(Vector2 playerPosition);
+
+    public abstract void updateAttackColliderPosition();
+
+    public abstract boolean isAttackAnimationFinished();
+
+    public abstract boolean isDeathAnimationComplete();
+
+    public abstract boolean isHitAnimationFinished();
+
+    public abstract void attack();
+
+    public abstract void chase();
+
+    public abstract void die();
+
+    public abstract void hit();
+
+    public abstract void idle();
+
+    public abstract void update(float dt, Vector2 position);
+
+    public abstract void draw(Batch batch);
+
 }

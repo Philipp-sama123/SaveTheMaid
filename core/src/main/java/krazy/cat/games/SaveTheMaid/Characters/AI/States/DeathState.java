@@ -6,7 +6,7 @@ import krazy.cat.games.SaveTheMaid.Characters.AI.BaseAICharacter;
 
 public class DeathState implements State {
     @Override
-    public void enter(BaseAICharacter enemy) {
+    public void enter(BaseAICharacter<?> enemy) {
         enemy.spawnPickupAtDeathPosition(enemy.getBody().getPosition().cpy());
 
         enemy.DEATH_SOUND.play();
@@ -16,14 +16,14 @@ public class DeathState implements State {
     }
 
     @Override
-    public void update(BaseAICharacter enemy, float deltaTime, Vector2 playerPosition) {
+    public void update(BaseAICharacter<?> enemy, float deltaTime, Vector2 playerPosition) {
         if (enemy.isDeathAnimationComplete()) {
             enemy.isDestroyed = true;
         }
     }
 
     @Override
-    public void exit(BaseAICharacter enemy) {
+    public void exit(BaseAICharacter<?> enemy) {
         // No exit logic for death
     }
 }
