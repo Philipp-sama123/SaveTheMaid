@@ -104,15 +104,6 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetDamned.Damned
         rightSensorShape.dispose();
     }
 
-    // Setter methods called from the contact listener.
-    public void setLeftEdgeGrounded(boolean grounded) {
-        this.leftEdgeGrounded = grounded;
-    }
-
-    public void setRightEdgeGrounded(boolean grounded) {
-        this.rightEdgeGrounded = grounded;
-    }
-
     @Override
     public void draw(Batch batch) {
         if (isDestroyed && isDeathAnimationComplete()) return;
@@ -241,9 +232,10 @@ public class DamnedAICharacter extends BaseAICharacter<AnimationSetDamned.Damned
 
     @Override
     public void hit() {
-        stateTime = 0;
-        setAnimation(AnimationSetDamned.DamnedAnimationType.HIT);
-        body.setLinearVelocity(0, body.getLinearVelocity().y);
+       // currentState = AnimationSetDamned.DamnedAnimationType.IDLE;
+//        stateTime = 0;
+//        setAnimation(AnimationSetDamned.DamnedAnimationType.HIT);
+        //       body.setLinearVelocity(0, body.getLinearVelocity().y);
     }
 
     @Override

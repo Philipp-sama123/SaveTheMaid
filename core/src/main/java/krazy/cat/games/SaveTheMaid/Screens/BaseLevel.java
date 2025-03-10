@@ -34,9 +34,10 @@ import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public abstract class BaseLevel implements Screen {
-    private static final double PICKUP_SPAWN_PROBABILITY = 0.1;
+    private static final double PICKUP_SPAWN_PROBABILITY = 0.2;
     private static final float ZOOM_FACTOR = .8f;
     private final float PLAYER_FEET_OFFSET = 75 / PPM;
+    private final float PHYSICS_TIME_STEP = 1 / 60f;
 
     protected final SaveTheMaidGame game;
     protected final OrthographicCamera gameCamera;
@@ -50,8 +51,8 @@ public abstract class BaseLevel implements Screen {
     protected final World world;
     protected final Box2DDebugRenderer box2DDebugRenderer;
 
-    private final Array<BaseAICharacter> enemies = new Array<>();
-    private final Array<BaseFriendAICharacter> friends = new Array<>();
+    private final Array<BaseAICharacter<?>> enemies = new Array<>();
+    private final Array<BaseFriendAICharacter<?>> friends = new Array<>();
     private final Array<EnemySpawnPoint> spawnPoints = new Array<>();
     private final Array<PickupObject> pickups = new Array<>();
     private final Array<PickupSpawnRequest> pendingPickupSpawnRequests = new Array<>();
@@ -60,7 +61,6 @@ public abstract class BaseLevel implements Screen {
 
     public boolean isShowBox2dDebug;
     private float accumulator = 0f;
-    private final float fixedTimeStep = 1 / 60f;
     protected final int mapWidthInPixels;
     protected final int mapHeightInPixels;
     protected int enemiesKilled;
@@ -80,12 +80,15 @@ public abstract class BaseLevel implements Screen {
         this.mapLoader = new TmxMapLoader();
         this.map = mapLoader.load(mapPath);
         configureMapTextures();
+
         this.renderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
         this.world = new World(new Vector2(0, -125 / PPM), false);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
         new Box2dWorldCreator(world, map, this);
         world.setContactListener(new WorldContactListener());
+
         this.player = new Player(world, this);
+
         this.mapWidthInPixels = calculateMapDimension("width") * calculateMapDimension("tilewidth");
         this.mapHeightInPixels = calculateMapDimension("height") * calculateMapDimension("tileheight");
         gameCamera.position.set(gameViewport.getWorldWidth() / 2, gameViewport.getWorldHeight() / 2, 0);
@@ -157,9 +160,9 @@ public abstract class BaseLevel implements Screen {
 
     private void updatePhysics(float deltaTime) {
         accumulator += deltaTime;
-        while (accumulator >= fixedTimeStep) {
-            world.step(fixedTimeStep, 6, 2);
-            accumulator -= fixedTimeStep;
+        while (accumulator >= PHYSICS_TIME_STEP) {
+            world.step(PHYSICS_TIME_STEP, 6, 2);
+            accumulator -= PHYSICS_TIME_STEP;
         }
     }
 
@@ -200,8 +203,18 @@ public abstract class BaseLevel implements Screen {
     }
 
     private void renderMap() {
+        // add a margin for the map to render also objects out of the viewport
+        float margin = 256 / PPM;
+        float adjustedViewportWidth = gameCamera.viewportWidth + margin;
+        float adjustedViewportHeight = gameCamera.viewportHeight + margin;
+        float viewX = gameCamera.position.x - adjustedViewportWidth / 2;
+        float viewY = gameCamera.position.y - adjustedViewportHeight / 2;
+
+        renderer.setView(gameCamera.combined, viewX, viewY, adjustedViewportWidth, adjustedViewportHeight);
         renderer.render();
-        if (isShowBox2dDebug) box2DDebugRenderer.render(world, gameCamera.combined);
+
+        if (isShowBox2dDebug)
+            box2DDebugRenderer.render(world, gameCamera.combined);
     }
 
     private void renderEntities() {
@@ -278,7 +291,7 @@ public abstract class BaseLevel implements Screen {
     }
 
     public void requestPickupSpawn(Vector2 position) {
-        if (Math.random() < PICKUP_SPAWN_PROBABILITY) { // 10% chance to spawn a pickup
+        if (Math.random() < PICKUP_SPAWN_PROBABILITY) {
             PickupObject.PickupType type = (Math.random() < 0.5)
                 ? PickupObject.PickupType.LIFE
                 : PickupObject.PickupType.AMMO;

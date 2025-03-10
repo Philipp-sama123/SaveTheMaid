@@ -15,8 +15,8 @@ public class PlayerEffectManager {
     private final Player player;
 
     private static final float BLOOD_EFFECT_SCALE = 0.5f; // 50% of original size
-    private static final float JUMP_EFFECT_SCALE = 1.5f;
-    private static final int JUMP_EFFECT_Y_OFFSET = 25;
+    private static final int JUMP_EFFECT_Y_OFFSET = 45;
+    private static final int JUMP_EFFECT_X_OFFSET = 10;
 
 
     public PlayerEffectManager(Player player) {
@@ -57,11 +57,11 @@ public class PlayerEffectManager {
         // Draw jump effect
         if (showJumpEffect) {
             TextureRegion jumpEffectFrame = jumpEffectAnimation.getKeyFrame(jumpEffectTime);
-            float effectPosX = player.getBody().getPosition().x - (jumpEffectFrame.getRegionWidth() * JUMP_EFFECT_SCALE / 2f / PPM);
-            float effectPosY = player.getBody().getPosition().y - JUMP_EFFECT_Y_OFFSET / PPM;
+            float effectPosX = player.getBody().getPosition().x - ((jumpEffectFrame.getRegionWidth() + JUMP_EFFECT_X_OFFSET) / 2f / PPM);
+            float effectPosY = player.getBody().getPosition().y - (JUMP_EFFECT_Y_OFFSET / PPM);
             batch.draw(jumpEffectFrame, effectPosX, effectPosY,
-                jumpEffectFrame.getRegionWidth() * JUMP_EFFECT_SCALE / PPM,
-                jumpEffectFrame.getRegionHeight() * JUMP_EFFECT_SCALE / PPM);
+                jumpEffectFrame.getRegionWidth() / PPM,
+                jumpEffectFrame.getRegionHeight() / PPM);
         }
         // Draw blood effect
         if (showBloodEffect) {
@@ -119,7 +119,7 @@ public class PlayerEffectManager {
         Texture slideSmokeSpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_SLIDE_EFFECT_TEXTURE, Texture.class);
         Texture destroySpriteSheet = GameAssetManager.getInstance().get(AssetPaths.PLAYER_DESTROY_EFFECT_TEXTURE, Texture.class);
 
-        jumpEffectAnimation = createAnimation(jumpSpriteSheet, 32, 16, 10, 0.05f);
+        jumpEffectAnimation = createAnimation(jumpSpriteSheet, 64, 64, 6, 0.1f);
         bloodEffectAnimation = createAnimation(bloodSpriteSheet, 110, 86, 7, 0.1f);
         slideEffectAnimation = createAnimation(slideSmokeSpriteSheet, 48, 32, 9, 0.05f);
         destroyEffectAnimation = createAnimation(destroySpriteSheet, 64, 64, 13, 0.1f);

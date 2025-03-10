@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="500" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="140">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="500" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="142">
  <tileset firstgid="1" source="PlatformerAssets.tsx"/>
  <tileset firstgid="1081" source="HellTiles32x32.tsx"/>
  <tileset firstgid="1234" source="MaidBathing.tsx"/>
@@ -14,7 +14,7 @@
  </layer>
  <layer id="1" name="Graphics" width="500" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt201OwlAYBVAGhNXozIk6dAPGnxEwQMPSkLgBdQuO2QPr4GtiU2zorw20ck5y0yZtXsLovu+FjkYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHB623EWAGCYrqPHbyK3FX1+p+8BoLem0dOzyLykrx/j2VPkWacDwKAt97rcGT0ADF/dM3oAoJ10Zs5f8/d/UeeMHgBoL5mdXwpSd55exXtvkbW+BoCTeIgO/i7IfU/7Od0/NI39BgD/VVWfm70BoF8+opO/cr3cZD5/b3j+3lXsJQA4V5vx7+y7mmT3VX2e7AE+f/YBOhYAjiv9RqwsyX/eXkv6fBG5iO6/nHRzLUrV8yY5tFaX65et1/b3H1oHABI7OxFoYw==
+   eJzt2ztOw0AUBdAUo6wGOhqgpEiL+CgFIASITbAEWAK0gNgAsAVq9sA6eFYSYUfxLxhIyDnS0zhjZ6RUd97I6fUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgCrXqd08ALB4bnO5vZNmzwMAf+8jsnmYRuO0/Zg7HddB7vpQngPAQtmMbN6K2q7J6EsZDgAL6yhy+jjqRF4DwEqpOqMHAJZD0zN6AGA++d4530N32U87oweAn5X1zucl1bSfvo/nHqIeS56/SsWxK8PU/PP0PQD4T/Yi595KarejDLxJxfG7JvuHtlW23wCAZVeX53W9dxN38d1BGo11BjIXACo9R1a+TuVlm/78qeX5e1elrwZgVb2nYuVt9L+u6/I82wO8jPcBMhYAftfkP2JVlb3zdlGR52dRa5H96/1uxrKqu9+mZq3V5fpV6837+2etAwCZT+hLcZg=
   </data>
  </layer>
  <objectgroup id="3" name="Ground">
@@ -29,8 +29,8 @@
   <object id="122" x="577.507" y="3136.5" width="222" height="10"/>
   <object id="124" x="866" y="3009" width="92" height="10"/>
   <object id="127" x="160" y="3104" width="64" height="10"/>
-  <object id="128" x="993" y="2881" width="94" height="30"/>
-  <object id="129" x="1025" y="2849" width="30" height="94"/>
+  <object id="128" x="930.95" y="2815.75" width="220.691" height="30"/>
+  <object id="129" x="1024.27" y="2784.47" width="30" height="94"/>
   <object id="131" x="995" y="3105" width="668" height="13"/>
   <object id="133" x="1762" y="3040" width="476" height="15"/>
   <object id="138" x="579" y="3073" width="94" height="15"/>
@@ -42,15 +42,17 @@
   <object id="118" x="594.608" y="3468.95"/>
  </objectgroup>
  <objectgroup id="7" name="SpawnPoints">
-  <object id="108" x="512.198" y="2977.3" width="31.5572" height="27.916"/>
-  <object id="109" x="413.885" y="2979.73" width="33.9847" height="26.7023"/>
-  <object id="110" x="349.557" y="2976.09" width="36.4122" height="26.7023"/>
-  <object id="125" x="1156.91" y="2914.26" width="24.7321" height="16.488"/>
-  <object id="126" x="735.092" y="2802.97" width="32.9761" height="23.3581"/>
-  <object id="134" x="2177.43" y="3009.5" width="30.1927" height="28.4167"/>
-  <object id="135" x="1950.98" y="3013.94" width="36.4088" height="22.2005"/>
-  <object id="136" x="2083.3" y="2958.88" width="22.2005" height="11.5443"/>
-  <object id="137" x="1849.75" y="2950.89" width="10.6562" height="14.2083"/>
+  <object id="108" x="512" y="2976" width="32" height="32"/>
+  <object id="109" x="416" y="2976" width="32" height="32"/>
+  <object id="110" x="352" y="2976" width="32" height="32"/>
+  <object id="125" x="1152" y="2912" width="32" height="32"/>
+  <object id="126" x="736" y="2816" width="32" height="32"/>
+  <object id="134" x="2176" y="3008" width="32" height="32"/>
+  <object id="135" x="1952" y="3008" width="32" height="32"/>
+  <object id="136" x="2080" y="3008" width="32" height="32"/>
+  <object id="137" x="1824" y="3008" width="32" height="32"/>
+  <object id="140" x="1152" y="3072" width="32" height="32"/>
+  <object id="141" x="1472" y="3072" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="8" name="SpawnPointsFriend"/>
 </map>
