@@ -35,9 +35,9 @@ public class Player {
     private static final float DEATH_SCREEN_DELAY = 5.0f; // Delay before showing death screen
 
     // --- Movement speeds (in meters per second) ---
-    private final float slowSpeed = 25 / PPM;
-    private final float walkSpeed = 50 / PPM;
-    private final float runSpeed = 100 / PPM;
+    private final float slowSpeed = 20 / PPM;
+    private final float walkSpeed = 40 / PPM;
+    private final float runSpeed = 80 / PPM;
 
     // --- Fields ---
     private BaseLevel baseLevel = null; // TODO REMOVE!
@@ -398,10 +398,6 @@ public class Player {
 
     public void removeFriend() {
         friendAICharacter = null;
-    }
-
-    public void appleHeal() {
-        currentHealth = maxHealth;
     }
 
     public Body getBody() {

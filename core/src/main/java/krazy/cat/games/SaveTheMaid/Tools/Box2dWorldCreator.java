@@ -7,7 +7,6 @@ import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_GROUND;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PLAYER;
 import static krazy.cat.games.SaveTheMaid.WorldContactListener.CATEGORY_PROJECTILE;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -23,18 +22,11 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.Random;
 
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.BatAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.DamnedAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.EnemyType;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.RatAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.EnemySpawnPoint;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.CatCharacter;
 import krazy.cat.games.SaveTheMaid.Screens.BaseLevel;
-import krazy.cat.games.SaveTheMaid.Sprites.Apple;
-import krazy.cat.games.SaveTheMaid.Sprites.Brick;
 import krazy.cat.games.SaveTheMaid.Sprites.Goal;
-import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public class Box2dWorldCreator {
     public Box2dWorldCreator(World world, TiledMap map, BaseLevel baseLevel) {
@@ -100,8 +92,7 @@ public class Box2dWorldCreator {
         }
         // Create Goal objects for "Apple" layer
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
-            new Apple(world, rectangle);
+            // ToDo: Replace with another layer
         }
         // Create bodies for "Destroy" layer
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {

@@ -3,8 +3,6 @@ package krazy.cat.games.SaveTheMaid;
 import com.badlogic.gdx.physics.box2d.*;
 
 import krazy.cat.games.SaveTheMaid.Characters.AI.*;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.DamnedAICharacter;
-import krazy.cat.games.SaveTheMaid.Characters.AI.Enemies.ZombieAICharacter;
 import krazy.cat.games.SaveTheMaid.Characters.AI.Friends.*;
 import krazy.cat.games.SaveTheMaid.Characters.Player.Player;
 import krazy.cat.games.SaveTheMaid.Characters.Projectile;
@@ -50,9 +48,9 @@ public class WorldContactListener implements ContactListener {
         }
         // Handle player and enemy collisions
         else if (userDataA instanceof Player && userDataB instanceof BaseAICharacter) {
-            handleAttackCollision((Player) userDataA, (BaseAICharacter) userDataB);
+            handleAttackCollision((Player) userDataA, (BaseAICharacter<?>) userDataB);
         } else if (userDataB instanceof Player && userDataA instanceof BaseAICharacter) {
-            handleAttackCollision((Player) userDataB, (BaseAICharacter) userDataA);
+            handleAttackCollision((Player) userDataB, (BaseAICharacter<?>) userDataA);
         }
         // Handle player and water collisions
         else if (userDataA instanceof Player && userDataB instanceof WaterEffect) {
@@ -62,16 +60,11 @@ public class WorldContactListener implements ContactListener {
         }
         // Handle player and friend interactions
         else if (userDataA instanceof Player && userDataB instanceof BaseFriendAICharacter) {
-            handleFriendInteraction((Player) userDataA, (BaseFriendAICharacter) userDataB);
+            handleFriendInteraction((Player) userDataA, (BaseFriendAICharacter<?>) userDataB);
         } else if (userDataB instanceof Player && userDataA instanceof BaseFriendAICharacter) {
-            handleFriendInteraction((Player) userDataB, (BaseFriendAICharacter) userDataA);
+            handleFriendInteraction((Player) userDataB, (BaseFriendAICharacter<?>) userDataA);
         }
-        // Handle player collecting apples
-        else if (userDataA instanceof Player && userDataB instanceof Apple) {
-            ((Apple) userDataB).onPlayerCollision((Player) userDataA);
-        } else if (userDataB instanceof Player && userDataA instanceof Apple) {
-            ((Apple) userDataA).onPlayerCollision((Player) userDataB);
-        }
+
         // Handle cat reaching goal
         else if (userDataA instanceof Goal && userDataB instanceof CatCharacter) {
             handleGoalCollision((Goal) userDataA, (CatCharacter) userDataB);
@@ -86,22 +79,22 @@ public class WorldContactListener implements ContactListener {
         }
         // Check if enemy touches the ground
         if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-            ((BaseAICharacter) userDataA).increaseGroundedCount();
+            ((BaseAICharacter<?>) userDataA).increaseGroundedCount();
         } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-            ((BaseAICharacter) userDataB).increaseGroundedCount();
+            ((BaseAICharacter<?>) userDataB).increaseGroundedCount();
         }
         // Handle collision with the destroy zone
         if ("destroy".equals(userDataA)) {
             if (userDataB instanceof Player) {
                 ((Player) userDataB).die();
             } else if (userDataB instanceof BaseAICharacter) {
-                ((BaseAICharacter) userDataB).onDie();
+                ((BaseAICharacter<?>) userDataB).onDie();
             }
         } else if ("destroy".equals(userDataB)) {
             if (userDataA instanceof Player) {
                 ((Player) userDataA).die();
             } else if (userDataA instanceof BaseAICharacter) {
-                ((BaseAICharacter) userDataA).onDie();
+                ((BaseAICharacter<?>) userDataA).onDie();
             }
         }
 
@@ -137,9 +130,9 @@ public class WorldContactListener implements ContactListener {
         }
         // Check if enemy leaves the ground
         if (userDataA instanceof BaseAICharacter && fixtureB.getFilterData().categoryBits == CATEGORY_GROUND) {
-            ((BaseAICharacter) userDataA).decreaseGroundedCount();
+            ((BaseAICharacter<?>) userDataA).decreaseGroundedCount();
         } else if (userDataB instanceof BaseAICharacter && fixtureA.getFilterData().categoryBits == CATEGORY_GROUND) {
-            ((BaseAICharacter) userDataB).decreaseGroundedCount();
+            ((BaseAICharacter<?>) userDataB).decreaseGroundedCount();
         }
 
         // --- Handle end of edge sensor collisions ---
@@ -178,7 +171,7 @@ public class WorldContactListener implements ContactListener {
     private void handleProjectileCollision(Projectile projectile, Object target) {
         if (target instanceof BaseAICharacter) {
             projectile.onCollision();
-            ((BaseAICharacter) target).onHit();
+            ((BaseAICharacter<?>) target).onHit();
         } else if (target instanceof Player) {
             projectile.onCollision();
             ((Player) target).onStartEnemyAttackCollision();
@@ -190,7 +183,7 @@ public class WorldContactListener implements ContactListener {
     private void handleProjectileUpCollision(ProjectileUp projectileUp, Object target) {
         if (target instanceof BaseAICharacter) {
             projectileUp.onCollision();
-            ((BaseAICharacter) target).onHit();
+            ((BaseAICharacter<?>) target).onHit();
         } else if (target instanceof Player) {
             projectileUp.onCollision();
             ((Player) target).onStartEnemyAttackCollision();
@@ -199,11 +192,11 @@ public class WorldContactListener implements ContactListener {
         }
     }
 
-    private void handleAttackCollision(Player player, BaseAICharacter enemy) {
+    private void handleAttackCollision(Player player, BaseAICharacter<?> enemy) {
         player.onStartEnemyAttackCollision();
     }
 
-    private void handleFriendInteraction(Player player, BaseFriendAICharacter friend) {
+    private void handleFriendInteraction(Player player, BaseFriendAICharacter<?> friend) {
         friend.activate(player);
         player.setFriendReference(friend);
     }
