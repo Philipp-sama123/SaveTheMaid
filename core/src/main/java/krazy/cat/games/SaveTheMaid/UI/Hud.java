@@ -33,13 +33,10 @@ public class Hud implements Disposable {
 
     private Integer worldTimer;
     private float timeCount;
-    private final Integer health;
 
     private final Label countdownLabel;
     private final Label timeLabel;
-    private final Label levelLabel;
-    private final Label worldLabel;
-    private final Label playerLabel;
+    private final Label healthLabel;
     private final Label scoreLabel;      // Displays the current score
     private final Label highScoreLabel;  // Displays the high score
 
@@ -63,15 +60,11 @@ public class Hud implements Disposable {
         this.viewport = viewport;
         this.worldTimer = 0;
         this.timeCount = 0;
-        this.health = 100; // Default health value
 
         // Set up stage and viewport
         stage = new Stage(viewport, game.batch);
 
         // Initialize the table layout
-        Table table = new Table();
-        table.top();
-        table.setFillParent(true);
 
         BitmapFont font = new BitmapFont();
         font.getData().setScale(0.5f);
@@ -79,9 +72,7 @@ public class Hud implements Disposable {
         // Labels
         countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(font, Color.WHITE));
         timeLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
-        levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
-        worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
-        playerLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
+        healthLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
         scoreLabel = new Label("Score: " + ScoreSystemManager.getInstance().getScore(), new Label.LabelStyle(font, Color.YELLOW));
         highScoreLabel = new Label("High Score: " + ScoreSystemManager.getInstance().getHighScore(), new Label.LabelStyle(font, Color.GREEN));
 
@@ -98,24 +89,28 @@ public class Hud implements Disposable {
         Stack healthStack = new Stack();
         healthStack.add(healthBar);
 
+        Table table = new Table();
+        table.top();
+        table.setFillParent(true);
         // Arrange UI elements in the table
         table.add(healthStack).expandX();
         table.add().expandX();
-        table.add(timeLabel).expandX();
+        table.add(ammoTextLabel).colspan(4).expandX();
         table.add(scoreLabel).expandX();
         table.row();
-        table.add(playerLabel).expandX();
+        table.add(healthLabel).expandX();
         table.add().expandX();
-        table.add(countdownLabel).expandX();
+        table.add(ammoCountsLabel).colspan(4).expandX();
         table.add(highScoreLabel).expandX();
         // NEW: Add rows for the ammo display under the high score
-        table.row();
-        table.add(ammoTextLabel).colspan(4).expandX().padTop(5);
-        table.row();
-        table.add(ammoCountsLabel).colspan(4).expandX().padTop(2);
-
         stage.addActor(table);
-
+        Table timeTable = new Table();
+        timeTable.bottom().right(); // Align the table to the bottom right
+        timeTable.setFillParent(true);
+        timeTable.add(timeLabel).right().padRight(10);
+        timeTable.row();
+        timeTable.add(countdownLabel).right().padRight(10);
+        stage.addActor(timeTable);
         // Initialize controls
         createMovementJoystick();
         createButtons();
