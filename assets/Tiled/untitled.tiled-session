@@ -48,18 +48,23 @@
                 7,
                 8
             ],
-            "scale": 1.0413,
-            "selectedLayer": 1,
+            "scale": 1.5497,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 303.46682032075296,
-                "y": 3027.465667915106
+                "x": 202.61986190875652,
+                "y": 3026.7148480351034
             }
         },
         "HellTiles32x32.tsx": {
-            "scaleInDock": 1.5354,
+            "scaleInDock": 0.8998,
+            "scaleInEditor": 1
+        },
+        "LargeStatue.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "LargeStatue2.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "Level_1.tmx": {
@@ -114,22 +119,25 @@
     "openFiles": [
         "Level_2.tmx",
         "Level_1.tmx",
-        "HellLevel.tmx"
+        "HellLevel.tmx",
+        "FireRed.tsx",
+        "lava-tileset.tsx",
+        "LargeStatue.tsx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
-        "LargeStatue2.tsx",
         "Level_2.tmx",
         "Level_1.tmx",
-        "HellLevel.tmx",
-        "water.tsx",
+        "LargeStatue.tsx",
         "lava-tileset.tsx",
+        "FireRed.tsx",
+        "HellLevel.tmx",
+        "LargeStatue2.tsx",
+        "water.tsx",
         "volcanoe_tiles.tsx",
         "Background_Full.tsx",
         "BackgroundFull.tsx",
-        "PlatformerAssets.tsx",
-        "MaidBathing.tsx",
-        "FireRed.tsx"
+        "PlatformerAssets.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

@@ -40,8 +40,12 @@ public class Hud implements Disposable {
     private final Label levelLabel;
     private final Label worldLabel;
     private final Label playerLabel;
-    private final Label scoreLabel; // NEW: Label to display the score
-    private final Label highScoreLabel; // NEW: Label for the high score
+    private final Label scoreLabel;      // Displays the current score
+    private final Label highScoreLabel;  // Displays the high score
+
+    // NEW: Ammo display labels
+    private final Label ammoTextLabel;   // Simply displays "Ammo"
+    private final Label ammoCountsLabel; // Displays: currentStandardAmmo / maxStandardAmmo   currentUpAmmo / maxUpAmmo
 
     private final Image healthBar;
     private ImageButton jumpButton;
@@ -53,7 +57,6 @@ public class Hud implements Disposable {
     private Touchpad movementJoystick;
 
     private boolean jumpPressed = false;
-
 
     public Hud(SaveTheMaidGame game, Viewport viewport) {
         this.game = game;
@@ -79,8 +82,12 @@ public class Hud implements Disposable {
         levelLabel = new Label("1/1", new Label.LabelStyle(font, Color.WHITE));
         worldLabel = new Label("WORLD", new Label.LabelStyle(font, Color.WHITE));
         playerLabel = new Label("HEALTH", new Label.LabelStyle(font, Color.WHITE));
-        scoreLabel = new Label("Score: " + ScoreSystemManager.getInstance().getScore(), new Label.LabelStyle(font, Color.YELLOW)); // Initial score display
-        highScoreLabel = new Label(("High Score: " + ScoreSystemManager.getInstance().getHighScore()), new Label.LabelStyle(font, Color.GREEN)); // Initial high score
+        scoreLabel = new Label("Score: " + ScoreSystemManager.getInstance().getScore(), new Label.LabelStyle(font, Color.YELLOW));
+        highScoreLabel = new Label("High Score: " + ScoreSystemManager.getInstance().getHighScore(), new Label.LabelStyle(font, Color.GREEN));
+
+        // NEW: Ammo text and counts labels
+        ammoTextLabel = new Label("Ammo", new Label.LabelStyle(font, Color.WHITE));
+        ammoCountsLabel = new Label("0 / 0   0 / 0", new Label.LabelStyle(font, Color.WHITE));
 
         // Health Bar
         Texture healthBarTexture = GameAssetManager.getInstance().get(AssetPaths.HEALTH_BAR_SIMPLE, Texture.class);
@@ -95,12 +102,17 @@ public class Hud implements Disposable {
         table.add(healthStack).expandX();
         table.add().expandX();
         table.add(timeLabel).expandX();
-        table.add(scoreLabel).expandX(); // Add score to the HUD
+        table.add(scoreLabel).expandX();
         table.row();
         table.add(playerLabel).expandX();
         table.add().expandX();
         table.add(countdownLabel).expandX();
-        table.add(highScoreLabel).expandX(); // Add high score to the HUD
+        table.add(highScoreLabel).expandX();
+        // NEW: Add rows for the ammo display under the high score
+        table.row();
+        table.add(ammoTextLabel).colspan(4).expandX().padTop(5);
+        table.row();
+        table.add(ammoCountsLabel).colspan(4).expandX().padTop(2);
 
         stage.addActor(table);
 
@@ -207,24 +219,24 @@ public class Hud implements Disposable {
         debugButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.getCurrentLevel().isShowBox2dDebug = !game.getCurrentLevel().isShowBox2dDebug; // Switch back to GameScreen
+                game.getCurrentLevel().isShowBox2dDebug = !game.getCurrentLevel().isShowBox2dDebug;
             }
         });
     }
 
     private void createMovementJoystick() {
-        // We still need to load the knob texture
+        // Load the knob texture
         Texture joystickKnob = new Texture(Gdx.files.internal("UiSprites/Joystick/MoveKnob.png"));
 
         // Create joystick style
         Touchpad.TouchpadStyle movementJoystickStyle = new Touchpad.TouchpadStyle();
 
-        // Remove the background by setting it to null
+        // Remove background by setting it to null
         movementJoystickStyle.background = null;
-        // Set the knob drawable as usual
+        // Set the knob drawable
         movementJoystickStyle.knob = new TextureRegionDrawable(new TextureRegion(joystickKnob));
 
-        // Adjust knob size relative to the desired scale
+        // Adjust knob size relative to desired scale
         TextureRegionDrawable knobDrawable = (TextureRegionDrawable) movementJoystickStyle.knob;
         float knobWidth = joystickKnob.getWidth() * 0.1f;
         float knobHeight = joystickKnob.getHeight() * 0.1f;
@@ -239,7 +251,7 @@ public class Hud implements Disposable {
         table.setFillParent(true);
         table.bottom().left();
 
-        // Set a fixed size for the touchpad (the size is still used for input bounds)
+        // Set a fixed size for the touchpad (used for input bounds)
         float joystickSize = 100; // adjust as needed
         table.add(movementJoystick).size(joystickSize, joystickSize);
         stage.addActor(table);
@@ -259,6 +271,16 @@ public class Hud implements Disposable {
             timeCount = 0;
         }
 
+        // Update ammo counts assuming the player class provides these methods.
+        // The ammoCountsLabel is updated to display:
+        // currentStandardAmmo / maxStandardAmmo   currentUpAmmo / maxUpAmmo
+        ammoCountsLabel.setText(
+            game.getCurrentLevel().getPlayer().getStandardAmmoCount() + " / "
+                + game.getCurrentLevel().getPlayer().getMaxStandardAmmoCount() + "   "
+                + game.getCurrentLevel().getPlayer().getUpAmmoCount() + " / "
+                + game.getCurrentLevel().getPlayer().getMaxUpAmmoCount()
+        );
+
         if (shootUpButton.isPressed()) {
             game.getCurrentLevel().getPlayer().shootUp();
         }
@@ -277,14 +299,14 @@ public class Hud implements Disposable {
         if (slideButton.isPressed()) {
             game.getCurrentLevel().getPlayer().slide();
         }
-        float joystickPercentX = movementJoystick.getKnobPercentX(); // Knob percentage movement on the X-axis
+        float joystickPercentX = movementJoystick.getKnobPercentX(); // X-axis movement
         game.getCurrentLevel().getPlayer().move(joystickPercentX);
         game.getCurrentLevel().getPlayer().crouch(movementJoystick.getKnobPercentY() < -0.75);
     }
 
     public void updateHealth(int currentHealth, int maxHealth) {
         currentHealth = Math.max(0, Math.min(currentHealth, maxHealth));
-        healthBar.setWidth(healthBar.getPrefWidth() * (float) currentHealth / maxHealth);
+        healthBar.setWidth(healthBar.getPrefWidth() * ((float) currentHealth / maxHealth));
     }
 
     @Override

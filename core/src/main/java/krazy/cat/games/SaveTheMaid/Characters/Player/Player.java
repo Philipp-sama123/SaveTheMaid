@@ -50,7 +50,7 @@ public class Player {
     private int currentHealth = maxHealth;
     private float deathTimer = 0f;
 
-    // Movement/State flagsØ
+    // Movement/State flags
     private int jumpCount = 0;
     private int groundedCount = 0;
     private boolean isShooting = false;
@@ -64,9 +64,12 @@ public class Player {
     private AnimationType currentAnimationState = AnimationType.IDLE;
 
     private BaseFriendAICharacter friendAICharacter;
-    // Ammo
-    private int ammoCount = 0;
 
+    // --- Ammo Fields ---
+    private int standardAmmoCount = 100;
+    private int maxStandardAmmoCount = 100;
+    private int upAmmoCount = 25;
+    private int maxUpAmmoCount = 25;
 
     // --- Constructors ---
     public Player(World world) {
@@ -177,16 +180,20 @@ public class Player {
         }
     }
 
+    // --- Modified Shooting Methods with Ammo Checks ---
     public void shootUp() {
         if (isGrounded() && !isShootingUp && !isShooting && !isSliding) {
             isShootingUp = true;
             stateTime = 0f;
-
-            projectileManager.addShootUpProjectile(body);
-            playerSoundManager.playShootSound();
+            if (upAmmoCount > 0) {
+                upAmmoCount--;
+                projectileManager.addShootUpProjectile(body);
+                playerSoundManager.playShootSound();
+            } else {
+                // Optionally play an empty ammo sound or simply do nothing.
+            }
         }
     }
-
 
     public void shoot() {
         if (!isShooting && !isShootingUp) {
@@ -197,8 +204,13 @@ public class Player {
                 currentAnimationState = AnimationType.SLIDE_SHOOT;
             }
 
-            playerSoundManager.playShootSound();
-            projectileManager.addShootProjectile(body, isFacingRight, isCrouching, isSliding);
+            if (standardAmmoCount > 0) {
+                standardAmmoCount--;
+                playerSoundManager.playShootSound();
+                projectileManager.addShootProjectile(body, isFacingRight, isCrouching, isSliding);
+            } else {
+                // Optionally play an empty ammo sound or do nothing.
+            }
         }
     }
 
@@ -403,12 +415,14 @@ public class Player {
     public int getMaxHealth() {
         return maxHealth;
     }
-    public int getAmmoCount() {
-        return ammoCount;
+
+    // --- Ammo Management ---
+    public int getStandardAmmoCount() {
+        return standardAmmoCount;
     }
 
-    public void addAmmo(int amount) {
-        ammoCount += amount;
+    public int getUpAmmoCount() {
+        return upAmmoCount;
     }
 
     public void heal(int amount) {
@@ -416,12 +430,33 @@ public class Player {
         currentHealth = Math.min(currentHealth + amount, maxHealth);
     }
 
+    public void addStandardAmmo(int amount) {
+        if (standardAmmoCount < maxStandardAmmoCount)
+            standardAmmoCount += amount;
+    }
+
+    public void addUpAmmo(int amount) {
+        if (maxUpAmmoCount < upAmmoCount)
+            upAmmoCount += amount;
+    }
+
+    // --- Pickup Handling ---
     public void pickup(PickupObject pickup) {
         if (pickup.getType() == PickupObject.PickupType.LIFE) {
             heal(20); // For example, heal the player by 20 points
         } else if (pickup.getType() == PickupObject.PickupType.AMMO) {
-            addAmmo(5); // For example, add 5 units of ammunition
+            // Adjust ammo amounts as desired; here we add ammo to both types.
+            addStandardAmmo(5);
+            addUpAmmo(3);
         }
         pickup.collect();
+    }
+
+    public int getMaxStandardAmmoCount() {
+        return maxStandardAmmoCount;
+    }
+
+    public int getMaxUpAmmoCount() {
+        return maxUpAmmoCount;
     }
 }

@@ -34,8 +34,10 @@ import krazy.cat.games.SaveTheMaid.UI.Hud;
 import krazy.cat.games.SaveTheMaid.WorldContactListener;
 
 public abstract class BaseLevel implements Screen {
-    private static float ZOOM_FACTOR = .8f;
-    private float feetOffset = 75 / PPM;
+    private static final double PICKUP_SPAWN_PROBABILITY = 0.1;
+    private static final float ZOOM_FACTOR = .8f;
+    private final float PLAYER_FEET_OFFSET = 75 / PPM;
+
     protected final SaveTheMaidGame game;
     protected final OrthographicCamera gameCamera;
     protected final Viewport gameViewport;
@@ -48,11 +50,11 @@ public abstract class BaseLevel implements Screen {
     protected final World world;
     protected final Box2DDebugRenderer box2DDebugRenderer;
 
-    protected final Array<BaseAICharacter> enemies = new Array<>();
-    protected final Array<BaseFriendAICharacter> friends = new Array<>();
-    protected final Array<EnemySpawnPoint> spawnPoints = new Array<>();
-    protected Array<PickupObject> pickups = new Array<>();
-    private Array<PickupSpawnRequest> pendingPickupSpawnRequests = new Array<>();
+    private final Array<BaseAICharacter> enemies = new Array<>();
+    private final Array<BaseFriendAICharacter> friends = new Array<>();
+    private final Array<EnemySpawnPoint> spawnPoints = new Array<>();
+    private final Array<PickupObject> pickups = new Array<>();
+    private final Array<PickupSpawnRequest> pendingPickupSpawnRequests = new Array<>();
 
     protected Player player;
 
@@ -186,7 +188,7 @@ public abstract class BaseLevel implements Screen {
     private void updateCamera() {
         float cameraX = Math.max(gameCamera.viewportWidth / 2,
             Math.min(player.getBody().getPosition().x, mapWidthInPixels / PPM - gameCamera.viewportWidth / 2));
-        float playerFeetY = player.getBody().getPosition().y - feetOffset;
+        float playerFeetY = player.getBody().getPosition().y - PLAYER_FEET_OFFSET;
         float targetCameraY = playerFeetY + gameCamera.viewportHeight / 2;
         // Clamp the camera Y to the map boundaries.
         float cameraY = Math.max(gameCamera.viewportHeight / 2,
@@ -276,9 +278,12 @@ public abstract class BaseLevel implements Screen {
     }
 
     public void requestPickupSpawn(Vector2 position) {
-        PickupObject.PickupType type = (Math.random() < 0.5)
-            ? PickupObject.PickupType.LIFE
-            : PickupObject.PickupType.AMMO;
-        pendingPickupSpawnRequests.add(new PickupSpawnRequest(position, type));
+        if (Math.random() < PICKUP_SPAWN_PROBABILITY) { // 10% chance to spawn a pickup
+            PickupObject.PickupType type = (Math.random() < 0.5)
+                ? PickupObject.PickupType.LIFE
+                : PickupObject.PickupType.AMMO;
+            pendingPickupSpawnRequests.add(new PickupSpawnRequest(position, type));
+        }
     }
+
 }
